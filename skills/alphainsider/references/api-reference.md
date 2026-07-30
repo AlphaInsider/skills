@@ -1,6 +1,6 @@
 # AlphaInsider API Reference
 
-Source material: AlphaInsider `llms.txt`, OpenAPI, AsyncAPI, and limits documentation.
+Source material: AlphaInsider `llms.txt`, focused Markdown pages, OpenAPI, AsyncAPI, agent guides, and limits documentation. For current REST schemas use `https://api.alphainsider.com/openapi.yaml`; for current WebSocket schemas use `https://api.alphainsider.com/asyncapi.yaml`.
 
 ## Base URLs
 
@@ -32,6 +32,8 @@ Successful REST responses use `{ "success": true, "response": <data> }`. Failed 
 ## Display Values
 
 Read `input-multiplier.md` before displaying strategy values, positions, orders, trades, or performance to users. AlphaInsider returns normalized strategy values; user-facing USD or share/crypto amounts require `input_multiplier`.
+
+Bot broker values and `getMaxOrderSize` limits are already user-facing; do not apply `input_multiplier` to them. Webhook signal actions and percentage allocations also do not use multiplier math.
 
 ## Endpoint Groups
 

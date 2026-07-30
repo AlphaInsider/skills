@@ -14,7 +14,7 @@ Inputs:
 
 | Location | Name | Required | Type / values | Description |
 | --- | --- | --- | --- | --- |
-| query | `stock_id[]` | Yes | array of string | One or more stock IDs. Use an internal ID or `SYMBOL:EXCHANGE`. |
+| query | `stock_id[]` | Yes | array of string (max 100) | One or more stock IDs. Use an internal ID or `SYMBOL:EXCHANGE`. |
 
 Outputs:
 

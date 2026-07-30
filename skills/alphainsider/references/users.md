@@ -14,7 +14,7 @@ Inputs:
 
 | Location | Name | Required | Type / values | Description |
 | --- | --- | --- | --- | --- |
-| query | `user_id[]` | Yes | array of string | Array of user IDs. |
+| query | `user_id[]` | Yes | array of string (max 100) | Array of user IDs. |
 
 Outputs:
 

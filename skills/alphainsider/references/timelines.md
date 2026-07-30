@@ -19,7 +19,7 @@ Inputs:
 | Location | Name | Required | Type / values | Description |
 | --- | --- | --- | --- | --- |
 | header | `Authorization` | No | string (JWT) | AlphaInsider API token sent exactly as the header value; do not prepend `Bearer`. |
-| query | `timeline_id[]` | Yes | array of string | One or more timeline event IDs. Repeat this query parameter for multiple timelines. |
+| query | `timeline_id[]` | Yes | array of string (max 100) | One or more timeline event IDs. Repeat this query parameter for multiple timelines. |
 
 Outputs:
 
@@ -75,7 +75,7 @@ Inputs:
 | Location | Name | Required | Type / values | Description |
 | --- | --- | --- | --- | --- |
 | header | `Authorization` | No | string (JWT) | AlphaInsider API token sent exactly as the header value; do not prepend `Bearer`. |
-| query | `strategy_id[]` | Yes | array of string | One or more strategy IDs. Repeat this query parameter for multiple strategies. |
+| query | `strategy_id[]` | Yes | array of string (max 100) | One or more strategy IDs. Repeat this query parameter for multiple strategies. |
 | query | `type[]` | No | array of string | Array of timeline types to filter by. |
 | query | `is_notification` | No | boolean | If true, only show timelines you receive notifications from. |
 | query | `start_date` | No | string (date-time) | Start date. |

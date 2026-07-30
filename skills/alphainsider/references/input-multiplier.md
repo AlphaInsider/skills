@@ -23,9 +23,11 @@ AlphaInsider strategy fields such as `strategy_value`, position `amount`, positi
 user_value = normalized_strategy_value * input_multiplier
 ```
 
-Each strategy/subscription can have its own multiplier. Strategy owners always have an owner `input_multiplier`; subscribers/non-owners may need a saved or calculated multiplier for their own display context. Do not reuse a multiplier across strategies, subscribers, or calculation dates. API numeric values commonly arrive as strings; parse them before doing math.
+Each strategy/subscription can have its own multiplier. Strategy owners always have an owner `input_multiplier`; subscribers/non-owners may need a saved or calculated multiplier for their own display context. Do not reuse a multiplier across strategies, subscribers, or calculation dates. API numeric values commonly arrive as strings; parse them before doing math and preserve precision when sending normalized order values.
 
 Prices are already market prices. Do not multiply or divide `price`, `bid`, `ask`, `last`, `stop_price`, slippage, fees, allocation percentages, or raw API responses unless this reference explicitly says to derive a display value.
+
+Bot broker values and `getMaxOrderSize` limits are already user-facing. Do not apply `input_multiplier` to bot portfolio values, broker cash or positions, or max-order-size results. `newOrderWebhook` signal actions and `newOrderAllocations` target percentages also require no multiplier math.
 
 ## Owner Vs Subscriber Context
 
@@ -74,6 +76,12 @@ Current displayed strategy value:
 display_value = strategy_value * input_multiplier
 ```
 
+For a subscriber/non-owner without a multiplier, display the portfolio as a percentage of the normalized starting value:
+
+```text
+portfolio_percent = strategy_value * 100
+```
+
 Performance charts use a baseline value. If the performance series includes the saved `input_date`, use the calculation's `strategy_value` at that date as the baseline for calculated user display. Otherwise use the first strategy value in the selected performance window.
 
 Owners always display strategy performance with `input_multiplier`. Subscribers display dollar gain/loss when they have a saved or calculated multiplier:
@@ -120,6 +128,13 @@ Displayed market value can preserve the sign for exposure, or use absolute value
 ```text
 position_market_value = amount * current_price * input_multiplier
 liability_market_value = abs(amount) * ask * input_multiplier
+```
+
+For cash, use a price of `1`:
+
+```text
+display_cash = amount * input_multiplier
+cash_percent = (amount / strategy_value) * 100
 ```
 
 Position gain/loss amount uses normalized position value converted to user scale. Treat `avg_price` as the entry price when a client or integration names it that way; the REST position payload uses `price`.
@@ -171,3 +186,5 @@ Send exactly one of `amount` or `total` to `newOrder`. Keep `price` and `stop_pr
 For owner-managed trades, do not place a user-denominated `newOrder` until the owner multiplier is available. For subscribers/non-owners without a multiplier, do not convert user USD or user share/crypto quantities into `newOrder`; ask the user to set a calculation, or require the user to explicitly provide normalized strategy units.
 
 `newOrderAllocations` uses target percentages and does not use `input_multiplier`.
+
+`newOrderWebhook` uses signal-style actions and does not use `input_multiplier`. By default an alert goes fully in or out at `leverage`; `pyramiding` steps exposure by `leverage / pyramiding` for each same-direction alert.

@@ -118,7 +118,7 @@ python scripts/alphainsider_request.py GET /getOrders
 
 Get max order size. Be sure to leave room for slippage and fee when calculating max buying/selling power.
 
-Note: Use this before large trades because it factors available buying/selling power, slippage, and fees.
+Note: Use this before large, leveraged, or otherwise user-risky fixed orders because it factors available buying/selling power, slippage, and fees. The returned limits are user-facing; do not apply `input_multiplier` to them.
 
 Inputs:
 
@@ -152,7 +152,7 @@ python scripts/alphainsider_request.py GET /getMaxOrderSize \
 
 ## newOrder - POST `/newOrder`
 
-Create a new open order. Must pass `amount` or `total` not both. For TradingView or webhook integrations with percentage based order actions, see [newOrderWebhook](/resources/webhooks/neworderwebhook) or [newOrderAllocations](/resources/trades/newOrderAllocations) api endpoint.
+Create a new open order. Must pass `amount` or `total` not both. For TradingView or webhook integrations with percentage based order actions, see [newOrderWebhook](https://api.alphainsider.com/resources/webhooks/neworderwebhook) or [newOrderAllocations](https://api.alphainsider.com/resources/trades/neworderallocations).
 
 Note: Send exactly one of `amount` or `total`. Owner-managed trades must resolve the owner `input_multiplier` before converting user-entered quantities. If the user entered share/crypto or USD quantity, divide by `input_multiplier` before sending `newOrder.amount` or `newOrder.total`; see `input-multiplier.md`. Subscriber/non-owner missing-multiplier fallback is display-only unless the user explicitly provides normalized strategy units. Use `newOrderAllocations` for percentage allocation rebalances.
 
@@ -218,7 +218,7 @@ python scripts/alphainsider_request.py POST /newOrder \
 
 Create new orders based on percentage allocations.
 
-Note: Creates market orders to move a strategy toward target percentage allocations.
+Note: Creates market orders to move a strategy toward target percentage allocations. Do not send `order_dependencies` in this request. Allocation-generated increase orders may depend on reduce orders, so inspect each returned `order_dependencies` array before assuming the order can execute immediately.
 
 Inputs:
 
@@ -229,8 +229,8 @@ Inputs:
 | body | `allocations` | Yes | array of object | An array of positions the strategy should be allocated to. |
 | body | `allocations[].stock_id` | No | string | Stock ID. `"stock:exchange"` or `"stock_id"` |
 | body | `allocations[].action` | No | string: `buy`, `long`, `sell`, `short`, `close`, `flat` | Order actions. Action "buy" is the same as "long", "sell" is the same as "short", "close" is the same as "flat". When using "close" or "flat", the percent is set to 0—ignoring any percent passed. |
-| body | `allocations[].percent` | No | number (0..2) | The final position size, expressed as a positive decimal fraction of your equity (e.g., TSLA long 1.5 for a 150% long position in TSLA). Values must be positive decimals ranging from 0 to 2, with the sum of all allocations not exceeding the maximum leverage of 2 (or 200%). |
-| body | `slippage` | No | number (0..2; default `0.002`) | Slippage represents the percentage offset from the current bid/ask price when placing a limit order. This adjustment helps ensure that orders are more likely to fill by accounting for potential price movements. **Please note that the allocations may not sum precisely to 100%.** The following calculation illustrates our approach to determining a conservative buffer for potential fees and slippage: * `MaxOrderTotal = BuyingPower * 2` This calculates the maximum possible order total, representing a full position reversal (e.g., from maximum long to maximum short, or vice versa). * `ConservativeFeeTotal = MaxOrderTotal * (fee * 2)` This accounts for the buying power reduction due to fees, as fees are deducted from collateral. (Stock Fees: 0%, Crypto Fees: 0.25%). * `ConservativeSlippageTotal = MaxOrderTotal * Slippage` This reserves funds for the worst-case scenario of order fills impacted by slippage. * `FinalBuyingPower = BuyingPower - ConservativeFeeTotal - ConservativeSlippageTotal` The adjusted buying power after these reductions. |
+| body | `allocations[].percent` | No | number (0..2; increments of `0.0001`) | The final position size, expressed as a positive decimal fraction of your equity (e.g., TSLA long 1.5 for a 150% long position in TSLA). Values must be positive decimals ranging from 0 to 2, with the sum of all allocations not exceeding the maximum leverage of 2 (or 200%). |
+| body | `slippage` | No | number (0..2; increments of `0.001`; default `0.002`) | Slippage represents the percentage offset from the current bid/ask price when placing a limit order. This adjustment helps ensure that orders are more likely to fill by accounting for potential price movements. **Please note that the allocations may not sum precisely to 100%.** The following calculation illustrates our approach to determining a conservative buffer for potential fees and slippage: * `MaxOrderTotal = BuyingPower * 2` This calculates the maximum possible order total, representing a full position reversal (e.g., from maximum long to maximum short, or vice versa). * `ConservativeFeeTotal = MaxOrderTotal * (fee * 2)` This accounts for the buying power reduction due to fees, as fees are deducted from collateral. (Stock Fees: 0%, Crypto Fees: 0.25%). * `ConservativeSlippageTotal = MaxOrderTotal * Slippage` This reserves funds for the worst-case scenario of order fills impacted by slippage. * `FinalBuyingPower = BuyingPower - ConservativeFeeTotal - ConservativeSlippageTotal` The adjusted buying power after these reductions. |
 
 Outputs:
 

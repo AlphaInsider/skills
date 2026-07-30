@@ -195,12 +195,21 @@ def print_dry_run(method: str, url: str, headers: dict[str, str], body: object) 
     safe_headers = dict(headers)
     if "Authorization" in safe_headers:
         safe_headers["Authorization"] = "<redacted>"
-    if isinstance(body, dict):
-        body = dict(body)
-        for field in ("token", "api_token"):
-            if field in body:
-                body[field] = "<redacted>"
-    print(json.dumps({"method": method, "url": url, "headers": safe_headers, "body": body}, indent=2))
+
+    def redact(value: object) -> object:
+        if isinstance(value, dict):
+            return {
+                key: "<redacted>"
+                if key in {"token", "api_token"} or key.endswith(("_key", "_secret"))
+                else redact(item)
+                for key, item in value.items()
+            }
+        if isinstance(value, list):
+            return [redact(item) for item in value]
+        return value
+
+    safe_body = redact(body)
+    print(json.dumps({"method": method, "url": url, "headers": safe_headers, "body": safe_body}, indent=2))
 
 
 def main() -> int:

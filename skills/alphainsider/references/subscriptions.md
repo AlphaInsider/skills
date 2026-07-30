@@ -19,7 +19,7 @@ Inputs:
 | Location | Name | Required | Type / values | Description |
 | --- | --- | --- | --- | --- |
 | header | `Authorization` | Yes | string (JWT) | AlphaInsider API token sent exactly as the header value; do not prepend `Bearer`. |
-| query | `strategy_id[]` | No | array of string | One or more strategy IDs. Repeat this query parameter for multiple strategies. |
+| query | `strategy_id[]` | No | array of string (max 100) | One or more strategy IDs. Repeat this query parameter for multiple strategies. |
 
 Outputs:
 

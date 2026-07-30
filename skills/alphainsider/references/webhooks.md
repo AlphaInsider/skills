@@ -8,9 +8,9 @@ TradingView-style webhook order signals.
 
 ## newOrderWebhook - POST `/newOrderWebhook`
 
-New order from webhook. [Tutorial setup](https://alphainsider.com/resources#trading-view). Note, you can only go fully in or out of a position.
+New order from webhook. [Tutorial setup](https://alphainsider.com/resources#trading-view). By default, each alert goes fully in or out of the position at `leverage`; set `pyramiding` to scale into a position over multiple same-direction alerts.
 
-Note: This endpoint sends the token in the JSON body as `api_token`; do not send an `Authorization` header. Webhook signals can only go fully in or out of a position.
+Note: This endpoint sends the token in the JSON body as `api_token`; do not send an `Authorization` header. Webhook signal actions do not use `input_multiplier` math.
 
 Inputs:
 
@@ -19,7 +19,9 @@ Inputs:
 | body | `strategy_id` | Yes | string | Strategy ID. |
 | body | `stock_id` | Yes | string | Stock ID. `"stock:exchange"` or `"stock_id"` |
 | body | `action` | Yes | string: `buy`, `long`, `sell`, `short`, `close`, `flat` | Order actions. Action "buy" is the same as "long", "sell" is the same as "short", "close" is the same as "flat". It is recommended for TradingView webhooks to use the **{{strategy.market_position}}** to get all strategy actions. [See TradingView strategy alert guide for full list of automated actions](https://www.tradingview.com/support/solutions/43000481368-strategy-alerts/). |
-| body | `leverage` | No | number (0..2; default `1`) | Leverage to trade at. Defaults to 1 if not set. |
+| body | `leverage` | No | number (0..2; increments of `0.01`; default `1`) | Leverage to trade at. Defaults to 1 if not set. |
+| body | `pyramiding` | No | integer (1..100) | Number of same-direction alerts needed to reach full `leverage`. Each alert steps exposure by `leverage / pyramiding`; further same-direction alerts rebalance at full leverage. An opposite signal starts at the first step on the new side. Ignored by `close`/`flat`, which liquidates the strategy. If omitted, each alert goes fully in or out. |
+| body | `slippage` | No | number (0..0.05; increments of `0.001`; default `0.002`) | Offset from the current bid/ask used for the limit order to improve fill probability. |
 | body | `api_token` | Yes | string (JWT) | AlphaInsider API token used by webhook calls in the request body. |
 
 Outputs:
@@ -60,5 +62,5 @@ Example:
 
 ```bash
 python scripts/alphainsider_request.py POST /newOrderWebhook \
-  --json '{"stock_id":"SPY:ARCX","action":"buy","leverage":1}'
+  --json '{"stock_id":"SPY:ARCX","action":"buy","leverage":1,"pyramiding":5,"slippage":0.002}'
 ```

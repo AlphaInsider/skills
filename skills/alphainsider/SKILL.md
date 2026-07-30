@@ -1,6 +1,6 @@
 ---
 name: alphainsider
-description: Build, debug, or document integrations with the AlphaInsider trading API, including strategies, subscriptions, orders, positions, allocation rebalancing, bots, webhooks, market data, timelines, billing, withdrawals, and WebSocket streams. Use when Codex needs AlphaInsider endpoint behavior, request examples, authentication rules, helper-managed defaults, the request helper, or reusable REST and WebSocket clients.
+description: Build, debug, or document integrations with the AlphaInsider trading API, including strategies, subscriptions, normalized trading calculations, orders, positions, allocation rebalancing, bots, broker keys, webhooks, market data, timelines, billing, withdrawals, and WebSocket streams. Use when Codex needs AlphaInsider endpoint behavior, request examples, authentication rules, helper-managed defaults, the request helper, or reusable REST and WebSocket clients.
 ---
 
 # AlphaInsider API
@@ -9,14 +9,18 @@ Use this skill when working with AlphaInsider REST or WebSocket integrations.
 
 - REST base URL: `https://alphainsider.com/api`
 - WebSocket URL: `wss://alphainsider.com/ws`
-- Source docs used for this skill: `https://api.alphainsider.com/llms.txt`, `https://api.alphainsider.com/openapi.yaml`, and `https://api.alphainsider.com/asyncapi.yaml`
+- Hosted docs: `https://api.alphainsider.com`
+- Docs index: `https://api.alphainsider.com/llms.txt`; full-corpus fallback: `https://api.alphainsider.com/llms-full.txt`
+- REST source of truth: `https://api.alphainsider.com/openapi.yaml`
+- WebSocket source of truth: `https://api.alphainsider.com/asyncapi.yaml`
 
 ## Core Workflow
 
 1. Identify the API area and read the matching file in `references/`.
-2. For authenticated REST calls, use `scripts/alphainsider_request.py`; do not manually read or inject credentials.
-3. Let the helper add the authorization token and any helper-managed default IDs.
-4. Check `success` before using `response`; errors use `{ "success": false, "response": "<message>" }`.
+2. When current behavior or an unlisted detail matters, use `llms.txt` to find the focused Markdown page, then verify REST details in OpenAPI or WebSocket details in AsyncAPI. Use `llms-full.txt` only as a fallback.
+3. For authenticated REST calls, use `scripts/alphainsider_request.py`; do not manually read or inject credentials.
+4. Let the helper add the authorization token and any helper-managed default IDs.
+5. Check `success` before using `response`; errors use `{ "success": false, "response": "<message>" }`.
 
 For a standalone Python integration, reuse `scripts/runtime/`. Its REST and
 WebSocket clients are the canonical runtime source for `$strategy-creator`;
@@ -27,8 +31,9 @@ do not duplicate them in another skill.
 - `ALPHAINSIDER_API_KEY` is a private AlphaInsider credential. Agents must never inspect, print, request, echo, or inline its value.
 - Do not run commands intended to reveal the token, such as `env`, `printenv ALPHAINSIDER_API_KEY`, or opening `.env` for credential lookup.
 - Do not manually populate `Authorization`, `token`, or `api_token` fields from environment variables or `.env`.
-- Use `scripts/alphainsider_request.py` for authenticated REST calls. The helper may read `ALPHAINSIDER_API_KEY`, `ALPHAINSIDER_STRATEGY_ID`, and `ALPHAINSIDER_BOT_ID` from the process environment or `.env` in the invoking directory, inject auth safely, and redact token fields in dry-run output.
+- Use `scripts/alphainsider_request.py` for authenticated REST calls. The helper may read `ALPHAINSIDER_API_KEY`, `ALPHAINSIDER_STRATEGY_ID`, and `ALPHAINSIDER_BOT_ID` from the process environment or `.env` in the invoking directory, inject auth safely, and redact token and broker-credential fields in dry-run output.
 - `ALPHAINSIDER_STRATEGY_ID` and `ALPHAINSIDER_BOT_ID` are helper-managed defaults, not secrets like the API key. A user may still provide explicit `strategy_id` or `bot_id` values in a request.
+- Broker keys and secrets passed to `newBot` or `updateBotBrokerKeys` are private credentials. Never print, log, commit, quote, or summarize them; send only the fields required by the selected broker.
 
 If a required `strategy_id` or `bot_id` is not supplied by the user and the helper/API cannot resolve it from defaults, ask the user for that ID. Do not inspect `.env` to find it.
 
@@ -40,7 +45,9 @@ AlphaInsider strategy performance, position, order, and trade values are normali
 - If an owner flow appears to lack `input_multiplier`, refresh the strategy subscription/calculation context before displaying values or sizing orders.
 - Subscribers/non-owners use saved or calculated `input_multiplier` when available; if unavailable, label display values as percent derived from `strategy_value` or ask for `input_value` and `input_date`.
 - Never silently treat a missing `input_multiplier` as `1`.
-- API numeric values commonly arrive as strings; convert before math.
+- API numeric values commonly arrive as strings; convert before math and preserve precision when sending normalized order values.
+- `getMaxOrderSize` returns user-facing limits; do not apply `input_multiplier` to them. Use it before large, leveraged, or otherwise risky fixed orders.
+- `newOrderWebhook` uses signal-style actions and no `input_multiplier` math. Alerts go fully in or out by default; `pyramiding` enables stepped entries.
 - Open order responses from `getOrders`, `newOrder`, `newOrderAllocations`, `newOrderWebhook`, and `wsOrders` include `order_dependencies` as an array of prerequisite order IDs; `[]` means there are no outstanding prerequisites.
 
 ## Request Helper
@@ -71,7 +78,7 @@ The helper owns credential/default lookup. Do not read these values directly fro
 - Use `references/withdrawals.md` for balances, payouts, payout fees, income, and Stripe account links.
 - Use `references/timelines.md` for posts, previews, likes, and timeline reads.
 - Use `references/stocks.md` for stock lookup, search, price history, and exchange status.
-- Use `references/trades.md` for positions, orders, max order size, fixed orders, allocation orders, and cancellations.
-- Use `references/webhooks.md` for TradingView-style webhook orders.
-- Use `references/bots.md` for bot lifecycle, broker keys, allocations, performance, and activities.
+- Use `references/trades.md` for positions, orders, user-facing max order size, fixed orders, allocation orders, and cancellations.
+- Use `references/webhooks.md` for TradingView-style webhook orders, stepped entries with `pyramiding`, and webhook slippage.
+- Use `references/bots.md` for bot lifecycle, private broker keys, full-replacement allocations, real broker values, performance, and activities.
 - Use `references/websockets.md` for real-time subscriptions and channel payloads.

@@ -19,8 +19,8 @@ Inputs:
 | Location | Name | Required | Type / values | Description |
 | --- | --- | --- | --- | --- |
 | header | `Authorization` | No | string (JWT) | AlphaInsider API token sent exactly as the header value; do not prepend `Bearer`. |
-| query | `strategy_id[]` | Yes | array of string | One or more strategy IDs. Repeat this query parameter for multiple strategies. |
-| query | `timeframe` | No | string: `day`, `week`, `month`, `year`, `five_year` | Gets strategy values based on timeframe. |
+| query | `strategy_id[]` | Yes | array of string (max 100) | One or more strategy IDs. Repeat this query parameter for multiple strategies. |
+| query | `timeframe` | No | string: `day`, `week`, `month`, `year`, `five_year` (default `month`) | Gets strategy values based on timeframe. |
 
 Outputs:
 
@@ -67,7 +67,7 @@ Inputs:
 | Location | Name | Required | Type / values | Description |
 | --- | --- | --- | --- | --- |
 | header | `Authorization` | No | string (JWT) | AlphaInsider API token sent exactly as the header value; do not prepend `Bearer`. |
-| query | `strategy_id[]` | Yes | array of string | One or more strategy IDs. Repeat this query parameter for multiple strategies. |
+| query | `strategy_id[]` | Yes | array of string (max 100) | One or more strategy IDs. Repeat this query parameter for multiple strategies. |
 
 Outputs:
 
@@ -94,7 +94,7 @@ Inputs:
 | --- | --- | --- | --- | --- |
 | header | `Authorization` | No | string (JWT) | AlphaInsider API token sent exactly as the header value; do not prepend `Bearer`. |
 | query | `user_id` | Yes | string | User ID. |
-| query | `timeframe` | No | string: `day`, `week`, `month`, `year`, `five_year` | Gets strategy values based on timeframe. |
+| query | `timeframe` | No | string: `day`, `week`, `month`, `year`, `five_year` (default `month`) | Gets strategy values based on timeframe. |
 
 Outputs:
 
@@ -144,7 +144,7 @@ Inputs:
 | header | `Authorization` | No | string (JWT) | AlphaInsider API token sent exactly as the header value; do not prepend `Bearer`. |
 | query | `strategy_id` | Yes | string | Strategy ID. |
 | query | `frequency` | No | number (default `1`) | The number of intervals per tick. |
-| query | `interval` | No | string: `hour`, `day`, `week` | The timeframe per tick. |
+| query | `interval` | No | string: `hour`, `day`, `week` (default `hour`) | The timeframe per tick. |
 | query | `start_date` | Yes | string (date-time) | Start date. |
 | query | `end_date` | No | string (date-time) | End date. |
 
@@ -177,8 +177,8 @@ Inputs:
 | Location | Name | Required | Type / values | Description |
 | --- | --- | --- | --- | --- |
 | header | `Authorization` | No | string (JWT) | AlphaInsider API token sent exactly as the header value; do not prepend `Bearer`. |
-| query | `strategy_id[]` | Yes | array of string | One or more strategy IDs. Repeat this query parameter for multiple strategies. |
-| query | `timeframe` | No | string: `day`, `week`, `month`, `year`, `five_year` | Gets strategy values based on timeframe. |
+| query | `strategy_id[]` | Yes | array of string (max 100) | One or more strategy IDs. Repeat this query parameter for multiple strategies. |
+| query | `timeframe` | No | string: `day`, `week`, `month`, `year`, `five_year` (default `month`) | Gets strategy values based on timeframe. |
 | query | `limit` | No | number | Number of results to return. |
 
 Outputs:
@@ -233,8 +233,8 @@ Inputs:
 | body | `categories.excludes` | No | array of string | Must ***exclude*** these categories. |
 | body | `max_drawdown` | No | number | Filter by max drawdown. |
 | body | `positions` | No | object | Filter by current stock positions. |
-| body | `positions.includes` | No | array of string | Must ***include*** these stock positions. `["stock:exchange"]` or `["stock_id"]` |
-| body | `positions.excludes` | No | array of string | Must ***exclude*** these stock positions. `["stock:exchange"]` or `["stock_id"]` |
+| body | `positions.includes` | No | array of string (max 100) | Must ***include*** these stock positions. `["stock:exchange"]` or `["stock_id"]` |
+| body | `positions.excludes` | No | array of string (max 100) | Must ***exclude*** these stock positions. `["stock:exchange"]` or `["stock_id"]` |
 | body | `sectors` | No | object | Filter by sector. |
 | body | `sectors.includes` | No | array of string | Must ***include*** these sectors. |
 | body | `sectors.excludes` | No | array of string | Must ***exclude*** these sectors. |
@@ -244,8 +244,8 @@ Inputs:
 | body | `price_max` | No | number | Filter by maximum price. |
 | body | `created_min` | No | string (date-time) | Filter by minimum strategy created date. |
 | body | `created_max` | No | string (date-time) | Filter by maximum strategy created date. Must be greater than or equal to created_min. |
-| body | `timeframe` | No | string: `day`, `week`, `month`, `year`, `five_year` | Gets strategy values based on timeframe. |
-| body | `sort` | No | string: `top`, `trending`, `performance`, `popular`, `newest` | Sort results by. |
+| body | `timeframe` | No | string: `day`, `week`, `month`, `year`, `five_year` (default `month`) | Gets strategy values based on timeframe. |
+| body | `sort` | No | string: `top`, `trending`, `performance`, `popular`, `newest` (default `top`) | Sort results by. |
 | body | `limit` | No | number | Number of results to return. |
 | body | `offset_id` | No | string | Offet by ID. Used for pagination. |
 

@@ -6,7 +6,17 @@ Credential boundary: Authentication fields below describe API wire format. Agent
 
 Bot lifecycle, broker keys, settings, notifications, performance, allocations, and activities.
 
-Supported bot brokers are `alpaca`, `binance`, `bitfinex`, and `hyperliquid`.
+Supported bot brokers are `alpaca`, `binance`, `bitfinex`, and `hyperliquid`. Broker keys are private credentials: never print, log, commit, quote, or summarize them, and send only the key fields required by the selected broker.
+
+Workflow rules:
+
+- Create the bot, set the complete desired allocation list, configure optional settings/notifications, then start it and confirm status. Use reset or delete operations only when the user explicitly requests them.
+- `updateBotAllocations` replaces the full allocation set; it is not a patch. Read current allocations before changing one entry, keep the sum at or below `1.0`, and leave any remainder as broker cash.
+- Bot leverage is separate from allocation percent. Do not use leverage to make allocation sums exceed `1.0`.
+- `getBotInfo.broker_details`, `getBotPerformance.response[].portfolio_value`, broker cash, and broker positions are real broker values. Never apply `input_multiplier` to them.
+- `getBotAllocations.response[].positions` contains normalized strategy positions. For high-level target exposure, multiply the real broker portfolio value by the allocation percent and let AlphaInsider compute broker orders.
+- Use `updateBotBrokerKeys` to rotate credentials or switch paper/live mode, and confirm `getBotInfo.response.broker_status` before starting or restarting. To change broker type, create a new bot.
+- Bot statuses include `on`, `scheduled_rebalance`, `rebalancing`, `scheduled_close`, `closing`, `stopping`, and `off`. Confirm status before assuming a lifecycle action completed.
 
 The request helper can supply a default bot ID for endpoints that accept `bot_id` when the user has not supplied an explicit ID.
 
@@ -19,7 +29,7 @@ Inputs:
 | Location | Name | Required | Type / values | Description |
 | --- | --- | --- | --- | --- |
 | header | `Authorization` | Yes | string (JWT) | AlphaInsider API token sent exactly as the header value; do not prepend `Bearer`. |
-| query | `bot_id[]` | No | array of string | One or more bot IDs. Repeat this query parameter for multiple bots. |
+| query | `bot_id[]` | No | array of string (max 100) | One or more bot IDs. Repeat this query parameter for multiple bots. |
 
 Outputs:
 
@@ -109,6 +119,8 @@ Inputs:
 | body | `broker_keys.binance_secret` | No | string | Binance secret. |
 | body | `broker_keys.alpaca_key` | No | string | Alpaca key. |
 | body | `broker_keys.alpaca_secret` | No | string | Alpaca secret. |
+| body | `broker_keys.hyperliquid_key` | No | string | Hyperliquid key. |
+| body | `broker_keys.hyperliquid_secret` | No | string | Hyperliquid secret. |
 
 Outputs:
 
@@ -148,8 +160,8 @@ Inputs:
 | --- | --- | --- | --- | --- |
 | header | `Authorization` | Yes | string (JWT) | AlphaInsider API token sent exactly as the header value; do not prepend `Bearer`. |
 | body | `bot_id` | Yes | string | Bot ID. |
-| body | `leverage` | No | number (2..50) | The maximum leverage strategies can use to place orders. |
-| body | `slippage` | No | number (0..0.05) | The maximum percent from current price orders can be filled. |
+| body | `leverage` | No | number (2..50; increments of `1`) | The maximum leverage strategies can use to place orders. |
+| body | `slippage` | No | number (0..0.05; increments of `0.001`) | The maximum percent from current price orders can be filled. |
 | body | `rebalance_on_start` | No | boolean | Rebalance on start. |
 | body | `close_on_stop` | No | boolean | Close on stop. |
 
@@ -199,6 +211,8 @@ Inputs:
 | body | `broker_keys.binance_secret` | No | string | Binance secret. |
 | body | `broker_keys.alpaca_key` | No | string | Alpaca key. |
 | body | `broker_keys.alpaca_secret` | No | string | Alpaca secret. |
+| body | `broker_keys.hyperliquid_key` | No | string | Hyperliquid key. |
+| body | `broker_keys.hyperliquid_secret` | No | string | Hyperliquid secret. |
 
 Outputs:
 
@@ -414,6 +428,8 @@ python scripts/alphainsider_request.py POST /resetBot
 
 Get bot performance data.
 
+Note: `portfolio_value` is a real broker value. Do not apply `input_multiplier`.
+
 Inputs:
 
 | Location | Name | Required | Type / values | Description |
@@ -421,7 +437,7 @@ Inputs:
 | header | `Authorization` | Yes | string (JWT) | AlphaInsider API token sent exactly as the header value; do not prepend `Bearer`. |
 | query | `bot_id` | Yes | string | Bot ID. |
 | query | `frequency` | No | number (default `1`) | The number of intervals per tick. |
-| query | `interval` | No | string: `hour`, `day`, `week` | The timeframe per tick. |
+| query | `interval` | No | string: `hour`, `day`, `week` (default `hour`) | The timeframe per tick. |
 | query | `start_date` | Yes | string (date-time) | Start date. |
 | query | `end_date` | No | string (date-time) | End date. |
 
@@ -477,7 +493,7 @@ Inputs:
 | Location | Name | Required | Type / values | Description |
 | --- | --- | --- | --- | --- |
 | header | `Authorization` | Yes | string (JWT) | AlphaInsider API token sent exactly as the header value; do not prepend `Bearer`. |
-| query | `bot_id[]` | Yes | array of string | One or more bot IDs. Repeat this query parameter for multiple bots. |
+| query | `bot_id[]` | Yes | array of string (max 100) | One or more bot IDs. Repeat this query parameter for multiple bots. |
 
 Outputs:
 
@@ -529,15 +545,17 @@ python scripts/alphainsider_request.py GET /getBotAllocations
 
 Update bot allocations.
 
+Note: This endpoint replaces the full allocation set. Submit every allocation that should remain, keep the sum at or below `1.0`, and treat the unallocated remainder as broker cash.
+
 Inputs:
 
 | Location | Name | Required | Type / values | Description |
 | --- | --- | --- | --- | --- |
 | header | `Authorization` | Yes | string (JWT) | AlphaInsider API token sent exactly as the header value; do not prepend `Bearer`. |
 | body | `bot_id` | Yes | string | Bot ID. |
-| body | `allocations` | Yes | array of object | Array of allocations. |
+| body | `allocations` | Yes | array of object (max 100) | Complete desired allocation list. This replaces the existing set. |
 | body | `allocations[].strategy_id` | Yes | string | Strategy ID. |
-| body | `allocations[].percent` | Yes | number (0..1) | Percent of portfolio in this strategy. |
+| body | `allocations[].percent` | Yes | number (0..1; increments of `0.0001`) | Fraction of the broker portfolio assigned to this strategy. Keep the allocation sum at or below `1.0`. |
 
 Outputs:
 
@@ -596,7 +614,7 @@ Inputs:
 | --- | --- | --- | --- | --- |
 | header | `Authorization` | Yes | string (JWT) | AlphaInsider API token sent exactly as the header value; do not prepend `Bearer`. |
 | query | `bot_id` | Yes | string | Bot ID. |
-| query | `bot_activity_id[]` | No | array of string | Array of bot activity IDs. Leave empty to get all bot activities. |
+| query | `bot_activity_id[]` | No | array of string (max 100) | Array of bot activity IDs. Leave empty to get all bot activities. |
 | query | `type[]` | No | array of string | Array of activity types to filter by. |
 | query | `start_date` | No | string (date-time) | Start date. |
 | query | `end_date` | No | string (date-time) | End date. |
