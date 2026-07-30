@@ -1,0 +1,4 @@
+interface:
+  display_name: "AlphaInsider Strategy Creator"
+  short_description: "Design and build a paper-trading strategy"
+  default_prompt: "Use $strategy-creator to interview me and build an AlphaInsider strategy."

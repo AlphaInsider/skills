@@ -1,0 +1,4 @@
+interface:
+  display_name: "AlphaInsider"
+  short_description: "Build with the AlphaInsider trading API"
+  default_prompt: "Use $alphainsider to build an AlphaInsider API integration."

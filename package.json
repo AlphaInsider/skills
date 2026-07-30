@@ -1,0 +1,13 @@
+{
+  "name": "@alphainsider/skills",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Official AlphaInsider agent skills",
+  "scripts": {
+    "validate": "python3 scripts/validate_catalog.py",
+    "skills:list": "skills add . --list"
+  },
+  "devDependencies": {
+    "skills": "1.5.21"
+  }
+}
