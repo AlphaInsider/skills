@@ -48,8 +48,7 @@ After consent, create or refresh the reusable workspace machinery:
 - Generate `strategy/__init__.py`, `.env.example`, `pyproject.toml`,
   `AGENTS.md`, and `CONTEXT.md` directly in the target.
 - Merge required ignore entries without replacing unrelated `.gitignore`
-  content: `.env`, `.alphainsider/`, `docs/plan.md`, `strategy/`, `tests/`,
-  and `STRATEGY.md`.
+  content: `.env`, `.alphainsider/`, `docs/plan.md`, `strategy/`, and `tests/`.
 - Write `.alphainsider/manifest.json` with schema version `1`, the selected
   target, and the exact managed paths. Store checkpoints under
   `.alphainsider/state/`. Create `.alphainsider/backups/` and initialize
@@ -130,9 +129,11 @@ and do not simulate cash, fills, positions, fees, or slippage. Report signal
 counts, directional hit rate, forward returns, timestamped records, and
 unevaluable trailing signals. Support optional `--start` and `--end`.
 
-Finish by creating `STRATEGY.md` with purpose, signals, cadence, orders,
-schedule, risks, prerequisites, environment variables, installation, and the
-exact commands:
+Finish by creating or updating the workspace-root `README.md` with purpose,
+signals, cadence, orders, schedule, risks, prerequisites, environment
+variables, installation, and the exact commands. If `README.md` already
+exists, include it in the collision inventory, obtain explicit overwrite
+consent, and preserve unrelated content while updating the strategy guidance:
 
 ```bash
 python -m strategy run-once
@@ -149,5 +150,5 @@ durable trade-offs, and set `status: implemented`.
 ### Implemented
 
 For maintenance, keep `docs/plan.md`, `strategy/`, tests, `CONTEXT.md`, and
-`STRATEGY.md` synchronized. Re-read the selected provider reference and the
+`README.md` synchronized. Re-read the selected provider reference and the
 canonical AlphaInsider references before changing integration behavior.
