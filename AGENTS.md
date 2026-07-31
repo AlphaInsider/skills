@@ -11,6 +11,9 @@ This repository publishes reusable AlphaInsider agent skills from `skills/`.
   `references/` files.
 - Put deterministic reusable code in `scripts/`; never place credentials,
   `.env`, user plans, or generated strategies in this repository.
+- When a design decision changes data-provider behavior or CLI functionality,
+  update the affected skill's dependency declarations and generated-workspace
+  dependency guidance in the same change.
 - Preserve the AlphaInsider credential boundary: agents never inspect or print
   API keys or `.env` values.
 - Tests must not submit AlphaInsider paper orders. Network smoke tests are

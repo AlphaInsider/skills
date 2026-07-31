@@ -22,7 +22,10 @@ workspace must run without either installed skill.
 
 3. Ask which target directory to use, recommending the current directory.
    Treat the selected directory as the workspace root; never add a wrapper.
-4. Inspect the target without reading `.env`. Report every managed collision.
+4. Inspect the target without reading `.env`. Report every managed collision,
+   including both candidate provider clients (`strategy/clients/alpaca.py` and
+   `strategy/clients/coinbase.py`), even though only the selected provider's
+   file is ever written.
 5. If `.alphainsider/manifest.json` exists, ask whether to resume or replace.
 6. Obtain explicit consent before creating or overwriting any file. If consent
    is absent, make no changes.
@@ -42,23 +45,38 @@ After consent, create or refresh the reusable workspace machinery:
 - Copy AlphaInsider `scripts/runtime/client.py` and `stream.py` into
   `strategy/clients/` as `alphainsider.py` and `alphainsider_stream.py`;
   adjust the stream's relative client import.
-- Copy `scripts/market_data/alpaca.py` and `coinbase.py` from this skill into
-  `strategy/clients/`; adjust relative imports.
+- Copy only provider-neutral machinery here. The single market-data provider
+  client is copied in the Confirmed phase, after `docs/plan.md` records the
+  provider decision.
 - Copy this skill's `scripts/strategy_runtime/` into `strategy/runtime/`.
-- Generate `strategy/__init__.py`, `.env.example`, `pyproject.toml`,
-  `AGENTS.md`, and `CONTEXT.md` directly in the target.
-- Merge required ignore entries without replacing unrelated `.gitignore`
-  content: `.env`, `.alphainsider/`, `docs/plan.md`, `strategy/`, and `tests/`.
-- Write `.alphainsider/manifest.json` with schema version `1`, the selected
-  target, and the exact managed paths. Store checkpoints under
+- Generate `strategy/__init__.py`, `strategy/clients/__init__.py`,
+  `.env.example`, `pyproject.toml`, `AGENTS.md`, and `CONTEXT.md` directly in
+  the target. `.env.example` starts with exactly the provider-neutral
+  variables `ALPHAINSIDER_API_KEY=` and `ALPHAINSIDER_STRATEGY_ID=`; provider
+  variables are appended in the Confirmed phase.
+- Merge secret and local-artifact entries into `.gitignore` without replacing
+  unrelated content: `.env`, virtual environments, Python caches, test caches,
+  build output, and OS/IDE files. Never ignore `.alphainsider/`, `docs/`,
+  `strategy/`, `tests/`, `.env.example`, or another generated project file,
+  and never add a nested ignore file that excludes them.
+- Write `.alphainsider/manifest.json` with schema version `1`, target `.` so
+  the project remains portable, and the exact workspace-relative managed
+  paths, including `.gitignore`. Store checkpoints under
   `.alphainsider/state/`. Create `.alphainsider/backups/` and initialize
   `.alphainsider/state/checkpoint.json` to `{ "last_event_id": null }` for a
   fresh workspace. Write generated files through same-directory temporary
   files and atomic replacement; if generation fails, keep the prior files.
+  When the Confirmed phase copies the provider client, append its
+  workspace-relative path to the manifest under the same atomic-write rules.
 
-The generated project requires Python 3.11+ with `httpx`, `python-dotenv`,
-`alpaca-py`, and `websockets`; its dev dependencies are `pytest` and
-`pytest-asyncio`.
+Keep every tracked file portable: use workspace-relative paths and never write
+the user's home directory, the target's absolute path, credentials, or `.env`
+values into generated code, configuration, metadata, or documentation.
+
+The generated project requires Python 3.11+ with `httpx>=0.27`,
+`python-dotenv>=1.0`, and `websockets>=12`; its dev dependencies are
+`pytest>=8` and `pytest-asyncio>=0.23`. Provider clients must call documented
+REST and WebSocket protocols directly; never add an Alpaca or Coinbase SDK.
 
 ## Lifecycle
 
@@ -85,8 +103,16 @@ Cover at least:
 2. Provider symbols/product IDs and matching AlphaInsider `stock_id` values.
    Use the sibling skill's read-only `getStocks` workflow to snapshot each
    asset's `security`, `peg`, `fee`, `slippage`, and UTC retrieval time.
+   Reject any instrument whose `security` does not match the selected
+   provider's class — `stock` for Alpaca, `cryptocurrency` for Coinbase —
+   and resolve the mismatch before recording the universe.
 3. Deterministic or LLM signal logic, including holding or exit timing.
-4. Polling interval/timeframe or WebSocket channels.
+4. Polling endpoint/interval/timeframe or WebSocket channels. For Alpaca,
+   record feed, adjustment, `asof`, late-bar, halt, and reconnect behavior.
+   For Coinbase, record granularity, heartbeat, sequence-gap detection, and
+   state-resynchronization behavior. Batch all selected instruments and
+   channels onto one provider/feed connection by default; split connections
+   only for a documented provider limit or measured throughput need.
 5. Fixed normalized orders or allocation rebalancing and sizing.
 6. Position, stop, drawdown, kill-switch, and open-order constraints.
 7. Market-hours, continuous, or custom schedule.
@@ -112,11 +138,22 @@ Before implementation, read in full:
   `references/stocks.md`, `references/trades.md`, `references/webhooks.md`, and
   `references/websockets.md` as relevant.
 
+Then copy the selected provider's client — and only that one — from this
+skill's `scripts/market_data/alpaca.py` or `scripts/market_data/coinbase.py`
+into `strategy/clients/` under the same filename; the file is self-contained.
+Never copy, import, or reference the other provider's client anywhere in the
+workspace. Append the new path to `.alphainsider/manifest.json`. If a file
+already exists at that path, apply the resume rules: collision inventory and
+explicit consent. For Alpaca strategies, also append `ALPACA_KEY=`,
+`ALPACA_SECRET=`, and `ALPACA_FEED=iex` to `.env.example`; Coinbase strategies
+add no variables.
+
 Generate:
 
 - `strategy/decision.py`: pure decision logic with injected data and clients.
 - `strategy/loop.py`: reconcile → fetch → decide → submit paper orders.
-- `strategy/__main__.py`: `run-once` and `run` commands.
+- `strategy/__main__.py`: `run-once` and `run` commands; both validate the
+  AlphaInsider strategy type at startup.
 - `strategy/backtest.py`: only when the user accepted signal replay.
 - `tests/`: offline tests for clients, runtime, decisions, orchestration, and
   backtest accounting when selected.
@@ -124,6 +161,11 @@ Generate:
 Mandatory runtime behavior:
 
 - AlphaInsider is the only order destination and all orders are paper orders.
+- Before `run` or `run-once` starts its first decision cycle, call
+  `ensure_strategy_type(client, "stock")` in an Alpaca workspace or
+  `ensure_strategy_type(client, "cryptocurrency")` in a Coinbase workspace,
+  and refuse to run on `StrategyTypeMismatchError`. Backtests make no
+  AlphaInsider calls and never run this check.
 - Reconcile current positions and open orders before every decision.
 - Never assume a missing `input_multiplier` is `1`.
 - Use `EventCheckpoint` to reject duplicate market events across restarts.
@@ -158,8 +200,19 @@ orders. Network smoke tests are read-only and opt-in with
 update `CONTEXT.md`, add strategy-specific ADRs under `docs/adr/` only for
 durable trade-offs, and set `status: implemented`.
 
+Before handoff, verify the generated project is ready for version control. If
+the target is in a Git worktree, use `git check-ignore -v` and `git status` to
+confirm `.alphainsider/`, `docs/`, `strategy/`, `tests/`, `.env.example`,
+`pyproject.toml`, `README.md`, `AGENTS.md`, and `CONTEXT.md` are eligible to be
+committed. Only secrets and local/cache/build artifacts may remain ignored.
+Resolve target `.gitignore` conflicts within the granted consent and report
+any inherited or global ignore rule rather than editing files outside the
+selected workspace. Do not initialize Git, commit, configure a remote, or push
+unless the user separately asks.
+
 ### Implemented
 
-For maintenance, keep `docs/plan.md`, `strategy/`, tests, `CONTEXT.md`, and
-`README.md` synchronized. Re-read the selected provider reference and the
+For maintenance, keep `.alphainsider/`, `.gitignore`, `docs/plan.md`,
+`strategy/`, tests, `CONTEXT.md`, and `README.md` synchronized and
+version-control-ready. Re-read the selected provider reference and the
 canonical AlphaInsider references before changing integration behavior.

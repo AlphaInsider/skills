@@ -20,7 +20,9 @@ _not yet decided_ <!-- exactly one: alpaca | coinbase -->
 _not yet decided_
 <!-- Record provider symbols/product IDs and an AlphaInsider metadata snapshot
 for every instrument: stock_id, security, peg, fee, slippage, and retrieved_at
-in UTC. Record invalid or missing fee/slippage as 0 with a warning, e.g.
+in UTC. Every instrument's security must equal the provider class: stock for
+alpaca, cryptocurrency for coinbase. Record invalid or missing fee/slippage as
+0 with a warning, e.g.
 - Alpaca SPY → AlphaInsider SPY:ARCX; peg USD; fee 0; slippage 0.002;
   retrieved_at 2026-07-31T12:00:00Z
 - Coinbase BTC-USD → AlphaInsider BTC:COINBASE; peg USD; fee 0.0025;

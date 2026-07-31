@@ -42,6 +42,13 @@ confirmed plan lives at `docs/plan.md`, and executable code lives in
 replacement backs up managed files first, preserves unrelated files, and
 never reads, overwrites, or backs up `.env`.
 
+Generated workspaces are version-control-ready: `.alphainsider/`, `docs/`,
+`strategy/`, tests, project configuration, and documentation remain eligible
+to commit and push to GitHub. Only `.env` and local/cache/build artifacts are
+ignored; `.env.example` stays commit-ready. Generated metadata uses relative
+paths so cloning the repository on another machine does not retain the
+creator's absolute workspace path.
+
 After implementation, the standalone workspace supports:
 
 ```bash

@@ -32,3 +32,24 @@ def reconcile(client: Any, strategy_id: str | None = None) -> StrategySnapshot:
         positions=client.get_positions(strategy_id=strategy_id),
         open_orders=client.get_orders(strategy_id=strategy_id),
     )
+
+
+class StrategyTypeMismatchError(RuntimeError):
+    """The configured AlphaInsider strategy's type does not match this
+    workspace's market-data provider class."""
+
+
+def ensure_strategy_type(
+    client: Any, expected: str, strategy_id: str | None = None
+) -> dict[str, Any]:
+    """Fetch the configured strategy and refuse to run unless its ``type``
+    matches the provider class this workspace was generated for:
+    ``"stock"`` for Alpaca, ``"cryptocurrency"`` for Coinbase."""
+    strategy = client.get_strategy(strategy_id)
+    actual = strategy.get("type")
+    if actual != expected:
+        raise StrategyTypeMismatchError(
+            f"strategy {strategy.get('strategy_id')!r} has type {actual!r}; "
+            f"this workspace requires {expected!r}"
+        )
+    return strategy

@@ -31,7 +31,7 @@ Outputs:
 | `response[].strategy_id` | string | AlphaInsider strategy identifier. |
 | `response[].product_id` | string | Billing product identifier. |
 | `response[].user_id` | string | AlphaInsider user identifier. |
-| `response[].type` | string | Type or category for this object. |
+| `response[].type` | string | Strategy security type: `stock` or `cryptocurrency`. |
 | `response[].private` | boolean | Whether the strategy is private. |
 | `response[].name` | string | Display name. |
 | `response[].description` | string | Human-readable description. |
@@ -105,7 +105,7 @@ Outputs:
 | `response[].strategy_id` | string | AlphaInsider strategy identifier. |
 | `response[].product_id` | string | Billing product identifier. |
 | `response[].user_id` | string | AlphaInsider user identifier. |
-| `response[].type` | string | Type or category for this object. |
+| `response[].type` | string | Strategy security type: `stock` or `cryptocurrency`. |
 | `response[].private` | boolean | Whether the strategy is private. |
 | `response[].name` | string | Display name. |
 | `response[].description` | string | Human-readable description. |
@@ -190,7 +190,7 @@ Outputs:
 | `response[].strategy_id` | string | AlphaInsider strategy identifier. |
 | `response[].product_id` | string | Billing product identifier. |
 | `response[].user_id` | string | AlphaInsider user identifier. |
-| `response[].type` | string | Type or category for this object. |
+| `response[].type` | string | Strategy security type: `stock` or `cryptocurrency`. |
 | `response[].private` | boolean | Whether the strategy is private. |
 | `response[].name` | string | Display name. |
 | `response[].description` | string | Human-readable description. |
@@ -258,7 +258,7 @@ Outputs:
 | `response[].strategy_id` | string | AlphaInsider strategy identifier. |
 | `response[].product_id` | string | Billing product identifier. |
 | `response[].user_id` | string | AlphaInsider user identifier. |
-| `response[].type` | string | Type or category for this object. |
+| `response[].type` | string | Strategy security type: `stock` or `cryptocurrency`. |
 | `response[].private` | boolean | Whether the strategy is private. |
 | `response[].name` | string | Display name. |
 | `response[].description` | string | Human-readable description. |
