@@ -83,6 +83,8 @@ Cover at least:
 
 1. Exactly one primary provider: Alpaca equities or Coinbase public crypto.
 2. Provider symbols/product IDs and matching AlphaInsider `stock_id` values.
+   Use the sibling skill's read-only `getStocks` workflow to snapshot each
+   asset's `security`, `peg`, `fee`, `slippage`, and UTC retrieval time.
 3. Deterministic or LLM signal logic, including holding or exit timing.
 4. Polling interval/timeframe or WebSocket channels.
 5. Fixed normalized orders or allocation rebalancing and sizing.
@@ -90,7 +92,10 @@ Cover at least:
 7. Market-hours, continuous, or custom schedule.
 8. Backtesting only when every input is historically reconstructable without
    lookahead. If replayable, ask whether the user wants signal replay, then
-   ask for its window. If not replayable, record why and do not offer it.
+   ask for its window. For accepted USD-pegged universes, next ask for a
+   positive default starting value in USD and follow `references/backtesting.md`.
+   Keep non-USD replays signal-only. If not replayable, record why and do not
+   offer it.
 
 When all sections are resolved, present the complete plan. Do not generate
 bespoke strategy logic until the user explicitly confirms it. Then set
@@ -102,8 +107,10 @@ Before implementation, read in full:
 
 - This skill's `references/alpaca.md` or `references/coinbase.md` for the
   selected provider.
+- This skill's `references/backtesting.md` when the user accepted replay.
 - The sibling AlphaInsider skill's `references/input-multiplier.md`,
-  `references/trades.md`, and `references/websockets.md` as relevant.
+  `references/stocks.md`, `references/trades.md`, `references/webhooks.md`, and
+  `references/websockets.md` as relevant.
 
 Generate:
 
@@ -111,7 +118,8 @@ Generate:
 - `strategy/loop.py`: reconcile → fetch → decide → submit paper orders.
 - `strategy/__main__.py`: `run-once` and `run` commands.
 - `strategy/backtest.py`: only when the user accepted signal replay.
-- `tests/`: offline tests for clients, runtime, decisions, and orchestration.
+- `tests/`: offline tests for clients, runtime, decisions, orchestration, and
+  backtest accounting when selected.
 
 Mandatory runtime behavior:
 
@@ -123,11 +131,11 @@ Mandatory runtime behavior:
 - Never instantiate an Alpaca trading client.
 - Never call Coinbase accounts, orders, or authenticated user channels.
 
-Backtests are signal-only and read-only. Replay production decision logic in
-chronological order, expose no future information, make no AlphaInsider calls,
-and do not simulate cash, fills, positions, fees, or slippage. Report signal
-counts, directional hit rate, forward returns, timestamped records, and
-unevaluable trailing signals. Support optional `--start` and `--end`.
+Backtests are read-only. Replay production decision logic chronologically,
+expose no future information, and make no AlphaInsider calls during replay.
+For every accepted USD portfolio replay, implement the cash, position, cost,
+valuation, reporting, CLI, and test contract in `references/backtesting.md`.
+Keep accepted non-USD replays signal-only and explain the limitation.
 
 Finish by creating or updating the workspace-root `README.md` with purpose,
 signals, cadence, orders, schedule, risks, prerequisites, environment
@@ -140,6 +148,9 @@ python -m strategy run-once
 python -m strategy run
 python -m strategy backtest  # only when selected
 ```
+
+For portfolio-valued backtests, document the planned default and the optional
+`--initial-value` override.
 
 Run the complete offline suite. Automated tests must never submit paper
 orders. Network smoke tests are read-only and opt-in with

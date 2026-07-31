@@ -18,9 +18,13 @@ _not yet decided_ <!-- exactly one: alpaca | coinbase -->
 ## Universe
 
 _not yet decided_
-<!-- provider symbols/product IDs AND AlphaInsider stock_ids, e.g.
-- Alpaca SPY  → AlphaInsider SPY:ARCX
-- Coinbase BTC-USD → AlphaInsider BTC:COINBASE -->
+<!-- Record provider symbols/product IDs and an AlphaInsider metadata snapshot
+for every instrument: stock_id, security, peg, fee, slippage, and retrieved_at
+in UTC. Record invalid or missing fee/slippage as 0 with a warning, e.g.
+- Alpaca SPY → AlphaInsider SPY:ARCX; peg USD; fee 0; slippage 0.002;
+  retrieved_at 2026-07-31T12:00:00Z
+- Coinbase BTC-USD → AlphaInsider BTC:COINBASE; peg USD; fee 0.0025;
+  slippage 0.002; retrieved_at 2026-07-31T12:00:00Z -->
 
 ## Signals and decision logic
 
@@ -52,6 +56,12 @@ _not yet decided_
 - available: user declined
 - available: user accepted, with the historical window and the evaluation
   timing derived from the confirmed holding period or exit logic
+- for an accepted USD portfolio replay: positive default starting value in
+  USD; optional `--initial-value` override; the frozen per-asset fee/slippage
+  snapshot and any zero-default warnings; signal-close execution; and the
+  required mark-to-market and hypothetical-liquidation results
+- for an accepted non-USD replay: signal-only, with portfolio valuation marked
+  unavailable
 -->
 
 ## Confirmation

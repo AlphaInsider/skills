@@ -74,7 +74,12 @@ def validate() -> list[str]:
     if forbidden:
         errors.append("strategy-creator must not duplicate AlphaInsider resources")
 
-    required_strategy_refs = {"plan-template.md", "alpaca.md", "coinbase.md"}
+    required_strategy_refs = {
+        "alpaca.md",
+        "backtesting.md",
+        "coinbase.md",
+        "plan-template.md",
+    }
     actual_strategy_refs = {
         path.name for path in (strategy / "references").glob("*.md")
     }
