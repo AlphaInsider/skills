@@ -1,218 +1,176 @@
 ---
 name: strategy-creator
-description: Interview a user one decision at a time, plan and implement one bespoke AlphaInsider paper-trading strategy, and maintain its local workspace. Use when Codex needs to create, resume, replace, test, backtest, or document an AlphaInsider strategy using Alpaca equities or Coinbase public crypto market data.
+description: Interview users one decision at a time, maintain a decision-complete plan, and build, test, backtest, document, or change one automated AlphaInsider paper-trading strategy. Use for stock or cryptocurrency strategies that may depend on market data, models, APIs, or authorized web data but send orders only to AlphaInsider.
 ---
 
 # AlphaInsider Strategy Creator
 
-Drive one strategy through `interviewing → confirmed → implemented`. Require
-the sibling `$alphainsider` skill while building the workspace; the completed
-workspace must run without either installed skill.
+Use this skill as an instruction manual. Build only the project justified by the
+confirmed strategy plan; this skill contains no provider or runtime code.
+
+## Scope
+
+- Build one fully automated AlphaInsider paper-trading strategy per project.
+- Fix the project to the configured AlphaInsider strategy's explicit asset
+  class: `stock` or `cryptocurrency`. Every traded instrument must match that
+  class. Cross-asset and alternative data may inform signals but cannot expand
+  it.
+- Support fixed, dynamic, and constrained-dynamic instrument selection. Do not
+  require a predefined instrument list when the strategy selects candidates at
+  runtime.
+- Use AlphaInsider as the only order destination. Never instantiate a live
+  broker trading client.
+- Map the project to the user's AlphaInsider strategy through
+  `ALPHAINSIDER_STRATEGY_ID` in `.env`.
+- Never inspect, print, request, or copy `.env` values or API keys.
+- Treat this skill directory and the sibling `alphainsider` skill directory as
+  read-only sources. Never create, edit, format, or delete files in either one
+  while planning, building, testing, or maintaining a user's strategy.
+- Write every generated strategy artifact inside the selected project root.
 
 ## Preflight
 
-1. Locate this skill directory, then locate the sibling `alphainsider` skill.
-   Confirm its `SKILL.md`, `scripts/runtime/`, and `references/` exist.
-2. If the sibling is missing, stop before writing and tell the user to run:
+1. Locate this skill and the sibling `alphainsider` skill. Require its
+   `SKILL.md`, `scripts/alphainsider_request.py`, and `scripts/runtime/` before
+   doing any work. If missing, stop and ask the user to install both skills:
 
    ```bash
    npx skills@latest add https://github.com/AlphaInsider/skills \
      --skill alphainsider --skill strategy-creator
    ```
 
-3. Ask which target directory to use, recommending the current directory.
-   Treat the selected directory as the workspace root; never add a wrapper.
-4. Inspect the target without reading `.env`. Report every managed collision,
-   including both candidate provider clients (`strategy/clients/alpaca.py` and
-   `strategy/clients/coinbase.py`), even though only the selected provider's
-   file is ever written.
-5. If `.alphainsider/manifest.json` exists, ask whether to resume or replace.
-6. Obtain explicit consent before creating or overwriting any file. If consent
-   is absent, make no changes.
+2. Read [references/interview.md](references/interview.md) and
+   [references/plan-template.md](references/plan-template.md) in full.
+3. Ask for the project root, recommending the directory from which the user
+   invoked the skill. Accept a normal user-controlled project location,
+   including a suitable project directory beneath the user's home, when the
+   required files can be added safely. Reject an installed skill directory, an
+   obviously unsafe system location, or a location where the project cannot be
+   created. Use reasonable judgment; do not maintain an exhaustive path
+   denylist or perform elaborate filesystem checks. If unsuitable, explain why
+   and ask for another path.
+4. Inspect the selected project root without opening `.env`; list only files
+   this workflow would create or change that already exist.
+5. Treat an existing current-format `docs/plan.md` as resumable. Treat every
+   other collision as an ordinary file conflict and obtain explicit overwrite
+   approval. Preserve unrelated files.
 
-On resume, preserve existing managed files and continue from `docs/plan.md`.
-Creating a missing managed file or refreshing reusable machinery still needs
-an explicit collision inventory and consent. On replacement, copy every
-existing managed file to `.alphainsider/backups/<UTC timestamp>/`, preserving
-relative paths, before writing anything. Use a unique timestamp directory and
-abort without writes if backup creation fails. Never read, copy, overwrite, or
-back up `.env`. Preserve every unrelated file.
+Do not recognize or migrate legacy manifests, checkpoints, backups, generated
+runtime layouts, provider modules, or plan schemas. Do not create replacement
+backups or management metadata.
 
-## Bootstrap the workspace
+## Plan lifecycle
 
-After consent, create or refresh the reusable workspace machinery:
+Use `docs/plan.md` as the source of truth. Its only states are `draft`,
+`confirmed`, and `implemented`.
 
-- Copy AlphaInsider `scripts/runtime/client.py` and `stream.py` into
-  `strategy/clients/` as `alphainsider.py` and `alphainsider_stream.py`;
-  adjust the stream's relative client import.
-- Copy only provider-neutral machinery here. The single market-data provider
-  client is copied in the Confirmed phase, after `docs/plan.md` records the
-  provider decision.
-- Copy this skill's `scripts/strategy_runtime/` into `strategy/runtime/`.
-- Generate `strategy/__init__.py`, `strategy/clients/__init__.py`,
-  `.env.example`, `pyproject.toml`, `AGENTS.md`, and `CONTEXT.md` directly in
-  the target. `.env.example` starts with exactly the provider-neutral
-  variables `ALPHAINSIDER_API_KEY=` and `ALPHAINSIDER_STRATEGY_ID=`; provider
-  variables are appended in the Confirmed phase.
-- Merge secret and local-artifact entries into `.gitignore` without replacing
-  unrelated content: `.env`, virtual environments, Python caches, test caches,
-  build output, and OS/IDE files. Never ignore `.alphainsider/`, `docs/`,
-  `strategy/`, `tests/`, `.env.example`, or another generated project file,
-  and never add a nested ignore file that excludes them.
-- Write `.alphainsider/manifest.json` with schema version `1`, target `.` so
-  the project remains portable, and the exact workspace-relative managed
-  paths, including `.gitignore`. Store checkpoints under
-  `.alphainsider/state/`. Create `.alphainsider/backups/` and initialize
-  `.alphainsider/state/checkpoint.json` to `{ "last_event_id": null }` for a
-  fresh workspace. Write generated files through same-directory temporary
-  files and atomic replacement; if generation fails, keep the prior files.
-  When the Confirmed phase copies the provider client, append its
-  workspace-relative path to the manifest under the same atomic-write rules.
+### Draft
 
-Keep every tracked file portable: use workspace-relative paths and never write
-the user's home directory, the target's absolute path, credentials, or `.env`
-values into generated code, configuration, metadata, or documentation.
+1. On the first confirmed interview answer, create `docs/plan.md` from the
+   plan template after obtaining permission to create or replace that path.
+2. Follow the interview reference. Ask exactly one decision question per turn,
+   recommend an answer with a short reason, wait for the response, and write
+   the normalized answer immediately. Do not preserve the transcript.
+3. Research discoverable facts instead of asking the user. When requirements
+   are known, research current data sources and libraries using primary
+   documentation. Recommend the smallest feasible stack and obtain the user's
+   confirmation before recording it.
+4. Prefer Alpaca for equities and Coinbase for cryptocurrency when they meet
+   the requirements. Treat scraping as an explicitly approved, authorized
+   fallback when a supported API or feed is unsuitable.
+5. Prefer deterministic signal logic. Permit hosted models only when the plan
+   defines their inputs, outputs, version expectations, cost limits, timeouts,
+   failure behavior, and replay limitations.
+6. Before confirmation, use the sibling skill's request helper for read-only
+   validation of the configured AlphaInsider strategy and its asset class. If
+   the user explicitly names instruments, also validate their AlphaInsider
+   mappings. For dynamic selection, record the runtime resolution contract
+   without requiring candidate mappings in advance. Let the helper read
+   `.env`; never read it yourself. Record validation results without
+   credentials or strategy IDs.
+7. Offer backtesting only when every decision input can be reconstructed as it
+   was known at the decision time. If feasible, ask whether the user wants it;
+   if accepted, resolve the window and scope. Otherwise record why it would be
+   misleading or infeasible.
+8. Resolve contradictions and implementation-blocking decisions, then present
+   the complete normalized plan. Explicit confirmation changes the status to
+   `confirmed` and authorizes implementation immediately.
 
-The generated project requires Python 3.11+ with `httpx>=0.27`,
-`python-dotenv>=1.0`, and `websockets>=12`; its dev dependencies are
-`pytest>=8` and `pytest-asyncio>=0.23`. Provider clients must call documented
-REST and WebSocket protocols directly; never add an Alpaca or Coinbase SDK.
-
-## Lifecycle
-
-Read `docs/plan.md` when it exists. Missing or invalid state means
-`interviewing`; valid states are `interviewing`, `confirmed`, and
-`implemented`.
-
-### Interviewing
-
-- Discover workspace and API facts before asking the user.
-- Ask exactly one decision question per turn. Recommend an answer with a
-  short rationale, but record only the user's answer.
-- Treat required fields as unresolved even if the user calls an incomplete
-  description a complete plan. Never invent a default or defer a required
-  interview answer to generated configuration; ask for the next missing
-  decision instead.
-- On the first confirmed answer, copy `references/plan-template.md` to
-  `docs/plan.md`. Persist every later confirmed answer immediately.
-- Resolve all dependencies and contradictions before requesting confirmation.
-
-Cover at least:
-
-1. Exactly one primary provider: Alpaca equities or Coinbase public crypto.
-2. Provider symbols/product IDs and matching AlphaInsider `stock_id` values.
-   Use the sibling skill's read-only `getStocks` workflow to snapshot each
-   asset's `security`, `peg`, `fee`, `slippage`, and UTC retrieval time.
-   Reject any instrument whose `security` does not match the selected
-   provider's class — `stock` for Alpaca, `cryptocurrency` for Coinbase —
-   and resolve the mismatch before recording the universe.
-3. Deterministic or LLM signal logic, including holding or exit timing.
-4. Polling endpoint/interval/timeframe or WebSocket channels. For Alpaca,
-   record feed, adjustment, `asof`, late-bar, halt, and reconnect behavior.
-   For Coinbase, record granularity, heartbeat, sequence-gap detection, and
-   state-resynchronization behavior. Batch all selected instruments and
-   channels onto one provider/feed connection by default; split connections
-   only for a documented provider limit or measured throughput need.
-5. Fixed normalized orders or allocation rebalancing and sizing.
-6. Position, stop, drawdown, kill-switch, and open-order constraints.
-7. Market-hours, continuous, or custom schedule.
-8. Backtesting only when every input is historically reconstructable without
-   lookahead. If replayable, ask whether the user wants signal replay, then
-   ask for its window. For accepted USD-pegged universes, next ask for a
-   positive default starting value in USD and follow `references/backtesting.md`.
-   Keep non-USD replays signal-only. If not replayable, record why and do not
-   offer it.
-
-When all sections are resolved, present the complete plan. Do not generate
-bespoke strategy logic until the user explicitly confirms it. Then set
-`status: confirmed`.
+Do not generate strategy code while the plan is `draft`. Conservative agent
+defaults are allowed for incidental mechanics only when labeled in the plan;
+the final confirmation must make them visible and accepted.
 
 ### Confirmed
 
-Before implementation, read in full:
+Read the relevant sibling AlphaInsider references before writing integration
+code, especially authentication, runtime-client, stocks, trades,
+input-multiplier, and WebSocket guidance as applicable.
 
-- This skill's `references/alpaca.md` or `references/coinbase.md` for the
-  selected provider.
-- This skill's `references/backtesting.md` when the user accepted replay.
-- The sibling AlphaInsider skill's `references/input-multiplier.md`,
-  `references/stocks.md`, `references/trades.md`, `references/webhooks.md`, and
-  `references/websockets.md` as relevant.
+Before writing, inventory every exact project path the confirmed plan will
+create or change. Plan confirmation authorizes new files, but an existing file
+still requires explicit overwrite approval. Keep every write inside the
+selected project root. Use machine-specific absolute paths only to locate the
+project during the current run; persist project-relative paths in the project.
 
-Then copy the selected provider's client — and only that one — from this
-skill's `scripts/market_data/alpaca.py` or `scripts/market_data/coinbase.py`
-into `strategy/clients/` under the same filename; the file is self-contained.
-Never copy, import, or reference the other provider's client anywhere in the
-workspace. Append the new path to `.alphainsider/manifest.json`. If a file
-already exists at that path, apply the resume rules: collision inventory and
-explicit consent. For Alpaca strategies, also append `ALPACA_KEY=`,
-`ALPACA_SECRET=`, and `ALPACA_FEED=iex` to `.env.example`; Coinbase strategies
-add no variables.
+Build the smallest standalone project that satisfies the plan:
 
-Generate:
+- Use Python by default. Use another language only when the plan records a
+  concrete ecosystem reason and an equivalent AlphaInsider integration.
+- Create `strategy/`, `tests/`, `.env.example`, ecosystem dependency
+  configuration, `.gitignore`, `README.md`, and `AGENTS.md`. Keep internal
+  modules specific to the strategy instead of imposing a generic framework.
+- For Python, read the sibling `scripts/runtime/client.py` as an immutable
+  source and copy it into the project; copy `stream.py` only when WebSockets are
+  required. Preserve credential and normalized-value behavior and adjust the
+  project copies without modifying or duplicating clients in either skill.
+- Put only variable names and safe examples in `.env.example`. Keep `.env`,
+  credentials, caches, and build artifacts ignored; keep the plan, source,
+  tests, and documentation commit-ready.
+- Expose project-native commands for one decision cycle, continuous operation,
+  tests, and an optional backtest when selected. Do not add a dry-run mode.
+- Implement the plan's `fixed`, `dynamic`, or `constrained dynamic` instrument
+  selection mode. For each actionable runtime candidate that lacks an exact
+  AlphaInsider ID, use `search_stocks` and reject missing or ambiguous matches;
+  never guess a mapping. Validate resolved IDs with `get_stocks`, batching
+  candidates when practical, and require each returned `security` to equal the
+  configured strategy's `stock` or `cryptocurrency` type before ordering.
+- Never submit an order for an unvalidated, missing, ambiguous, or mismatched
+  instrument. Revalidate newly selected or changed candidates according to the
+  plan's freshness rule. On validation failure, follow the plan-specific choice
+  to continue with valid candidates or abort that decision cycle.
+- Reconcile relevant AlphaInsider positions and open orders before decisions,
+  validate the configured strategy type at startup, and implement the plan's
+  stale-data, retry, duplicate-event, recovery, logging, sizing, and risk
+  behavior. Never treat a missing `input_multiplier` as `1`.
+- Keep decision logic independently testable. When backtesting is selected,
+  replay production decisions chronologically without AlphaInsider calls or
+  future information. For dynamic selection, reconstruct the historical
+  candidate set as it existed at each decision time without survivorship bias.
+  Add portfolio accounting only when its execution and cost assumptions are
+  credible and documented.
 
-- `strategy/decision.py`: pure decision logic with injected data and clients.
-- `strategy/loop.py`: reconcile → fetch → decide → submit paper orders.
-- `strategy/__main__.py`: `run-once` and `run` commands; both validate the
-  AlphaInsider strategy type at startup.
-- `strategy/backtest.py`: only when the user accepted signal replay.
-- `tests/`: offline tests for clients, runtime, decisions, orchestration, and
-  backtest accounting when selected.
+After implementation, create strategy-specific offline tests for signals,
+risk rules, order mapping, orchestration, and backtesting when selected. Mock
+all external services. Tests and implementation verification must never submit
+AlphaInsider orders; do not run an order-submitting command merely to verify
+the build.
 
-Mandatory runtime behavior:
+Write `README.md` for humans: purpose, behavior, prerequisites, setup,
+environment variable names, commands, monitoring, limitations, and recovery.
+Write `AGENTS.md` for agents: treat `docs/plan.md` as authoritative, preserve
+the credential boundary, identify code/test entry points, and require the
+maintenance workflow below.
 
-- AlphaInsider is the only order destination and all orders are paper orders.
-- Before `run` or `run-once` starts its first decision cycle, call
-  `ensure_strategy_type(client, "stock")` in an Alpaca workspace or
-  `ensure_strategy_type(client, "cryptocurrency")` in a Coinbase workspace,
-  and refuse to run on `StrategyTypeMismatchError`. Backtests make no
-  AlphaInsider calls and never run this check.
-- Reconcile current positions and open orders before every decision.
-- Never assume a missing `input_multiplier` is `1`.
-- Use `EventCheckpoint` to reject duplicate market events across restarts.
-- Use `StrategyRunner` for graceful shutdown and bounded retry/backoff.
-- Never instantiate an Alpaca trading client.
-- Never call Coinbase accounts, orders, or authenticated user channels.
-
-Backtests are read-only. Replay production decision logic chronologically,
-expose no future information, and make no AlphaInsider calls during replay.
-For every accepted USD portfolio replay, implement the cash, position, cost,
-valuation, reporting, CLI, and test contract in `references/backtesting.md`.
-Keep accepted non-USD replays signal-only and explain the limitation.
-
-Finish by creating or updating the workspace-root `README.md` with purpose,
-signals, cadence, orders, schedule, risks, prerequisites, environment
-variables, installation, and the exact commands. If `README.md` already
-exists, include it in the collision inventory, obtain explicit overwrite
-consent, and preserve unrelated content while updating the strategy guidance:
-
-```bash
-python -m strategy run-once
-python -m strategy run
-python -m strategy backtest  # only when selected
-```
-
-For portfolio-valued backtests, document the planned default and the optional
-`--initial-value` override.
-
-Run the complete offline suite. Automated tests must never submit paper
-orders. Network smoke tests are read-only and opt-in with
-`RUN_SMOKE_TESTS=1 pytest -m smoke`. Once code, tests, and documentation agree,
-update `CONTEXT.md`, add strategy-specific ADRs under `docs/adr/` only for
-durable trade-offs, and set `status: implemented`.
-
-Before handoff, verify the generated project is ready for version control. If
-the target is in a Git worktree, use `git check-ignore -v` and `git status` to
-confirm `.alphainsider/`, `docs/`, `strategy/`, `tests/`, `.env.example`,
-`pyproject.toml`, `README.md`, `AGENTS.md`, and `CONTEXT.md` are eligible to be
-committed. Only secrets and local/cache/build artifacts may remain ignored.
-Resolve target `.gitignore` conflicts within the granted consent and report
-any inherited or global ignore rule rather than editing files outside the
-selected workspace. Do not initialize Git, commit, configure a remote, or push
-unless the user separately asks.
+Run the complete offline suite and static checks. When code, tests, plan, and
+documentation agree, set the plan status to `implemented`. Deployment or
+hosting is outside this workflow unless the user separately requests it.
+Before handoff, confirm that every created or changed strategy path belongs to
+the selected project root and that no operation wrote to either skill
+directory.
 
 ### Implemented
 
-For maintenance, keep `.alphainsider/`, `.gitignore`, `docs/plan.md`,
-`strategy/`, tests, `CONTEXT.md`, and `README.md` synchronized and
-version-control-ready. Re-read the selected provider reference and the
-canonical AlphaInsider references before changing integration behavior.
+For any behavior change, return the plan to `draft`, interview the affected
+decisions one at a time, and obtain confirmation before editing code. Then
+update implementation, tests, `README.md`, and `AGENTS.md` together and restore
+`implemented` only after verification passes.

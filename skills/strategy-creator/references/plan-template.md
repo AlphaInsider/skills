@@ -1,71 +1,68 @@
 ---
-status: interviewing
+status: draft
 ---
 
 # Strategy Plan
 
-<!--
-Copy this template to docs/plan.md on the first confirmed interview
-answer. Fill sections as answers arrive; leave unanswered sections as
-"_not yet decided_". Lifecycle: status is one of
-interviewing | confirmed | implemented.
--->
+Keep this file as a normalized specification, not an interview transcript.
+Replace unresolved placeholders as answers are confirmed. Never record API
+keys, `.env` values, or the configured AlphaInsider strategy ID.
 
-## Primary market data provider
+## Objective
 
-_not yet decided_ <!-- exactly one: alpaca | coinbase -->
+- Goal: _not yet decided_
+- Trading hypothesis: _not yet decided_
+- Success and failure criteria: _not yet decided_
 
-## Universe
+## AlphaInsider target
 
-_not yet decided_
-<!-- Record provider symbols/product IDs and an AlphaInsider metadata snapshot
-for every instrument: stock_id, security, peg, fee, slippage, and retrieved_at
-in UTC. Every instrument's security must equal the provider class: stock for
-alpaca, cryptocurrency for coinbase. Record invalid or missing fee/slippage as
-0 with a warning, e.g.
-- Alpaca SPY → AlphaInsider SPY:ARCX; peg USD; fee 0; slippage 0.002;
-  retrieved_at 2026-07-31T12:00:00Z
-- Coinbase BTC-USD → AlphaInsider BTC:COINBASE; peg USD; fee 0.0025;
-  slippage 0.002; retrieved_at 2026-07-31T12:00:00Z -->
+- Strict asset class: _not yet decided_ <!-- stock | cryptocurrency -->
+- Configured strategy validation: _pending_ <!-- result and UTC time; omit ID -->
+- Instrument selection mode: _not yet decided_ <!-- fixed | dynamic | constrained dynamic -->
+- Selection rules or constraints: _not yet decided_
+- Explicit instruments and validated mappings: _not applicable unless specified_
+- Runtime identifier resolution and AlphaInsider validation: _not yet decided_
+- Validation freshness: _not yet decided_
+- Invalid-instrument behavior: _not yet decided_ <!-- continue with valid candidates | abort cycle -->
 
-## Signals and decision logic
+## Strategy behavior
 
-_not yet decided_ <!-- deterministic rules or LLM engine (model + prompt contract) -->
+- Signal and decision rules: _not yet decided_
+- Entry, exit, and holding behavior: _not yet decided_
+- Decision cadence and schedule: _not yet decided_
 
-## Data cadence
+## Data and resources
 
-_not yet decided_ <!-- polling interval + timeframe, or WebSocket channels;
-extra signal sources only if explicitly confirmed -->
+- Required inputs and as-of timing: _not yet decided_
+- Selected sources, access method, and freshness rules: _not yet decided_
+- Libraries, models, and external services: _not yet decided_
+- Missing, stale, delayed, or conflicting data behavior: _not yet decided_
 
-## Order style and sizing
+## Execution and risk
 
-_not yet decided_ <!-- discrete new_order vs rebalance_allocations; sizes/percents; leverage ≤ 2.0 -->
-
-## Risk constraints
-
-_not yet decided_ <!-- max position, stops, drawdown kill-switch, open-order handling -->
-
-## Schedule
-
-_not yet decided_ <!-- market hours / 24-7 / custom window -->
+- AlphaInsider order method and sizing: _not yet decided_
+- Position and exposure constraints: _not yet decided_
+- Open-order, duplicate-event, retry, and recovery behavior: _not yet decided_
+- Disable or kill conditions and logging: _not yet decided_
 
 ## Backtesting
 
-_not yet decided_
-<!-- Record exactly one resolved outcome:
-- unavailable: why the strategy cannot be historically replayed (do not ask
-  the user about backtesting; this does not block the strategy)
-- available: user declined
-- available: user accepted, with the historical window and the evaluation
-  timing derived from the confirmed holding period or exit logic
-- for an accepted USD portfolio replay: positive default starting value in
-  USD; optional `--initial-value` override; the frozen per-asset fee/slippage
-  snapshot and any zero-default warnings; signal-close execution; and the
-  required mark-to-market and hypothetical-liquidation results
-- for an accepted non-USD replay: signal-only, with portfolio valuation marked
-  unavailable
--->
+- Historical reconstructibility: _not yet decided_
+- User choice: _not yet decided_ <!-- unavailable | declined | accepted -->
+- Window, scope, assumptions, and metrics: _not applicable until accepted_
+
+## Implementation
+
+- Project root: `.`
+- Path portability: project-relative paths only; installed skill directories are read-only
+- Language, dependencies, and project structure: _not yet decided_
+- Data flow and persistent state: _not yet decided_
+- Environment variable names and operator commands: _not yet decided_
+- Test scenarios and acceptance criteria: _not yet decided_
 
 ## Confirmation
 
-- [ ] User explicitly confirmed the complete plan (set `status: confirmed`)
+- Unresolved decisions: _not yet decided_
+- Agent-provided defaults: _none yet_
+- User confirmation: _pending_
+- Confirmation time: _pending_

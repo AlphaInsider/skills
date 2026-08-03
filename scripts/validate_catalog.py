@@ -12,11 +12,18 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = ROOT / "skills"
 EXPECTED_SKILLS = {"alphainsider", "strategy-creator"}
 EXPECTED_ALPHA_RUNTIME = {"__init__.py", "client.py", "stream.py"}
-EXPECTED_STRATEGY_RUNTIME = {
-    "__init__.py",
-    "checkpoint.py",
-    "reconcile.py",
-    "runner.py",
+EXPECTED_STRATEGY_REFERENCES = {"interview.md", "plan-template.md"}
+EXPECTED_PLAN_STATES = {"draft", "confirmed", "implemented"}
+REQUIRED_PLAN_SECTIONS = {
+    "# Strategy Plan",
+    "## Objective",
+    "## AlphaInsider target",
+    "## Strategy behavior",
+    "## Data and resources",
+    "## Execution and risk",
+    "## Backtesting",
+    "## Implementation",
+    "## Confirmation",
 }
 
 
@@ -69,24 +76,47 @@ def validate() -> list[str]:
             errors.append(f"{name}: missing agents/openai.yaml")
 
     strategy = SKILLS_DIR / "strategy-creator"
-    forbidden = list((strategy / "scripts").rglob("*alphainsider*"))
-    forbidden += list((strategy / "references").glob("*alphainsider*"))
-    if forbidden:
-        errors.append("strategy-creator must not duplicate AlphaInsider resources")
-
-    required_strategy_refs = {
-        "alpaca.md",
-        "backtesting.md",
-        "coinbase.md",
-        "plan-template.md",
-    }
     actual_strategy_refs = {
         path.name for path in (strategy / "references").glob("*.md")
     }
-    if actual_strategy_refs != required_strategy_refs:
+    if actual_strategy_refs != EXPECTED_STRATEGY_REFERENCES:
         errors.append(
             "strategy-creator references must be exactly "
-            f"{sorted(required_strategy_refs)}"
+            f"{sorted(EXPECTED_STRATEGY_REFERENCES)}"
+        )
+
+    strategy_scripts = [
+        path
+        for path in (strategy / "scripts").rglob("*")
+        if path.is_file() and "__pycache__" not in path.parts
+    ]
+    if strategy_scripts:
+        errors.append("strategy-creator must not contain scripts")
+
+    plan_template = strategy / "references" / "plan-template.md"
+    if plan_template.is_file():
+        plan_text = plan_template.read_text(encoding="utf-8")
+        try:
+            plan_fields = frontmatter(plan_template)
+        except ValueError as exc:
+            errors.append(str(exc))
+        else:
+            if plan_fields != {"status": "draft"}:
+                errors.append("strategy plan template must start in draft status")
+        missing_sections = REQUIRED_PLAN_SECTIONS - set(plan_text.splitlines())
+        if missing_sections:
+            errors.append(
+                "strategy plan template is missing sections "
+                f"{sorted(missing_sections)}"
+            )
+
+    strategy_text = (strategy / "SKILL.md").read_text(encoding="utf-8")
+    missing_states = {
+        state for state in EXPECTED_PLAN_STATES if f"`{state}`" not in strategy_text
+    }
+    if missing_states:
+        errors.append(
+            "strategy-creator is missing plan states " f"{sorted(missing_states)}"
         )
 
     alpha_runtime = {
@@ -97,15 +127,6 @@ def validate() -> list[str]:
         errors.append(
             "alphainsider runtime files must be exactly "
             f"{sorted(EXPECTED_ALPHA_RUNTIME)}"
-        )
-
-    strategy_runtime = {
-        path.name for path in (strategy / "scripts" / "strategy_runtime").glob("*.py")
-    }
-    if strategy_runtime != EXPECTED_STRATEGY_RUNTIME:
-        errors.append(
-            "strategy runtime files must be exactly "
-            f"{sorted(EXPECTED_STRATEGY_RUNTIME)}"
         )
 
     return errors
