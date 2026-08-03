@@ -16,6 +16,8 @@ This repository publishes reusable AlphaInsider agent skills from `skills/`.
   validation, and repository documentation in the same change.
 - Preserve the AlphaInsider credential boundary: agents never inspect or print
   API keys or `.env` values.
+- Agents may create, edit, and run local tests under `tests/`. The directory is
+  intentionally Git-ignored, so do not force-add its contents.
 - Tests must not submit AlphaInsider paper orders. Network smoke tests are
   read-only and opt-in.
 
