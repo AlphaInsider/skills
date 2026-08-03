@@ -49,11 +49,25 @@ confirmed strategy plan; this skill contains no provider or runtime code.
    created. Use reasonable judgment; do not maintain an exhaustive path
    denylist or perform elaborate filesystem checks. If unsuitable, explain why
    and ask for another path.
-4. Inspect the selected project root without opening `.env`; list only files
-   this workflow would create or change that already exist.
-5. Treat an existing current-format `docs/plan.md` as resumable. Treat every
-   other collision as an ordinary file conflict and obtain explicit overwrite
-   approval. Preserve unrelated files.
+4. Inspect `docs/plan.md` without opening `.env`. Recognize the root as a
+   project created by this skill only when that file has a valid `draft`,
+   `confirmed`, or `implemented` status, the `# Strategy Plan` title, and every
+   section heading from the current plan template. Do not require the current
+   field wording; this stable signature covers earlier projects that use the
+   same plan lifecycle and sections.
+5. For a recognized project, ask exactly one question before any strategy
+   interview: whether to **update the existing plan** or **replace the trading
+   strategy with a new one**. Recommend updating because it preserves prior
+   decisions.
+   - For an update, preserve unaffected decisions, keep a `draft` plan in that
+     state, and return a `confirmed` or `implemented` plan to `draft` before
+     changing behavior. Interview only the affected decisions.
+   - For a replacement, follow the replacement lifecycle below. Do not alter
+     the current plan or implementation while interviewing the replacement.
+6. Inspect the rest of the selected project root without opening `.env`; list
+   only files this workflow would create or change that already exist. Treat
+   collisions other than recognized plan files as ordinary file conflicts and
+   obtain explicit overwrite approval. Preserve unrelated files.
 
 Do not recognize or migrate legacy manifests, checkpoints, backups, generated
 runtime layouts, provider modules, or plan schemas. Do not create replacement
@@ -61,8 +75,42 @@ backups or management metadata.
 
 ## Plan lifecycle
 
-Use `docs/plan.md` as the source of truth. Its only states are `draft`,
-`confirmed`, and `implemented`.
+Use `docs/plan.md` as the source of truth for the current strategy. During a
+replacement, use `docs/replacement-plan.md` as the prospective plan while the
+current plan remains authoritative. Both plans use only `draft`, `confirmed`,
+and `implemented`.
+
+### Replacement
+
+1. When the user chooses replacement, resume `docs/replacement-plan.md` if it
+   has the current plan signature and is `draft` or `confirmed`. Treat any
+   other existing file at that path as an ordinary collision and obtain
+   explicit overwrite approval before starting a new replacement plan.
+2. For a new replacement, create `docs/replacement-plan.md` from the plan
+   template on the first confirmed interview answer. Follow the complete
+   interview from intent onward and update that file after every answer. Do not
+   modify `docs/plan.md` or any current implementation artifact.
+3. Explicit confirmation changes the replacement plan to `confirmed`, but does
+   not authorize deletion, plan promotion, or implementation. Inventory the
+   exact old artifacts attributable to this skill, using the current plan and
+   project contents. Include generated strategy source, tests, copied runtime,
+   dependency configuration, `.env.example`, `.gitignore`, `README.md`, and
+   `AGENTS.md` when present and attributable to the current strategy.
+4. Show the exact proposed deletion paths and ask for separate explicit
+   approval that also covers replacing `docs/plan.md` with the confirmed
+   replacement plan. Never recursively delete the project root. Never delete
+   `.env`, credentials, caches, unrelated files, or files whose ownership is
+   uncertain.
+5. If the user declines, leave the current plan and implementation unchanged
+   and retain the confirmed replacement plan for later resumption.
+6. If the user approves, delete only the approved paths, replace
+   `docs/plan.md` with `docs/replacement-plan.md`, remove the temporary path,
+   and follow the Confirmed workflow to build the replacement. After complete
+   offline verification, set the promoted plan to `implemented`.
+
+Plan confirmation and deletion approval are separate decisions. Never delete
+or reimplement the current strategy based only on replacement-plan
+confirmation.
 
 ### Draft
 
@@ -93,8 +141,10 @@ Use `docs/plan.md` as the source of truth. Its only states are `draft`,
    if accepted, resolve the window and scope. Otherwise record why it would be
    misleading or infeasible.
 8. Resolve contradictions and implementation-blocking decisions, then present
-   the complete normalized plan. Explicit confirmation changes the status to
-   `confirmed` and authorizes implementation immediately.
+   the complete normalized plan. Explicit confirmation of `docs/plan.md`
+   changes the status to `confirmed` and authorizes implementation immediately.
+   Confirmation of `docs/replacement-plan.md` stops at the separate deletion
+   gate above.
 
 Do not generate strategy code while the plan is `draft`. Conservative agent
 defaults are allowed for incidental mechanics only when labeled in the plan;

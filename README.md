@@ -38,6 +38,30 @@ prefers Alpaca for equity data or Coinbase for cryptocurrency data when they
 fit the confirmed requirements. Other supported data sources and explicitly
 authorized scraping remain available when justified.
 
+When `docs/plan.md` has a valid lifecycle status, the `# Strategy Plan` title,
+and the current template sections, Strategy Creator recognizes the folder as
+an existing project. It first asks whether to update the existing plan or
+replace the trading strategy with a new one, recommending an update to preserve
+unaffected decisions.
+
+A replacement is planned separately in `docs/replacement-plan.md`, leaving the
+current plan and implementation untouched. Confirming the replacement plan
+does not authorize deletion or implementation. The agent then lists every old
+generated project path proposed for deletion and obtains separate explicit
+approval. Approval promotes the replacement plan to `docs/plan.md`, removes
+only the approved old artifacts, and starts re-implementation. The workflow
+never recursively deletes the project root and never deletes `.env`,
+credentials, caches, unrelated files, or files with uncertain ownership. If
+approval is declined, the working strategy remains unchanged and the confirmed
+replacement plan remains resumable.
+
+The interview asks one short question at a time in plain trading language. To
+define how results will be judged, it proposes an understandable review period,
+results after fees, and loss or behavior that would mean the strategy needs to
+change or stop. The user can accept or adjust each recommendation without
+having to supply formal planning terms or design performance measurements from
+scratch.
+
 Each project retains the configured AlphaInsider strategy's strict stock or
 cryptocurrency type. Its instruments may be fixed, selected dynamically at
 runtime, or selected dynamically within a confirmed constraint. Explicitly
@@ -45,12 +69,13 @@ named instruments are verified during planning; runtime-selected candidates
 are resolved and type-checked through AlphaInsider before they can be traded.
 
 The plan progresses through `draft`, `confirmed`, and `implemented`.
-Confirmation authorizes the agent to build a small standalone project with
-strategy source, offline tests, dependency configuration, `.env.example`,
-`README.md`, and `AGENTS.md`. The generated project uses AlphaInsider as its
-only paper-order destination and obtains its configured strategy from `.env`.
-Only credentials and local/cache/build artifacts are ignored; the plan, code,
-tests, and documentation remain commit-ready.
+Confirmation of the active `docs/plan.md` authorizes the agent to build a small
+standalone project with strategy source, offline tests, dependency
+configuration, `.env.example`, `README.md`, and `AGENTS.md`. The generated
+project uses AlphaInsider as its only paper-order destination and obtains its
+configured strategy from `.env`. Only credentials and local/cache/build
+artifacts are ignored; the plan, code, tests, and documentation remain
+commit-ready.
 
 Backtesting is optional and offered only when the strategy's historical inputs
 can be reconstructed without lookahead. Generated projects expose one-cycle

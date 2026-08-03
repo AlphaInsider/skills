@@ -25,6 +25,43 @@ REQUIRED_PLAN_SECTIONS = {
     "## Implementation",
     "## Confirmation",
 }
+REQUIRED_PLAIN_LANGUAGE_PLAN_FIELDS = {
+    "- Goal:",
+    "- Why the strategy could work:",
+    "- When results will be reviewed:",
+    "- What would show the strategy is working:",
+    "- What would show the strategy needs changes or should stop:",
+    "- Automatic pause or shutdown conditions and logging:",
+    "- Tests to run and expected results:",
+}
+FORBIDDEN_USER_FACING_PHRASES = {
+    "acceptance criteria",
+    "evaluation horizon",
+    "success and failure criteria",
+    "success criteria",
+    "success criterion",
+    "success or failure criteria",
+}
+REQUIRED_REPLACEMENT_GUIDANCE = {
+    "every section heading from the current plan template",
+    "update the existing plan",
+    "replace the trading strategy with a new one",
+    "`docs/replacement-plan.md`",
+    "does not authorize deletion, plan promotion, or implementation",
+    "Show the exact proposed deletion paths",
+    "separate explicit approval",
+    "Never recursively delete the project root",
+    "Never delete `.env`",
+    "If the user declines",
+    "replace `docs/plan.md` with `docs/replacement-plan.md`",
+}
+REQUIRED_README_REPLACEMENT_GUIDANCE = {
+    "recognizes the folder as an existing project",
+    "`docs/replacement-plan.md`",
+    "separate explicit approval",
+    "never recursively deletes the project root",
+    "never deletes `.env`",
+}
 
 
 def frontmatter(path: Path) -> dict[str, str]:
@@ -109,6 +146,28 @@ def validate() -> list[str]:
                 "strategy plan template is missing sections "
                 f"{sorted(missing_sections)}"
             )
+        plan_lines = {line.partition(" _")[0] for line in plan_text.splitlines()}
+        missing_fields = REQUIRED_PLAIN_LANGUAGE_PLAN_FIELDS - plan_lines
+        if missing_fields:
+            errors.append(
+                "strategy plan template is missing plain-language fields "
+                f"{sorted(missing_fields)}"
+            )
+
+        interview_path = strategy / "references" / "interview.md"
+        if interview_path.is_file():
+            interview_text = interview_path.read_text(encoding="utf-8")
+            user_facing_text = f"{interview_text}\n{plan_text}".lower()
+            found_phrases = {
+                phrase
+                for phrase in FORBIDDEN_USER_FACING_PHRASES
+                if phrase in user_facing_text
+            }
+            if found_phrases:
+                errors.append(
+                    "strategy interview or plan uses replaced planning jargon "
+                    f"{sorted(found_phrases)}"
+                )
 
     strategy_text = (strategy / "SKILL.md").read_text(encoding="utf-8")
     missing_states = {
@@ -117,6 +176,34 @@ def validate() -> list[str]:
     if missing_states:
         errors.append(
             "strategy-creator is missing plan states " f"{sorted(missing_states)}"
+        )
+
+    interview_text = (
+        strategy / "references" / "interview.md"
+    ).read_text(encoding="utf-8")
+    manual_text = " ".join(f"{strategy_text}\n{interview_text}".split())
+    missing_replacement_guidance = {
+        guidance
+        for guidance in REQUIRED_REPLACEMENT_GUIDANCE
+        if guidance not in manual_text
+    }
+    if missing_replacement_guidance:
+        errors.append(
+            "strategy-creator is missing replacement guidance "
+            f"{sorted(missing_replacement_guidance)}"
+        )
+
+    readme_text = (ROOT / "README.md").read_text(encoding="utf-8")
+    normalized_readme = " ".join(readme_text.split())
+    missing_readme_guidance = {
+        guidance
+        for guidance in REQUIRED_README_REPLACEMENT_GUIDANCE
+        if guidance not in normalized_readme
+    }
+    if missing_readme_guidance:
+        errors.append(
+            "README is missing strategy replacement guidance "
+            f"{sorted(missing_readme_guidance)}"
         )
 
     alpha_runtime = {

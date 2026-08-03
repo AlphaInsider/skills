@@ -11,8 +11,10 @@ keys, `.env` values, or the configured AlphaInsider strategy ID.
 ## Objective
 
 - Goal: _not yet decided_
-- Trading hypothesis: _not yet decided_
-- Success and failure criteria: _not yet decided_
+- Why the strategy could work: _not yet decided_
+- When results will be reviewed: _not yet decided_
+- What would show the strategy is working: _not yet decided_
+- What would show the strategy needs changes or should stop: _not yet decided_
 
 ## AlphaInsider target
 
@@ -43,7 +45,7 @@ keys, `.env` values, or the configured AlphaInsider strategy ID.
 - AlphaInsider order method and sizing: _not yet decided_
 - Position and exposure constraints: _not yet decided_
 - Open-order, duplicate-event, retry, and recovery behavior: _not yet decided_
-- Disable or kill conditions and logging: _not yet decided_
+- Automatic pause or shutdown conditions and logging: _not yet decided_
 
 ## Backtesting
 
@@ -58,7 +60,7 @@ keys, `.env` values, or the configured AlphaInsider strategy ID.
 - Language, dependencies, and project structure: _not yet decided_
 - Data flow and persistent state: _not yet decided_
 - Environment variable names and operator commands: _not yet decided_
-- Test scenarios and acceptance criteria: _not yet decided_
+- Tests to run and expected results: _not yet decided_
 
 ## Confirmation
 

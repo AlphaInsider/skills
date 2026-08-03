@@ -8,19 +8,60 @@ questions and skip branches that cannot affect the project.
 - Ask exactly one decision question per turn and wait for the answer.
 - Recommend one answer with a short reason. Record the user's answer, not the
   recommendation or conversation.
+- Use plain trading language for a user who understands profit, loss, fees,
+  trades, and percentage limits. Avoid specialist terms when familiar words
+  work. If a specialist term is necessary, explain it immediately; for
+  example, describe drawdown as the largest drop from a previous high.
+- Make each question easy to answer by including a brief example or two or
+  three short choices. Use earlier answers to recommend a concrete choice that
+  the user can accept or adjust instead of asking them to invent a measurement.
 - Research repository, API, and provider facts instead of asking the user.
 - Challenge lookahead, overfitting, unavailable data, timing mismatches,
   hidden cost, unreliable execution, and unnecessary complexity. Offer the
   simplest feasible alternative and resolve the choice.
-- Update the matching plan section after every answer. Surface contradictions
-  immediately rather than collecting incompatible requirements.
+- Update the matching active plan section after every answer: `docs/plan.md`
+  for a new or updated strategy and `docs/replacement-plan.md` for a staged
+  replacement. Surface contradictions immediately rather than collecting
+  incompatible requirements.
 - Allow conservative defaults for incidental mechanics. Label them as agent
   defaults so the user accepts them with the complete plan.
 
+## Existing project branch
+
+After preflight recognizes a project from the status, `# Strategy Plan` title,
+and current template sections in `docs/plan.md`, ask exactly one question:
+"Would you like to update the existing plan or replace the trading strategy
+with a new one?" Present those as two short choices and recommend updating
+because it preserves prior decisions.
+
+- For **update**, preserve unaffected decisions and interview only the choices
+  the requested change affects. Return a `confirmed` or `implemented` plan to
+  `draft` before recording behavior changes.
+- For **replace**, leave the current plan and implementation untouched. Create
+  or resume `docs/replacement-plan.md` and run the complete decision tree for
+  the new strategy. A confirmed replacement plan proceeds only to the separate
+  deletion-approval gate in `SKILL.md`; it does not authorize deletion, plan
+  promotion, or implementation.
+
+If a valid replacement plan is already `draft`, resume its next unresolved
+decision. If it is `confirmed`, proceed to the deletion inventory and approval
+instead of repeating the interview.
+
 ## Decision tree
 
-1. **Intent** — Establish the goal, hypothesis, intended behavior, evaluation
-   horizon, and concrete success or failure criteria.
+1. **Intent** — Ask these as separate questions, in order when each still
+   applies:
+   - "What do you want this strategy to do?"
+   - "Why do you think this trading idea could work?"
+   - "After how much time or how many trades should we review the results?"
+   - "What results would tell you the strategy is working?"
+   - "What loss or behavior would make you change or stop it?"
+
+   Build the recommendation for each question from earlier answers. A concrete
+   result might be "profitable after fees over 50 trades without the account
+   falling more than 10% from a previous high." Treat these answers as a review
+   of whether the trading idea is working; keep them separate from automatic
+   safety limits and shutdown rules.
 2. **AlphaInsider target** — Resolve the configured strategy's strict `stock`
    or `cryptocurrency` type, then choose an instrument-selection mode:
    `fixed`, `dynamic`, or `constrained dynamic`. For fixed selection, record
@@ -43,10 +84,12 @@ questions and skip branches that cannot affect the project.
    sizing and order rules.
 6. **Risk and operations** — Resolve position/exposure limits, stops or exit
    constraints, missing/stale data behavior, retries, duplicate events,
-   restart state, disable conditions, logging, and recovery. For dynamic
-   instruments, resolve validation freshness and whether one invalid candidate
-   causes the cycle to continue with valid candidates or abort. Propose safe,
-   simple defaults when the strategy does not require a special choice.
+   restart state, automatic pause or shutdown conditions, logging, and
+   recovery. These are immediate safeguards, not the longer-term review of
+   whether the strategy is working. For dynamic instruments, resolve validation
+   freshness and whether one invalid candidate causes the cycle to continue
+   with valid candidates or abort. Propose safe, simple defaults when the
+   strategy does not require a special choice.
 7. **Resources** — Derive technical requirements before selecting tools.
    Research current primary documentation for plausible sources and libraries;
    check coverage, history, timestamps, latency, authentication, price, rate
@@ -61,13 +104,13 @@ questions and skip branches that cannot affect the project.
    each decision time; reject current-universe substitution and survivorship
    bias. If replay is infeasible, record the reason and do not offer a
    misleading test. If feasible, ask whether to backtest, then resolve the
-   historical window, evaluation timing, execution assumptions, costs, and
-   metrics. Reuse production decision logic and implement only the smallest
-   credible replay; signal-only evaluation is valid when portfolio accounting
-   would be speculative.
+   historical window, when results are measured, execution assumptions, costs,
+   and results to report. Reuse production decision logic and implement only
+   the smallest credible replay; signal-only evaluation is valid when portfolio
+   accounting would be speculative.
 9. **Implementation contract** — Resolve language when Python is unsuitable,
    module responsibilities, data flow, persistent state, configuration names,
-   one-cycle and continuous commands, test scenarios, and acceptance criteria.
+   one-cycle and continuous commands, tests to run, and expected results.
    Treat the selected project root as `.` in every persisted path; never embed
    machine-specific absolute paths or write generated artifacts into an
    installed skill directory.
@@ -86,3 +129,6 @@ Before presenting the plan for confirmation:
 - State backtesting as unavailable, declined, or accepted with its exact scope.
 - Present the complete normalized plan, including every agent default, and ask
   for explicit confirmation.
+- For a replacement, do not combine plan confirmation with deletion approval.
+  Leave the current plan and code unchanged until the user separately approves
+  the exact deletion list and replacement-plan promotion.
