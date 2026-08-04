@@ -1,8 +1,10 @@
 # Contributing
 
-Add each public skill under `skills/<skill-name>/` with a valid `SKILL.md` and
-matching `agents/openai.yaml`. Keep supporting references one level below the
-skill and include scripts only when deterministic behavior is valuable.
+Add each public skill under `skills/<skill-name>/` with a valid `SKILL.md`.
+Keep supporting references one level below the skill and include scripts only
+when deterministic behavior is valuable.
+Keep public skills and documentation agent-vendor agnostic; do not require
+vendor-specific metadata or behavior.
 
 When adding a public skill, update `EXPECTED_SKILLS` in
 `scripts/validate_catalog.py`, add installation and behavior coverage, and

@@ -1,27 +1,32 @@
 # AlphaInsider Skills
 
-Official agent skills for building with AlphaInsider and creating standalone
-AlphaInsider paper-trading strategies.
+## Overview
+
+AlphaInsider Skills provides reusable AI agent skills for integrating with
+AlphaInsider and building standalone automated paper-trading strategies. The
+skills are designed for developers who want API guidance, credential-safe
+tooling, or a structured workflow that turns a trading idea into a tested
+project.
 
 ## Skills
 
-- `alphainsider` — API references, credential-safe request tooling, normalized
-  sizing guidance, and reusable REST/WebSocket clients.
-- `strategy-creator` — an instruction manual with one local `.env` setup helper
-  that interviews one decision at a time, researches an appropriate data/tool
-  stack, maintains a confirmed plan, and builds, tests, documents, or changes
-  one automated stock or cryptocurrency strategy.
+- `alphainsider` documents the AlphaInsider API and includes reusable REST and
+  WebSocket clients, normalized trading calculations, and authenticated request
+  tooling.
+- `strategy-creator` interviews the user, researches suitable data sources,
+  maintains a confirmed strategy plan, and generates or updates one automated
+  stock or cryptocurrency strategy.
 
 ## Install
 
-AlphaInsider API skill only:
+Install only the AlphaInsider API skill:
 
 ```bash
 npx skills@latest add https://github.com/AlphaInsider/skills \
   --skill alphainsider
 ```
 
-Strategy Creator and its required dependency:
+Install Strategy Creator with its required AlphaInsider dependency:
 
 ```bash
 npx skills@latest add https://github.com/AlphaInsider/skills \
@@ -29,83 +34,35 @@ npx skills@latest add https://github.com/AlphaInsider/skills \
   --skill strategy-creator
 ```
 
-## Strategy Creator workflow
+## How it works
 
-Strategy Creator requires the AlphaInsider skill at startup, asks for a project
-root, and records each interview decision in `docs/plan.md`. It challenges
-unreliable assumptions, researches current providers and libraries, and
-prefers Alpaca for equity data or Coinbase for cryptocurrency data when they
-fit the confirmed requirements. Other supported data sources and explicitly
-authorized scraping remain available when justified.
+Use `alphainsider` when you need endpoint behavior, request examples, market
+data guidance, or reusable clients for an existing application.
 
-When `docs/plan.md` has a valid lifecycle status, the `# Strategy Plan` title,
-and the current template sections, Strategy Creator recognizes the folder as
-an existing project. It first asks whether to update the existing plan or
-replace the trading strategy with a new one, recommending an update to preserve
-unaffected decisions.
+Use `strategy-creator` when you want a complete strategy project. It asks one
+decision at a time and records the agreed design in `docs/plan.md`. After the
+plan is confirmed, it builds the smallest project that implements it, including
+strategy code, dependency configuration, documentation, and offline tests.
 
-A replacement is planned separately in `docs/replacement-plan.md`, leaving the
-current plan and implementation untouched. Confirming the replacement plan
-does not authorize deletion or implementation. The agent then lists every old
-generated project path proposed for deletion and obtains separate explicit
-approval. Approval promotes the replacement plan to `docs/plan.md`, removes
-only the approved old artifacts, and starts re-implementation. The workflow
-never recursively deletes the project root and never deletes `.env`,
-credentials, caches, unrelated files, or files with uncertain ownership. If
-approval is declined, the working strategy remains unchanged and the confirmed
-replacement plan remains resumable.
+Generated strategies use AlphaInsider as their only paper-trading order
+destination. They validate the configured asset class and instruments before
+ordering, reconcile existing positions and orders, and keep decision logic
+independently testable. Optional backtests are included only when the required
+historical inputs can be reconstructed without future information.
 
-The interview asks one short question at a time in plain trading language. To
-define how results will be judged, it proposes an understandable review period,
-results after fees, and loss or behavior that would mean the strategy needs to
-change or stop. The user can accept or adjust each recommendation without
-having to supply formal planning terms or design performance measurements from
-scratch.
+Credentials remain in the generated project's `.env`. Credential-safe helpers
+avoid displaying or recording secret values, and generated artifacts contain
+only variable names and safe examples. Each generated README includes a short,
+language-specific `Start` section with copy-paste setup, one-cycle, continuous,
+and test commands.
 
-If a required environment variable is missing, Strategy Creator names it and
-the exact project `.env` path, then asks the user either to add it there or to
-paste it in chat with a warning that chat is less secure. A pasted value is
-written through Strategy Creator's non-echoing helper, never displayed or
-recorded in project artifacts, and followed by non-ordering validation. The
-helper updates only the named entry, preserves unrelated `.env` content, and
-never writes inside an installed skill directory.
+Existing Strategy Creator projects can be updated or replaced. Replacement is
+planned separately and requires explicit approval before attributable files are
+removed. Offline verification mocks external services and never submits
+AlphaInsider orders.
 
-Each project retains the configured AlphaInsider strategy's strict stock or
-cryptocurrency type. Its instruments may be fixed, selected dynamically at
-runtime, or selected dynamically within a confirmed constraint. Explicitly
-named instruments are verified during planning; runtime-selected candidates
-are resolved and type-checked through AlphaInsider before they can be traded.
-
-The plan progresses through `draft`, `confirmed`, and `implemented`.
-Confirmation of the active `docs/plan.md` authorizes the agent to build a small
-standalone project with strategy source, offline tests, dependency
-configuration, `.env.example`, `README.md`, and `AGENTS.md`. The generated
-project uses AlphaInsider as its only paper-order destination and obtains its
-configured strategy from `.env`. Only credentials and local/cache/build
-artifacts are ignored; the plan, code, tests, and documentation remain
-commit-ready.
-
-Backtesting is optional and offered only when the strategy's historical inputs
-can be reconstructed without lookahead. Generated projects expose one-cycle
-and continuous operation plus tests and, when selected, a backtest command.
-Automated verification never submits AlphaInsider orders.
-
-Each generated README has a short `Start` section with ordered, copy-paste
-commands to install dependencies, prepare `.env`, and start either one decision
-cycle or continuous operation. Python instructions put
-`source .venv/bin/activate` immediately before the run commands. Other
-languages use the selected language's actual package-manager and runtime
-commands. Explanations stay brief.
-
-This version does not recognize or migrate workspaces created by the previous
-runtime-generating Strategy Creator.
-
-Strategy Creator treats its own directory and the AlphaInsider skill directory
-as read-only. It writes generated artifacts only into the user-selected project
-folder, defaulting to the invocation directory when that is a reasonable
-user-controlled location. Project folders beneath a user's home are allowed;
-installed skill directories and obviously unsafe system locations are not.
-Persisted project paths remain relative and portable.
+Detailed lifecycle, safety, and implementation rules remain in each skill's
+`SKILL.md` and references.
 
 ## Development
 

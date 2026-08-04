@@ -7,6 +7,8 @@ This repository publishes reusable AlphaInsider agent skills from `skills/`.
 - Keep each public skill self-contained except for the documented
   `strategy-creator` build-time dependency on `alphainsider`.
 - Expose public skills only as `skills/<name>/SKILL.md`.
+- Keep public skills and documentation agent-vendor agnostic; do not require
+  vendor-specific metadata or behavior.
 - Keep `SKILL.md` concise and route detailed material to one-level-deep
   `references/` files.
 - Put deterministic reusable code in `scripts/`; never place credentials,

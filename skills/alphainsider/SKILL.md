@@ -1,6 +1,6 @@
 ---
 name: alphainsider
-description: Build, debug, or document integrations with the AlphaInsider trading API, including strategies, subscriptions, normalized trading calculations, orders, positions, allocation rebalancing, bots, broker keys, webhooks, market data, timelines, billing, withdrawals, and WebSocket streams. Use when Codex needs AlphaInsider endpoint behavior, request examples, authentication rules, helper-managed defaults, the request helper, or reusable REST and WebSocket clients.
+description: Build, debug, or document integrations with the AlphaInsider trading API, including strategies, subscriptions, normalized trading calculations, orders, positions, allocation rebalancing, bots, broker keys, webhooks, market data, timelines, billing, withdrawals, and WebSocket streams. Use for AlphaInsider endpoint behavior, request examples, authentication rules, helper-managed defaults, the request helper, or reusable REST and WebSocket clients.
 ---
 
 # AlphaInsider API

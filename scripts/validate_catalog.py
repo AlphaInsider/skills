@@ -56,13 +56,6 @@ REQUIRED_REPLACEMENT_GUIDANCE = {
     "If the user declines",
     "replace `docs/plan.md` with `docs/replacement-plan.md`",
 }
-REQUIRED_README_REPLACEMENT_GUIDANCE = {
-    "recognizes the folder as an existing project",
-    "`docs/replacement-plan.md`",
-    "separate explicit approval",
-    "never recursively deletes the project root",
-    "never deletes `.env`",
-}
 REQUIRED_CREDENTIAL_GUIDANCE = {
     "`scripts/set_env_value.py`",
     "add the values to `.env` and tell you when ready",
@@ -73,13 +66,6 @@ REQUIRED_CREDENTIAL_GUIDANCE = {
     "approval to update only those names",
     "use the sibling request helper",
 }
-REQUIRED_README_CREDENTIAL_GUIDANCE = {
-    "exact project `.env` path",
-    "chat is less secure",
-    "non-echoing helper",
-    "preserves unrelated `.env` content",
-    "never writes inside an installed skill directory",
-}
 REQUIRED_STARTUP_GUIDANCE = {
     "a short `## Start` section",
     "ordered, copy-paste commands",
@@ -89,15 +75,26 @@ REQUIRED_STARTUP_GUIDANCE = {
     "`source .venv/bin/activate` immediately before the execution commands",
     "the project's exact package-manager and runtime commands",
 }
-REQUIRED_README_STARTUP_GUIDANCE = {
-    "short `Start` section",
-    "ordered, copy-paste commands",
-    "install dependencies",
-    "prepare `.env`",
-    "one decision cycle",
-    "continuous operation",
-    "`source .venv/bin/activate` immediately before the run commands",
-    "selected language's actual package-manager and runtime commands",
+README_MAX_WORDS = 450
+REQUIRED_README_SECTIONS = {
+    "# AlphaInsider Skills",
+    "## Overview",
+    "## Skills",
+    "## Install",
+    "## How it works",
+    "## Development",
+}
+REQUIRED_README_OVERVIEW_GUIDANCE = {
+    "`alphainsider`",
+    "`strategy-creator`",
+    "npx skills@latest add",
+    "`docs/plan.md`",
+    "paper-trading",
+    "Credentials remain",
+    "offline tests",
+    "language-specific `Start` section",
+    "explicit approval",
+    "never submits AlphaInsider orders",
 }
 
 
@@ -131,7 +128,6 @@ def validate() -> list[str]:
     for name in sorted(EXPECTED_SKILLS):
         skill_dir = SKILLS_DIR / name
         skill_md = skill_dir / "SKILL.md"
-        metadata = skill_dir / "agents" / "openai.yaml"
         if not skill_md.is_file():
             errors.append(f"{name}: missing SKILL.md")
             continue
@@ -146,8 +142,6 @@ def validate() -> list[str]:
             errors.append(f"{name}: frontmatter name does not match directory")
         if len(fields.get("description", "")) < 40:
             errors.append(f"{name}: description is too short")
-        if not metadata.is_file():
-            errors.append(f"{name}: missing agents/openai.yaml")
 
     strategy = SKILLS_DIR / "strategy-creator"
     actual_strategy_refs = {
@@ -257,37 +251,30 @@ def validate() -> list[str]:
 
     readme_text = (ROOT / "README.md").read_text(encoding="utf-8")
     normalized_readme = " ".join(readme_text.split())
-    missing_readme_guidance = {
-        guidance
-        for guidance in REQUIRED_README_REPLACEMENT_GUIDANCE
-        if guidance not in normalized_readme
-    }
-    if missing_readme_guidance:
+    missing_readme_sections = REQUIRED_README_SECTIONS - set(
+        readme_text.splitlines()
+    )
+    if missing_readme_sections:
         errors.append(
-            "README is missing strategy replacement guidance "
-            f"{sorted(missing_readme_guidance)}"
+            "README is missing sections " f"{sorted(missing_readme_sections)}"
         )
 
-    missing_readme_credential_guidance = {
-        guidance
-        for guidance in REQUIRED_README_CREDENTIAL_GUIDANCE
-        if guidance not in normalized_readme
-    }
-    if missing_readme_credential_guidance:
+    readme_word_count = len(readme_text.split())
+    if readme_word_count > README_MAX_WORDS:
         errors.append(
-            "README is missing credential setup guidance "
-            f"{sorted(missing_readme_credential_guidance)}"
+            f"README must not exceed {README_MAX_WORDS} words; "
+            f"found {readme_word_count}"
         )
 
-    missing_readme_startup_guidance = {
+    missing_readme_overview_guidance = {
         guidance
-        for guidance in REQUIRED_README_STARTUP_GUIDANCE
+        for guidance in REQUIRED_README_OVERVIEW_GUIDANCE
         if guidance not in normalized_readme
     }
-    if missing_readme_startup_guidance:
+    if missing_readme_overview_guidance:
         errors.append(
-            "README is missing generated startup guidance "
-            f"{sorted(missing_readme_startup_guidance)}"
+            "README is missing high-level guidance "
+            f"{sorted(missing_readme_overview_guidance)}"
         )
 
     alpha_runtime = {
