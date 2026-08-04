@@ -241,6 +241,13 @@ the build.
 
 Write `README.md` for humans: purpose, behavior, prerequisites, setup,
 environment variable names, commands, monitoring, limitations, and recovery.
+Include a short `## Start` section with ordered, copy-paste commands for
+dependency installation and `.env` preparation. Label the exact commands for
+one decision cycle and continuous operation equally. Match the selected
+language and keep explanations brief. For Python, place
+`source .venv/bin/activate` immediately before the execution commands. For any
+other language, use the project's exact package-manager and runtime commands;
+do not include Python steps.
 Write `AGENTS.md` for agents: treat `docs/plan.md` as authoritative, preserve
 the credential boundary and missing-variable setup choices, identify code/test
 entry points, and require the maintenance workflow below.

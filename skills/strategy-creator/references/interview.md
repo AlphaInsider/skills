@@ -111,6 +111,9 @@ instead of repeating the interview.
 9. **Implementation contract** — Resolve language when Python is unsuitable,
    module responsibilities, data flow, persistent state, configuration names,
    one-cycle and continuous commands, tests to run, and expected results.
+   Require the generated README's short startup sequence to use those exact
+   language-specific setup and run commands; for Python, include
+   `source .venv/bin/activate` before the run choices.
    Treat the selected project root as `.` in every persisted path; never embed
    machine-specific absolute paths or write generated artifacts into an
    installed skill directory.

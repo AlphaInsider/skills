@@ -90,6 +90,13 @@ can be reconstructed without lookahead. Generated projects expose one-cycle
 and continuous operation plus tests and, when selected, a backtest command.
 Automated verification never submits AlphaInsider orders.
 
+Each generated README has a short `Start` section with ordered, copy-paste
+commands to install dependencies, prepare `.env`, and start either one decision
+cycle or continuous operation. Python instructions put
+`source .venv/bin/activate` immediately before the run commands. Other
+languages use the selected language's actual package-manager and runtime
+commands. Explanations stay brief.
+
 This version does not recognize or migrate workspaces created by the previous
 runtime-generating Strategy Creator.
 

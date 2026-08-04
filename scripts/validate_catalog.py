@@ -80,6 +80,25 @@ REQUIRED_README_CREDENTIAL_GUIDANCE = {
     "preserves unrelated `.env` content",
     "never writes inside an installed skill directory",
 }
+REQUIRED_STARTUP_GUIDANCE = {
+    "a short `## Start` section",
+    "ordered, copy-paste commands",
+    "dependency installation and `.env` preparation",
+    "one decision cycle and continuous operation equally",
+    "Match the selected language",
+    "`source .venv/bin/activate` immediately before the execution commands",
+    "the project's exact package-manager and runtime commands",
+}
+REQUIRED_README_STARTUP_GUIDANCE = {
+    "short `Start` section",
+    "ordered, copy-paste commands",
+    "install dependencies",
+    "prepare `.env`",
+    "one decision cycle",
+    "continuous operation",
+    "`source .venv/bin/activate` immediately before the run commands",
+    "selected language's actual package-manager and runtime commands",
+}
 
 
 def frontmatter(path: Path) -> dict[str, str]:
@@ -225,6 +244,17 @@ def validate() -> list[str]:
             f"{sorted(missing_credential_guidance)}"
         )
 
+    missing_startup_guidance = {
+        guidance
+        for guidance in REQUIRED_STARTUP_GUIDANCE
+        if guidance not in manual_text
+    }
+    if missing_startup_guidance:
+        errors.append(
+            "strategy-creator is missing generated README startup guidance "
+            f"{sorted(missing_startup_guidance)}"
+        )
+
     readme_text = (ROOT / "README.md").read_text(encoding="utf-8")
     normalized_readme = " ".join(readme_text.split())
     missing_readme_guidance = {
@@ -247,6 +277,17 @@ def validate() -> list[str]:
         errors.append(
             "README is missing credential setup guidance "
             f"{sorted(missing_readme_credential_guidance)}"
+        )
+
+    missing_readme_startup_guidance = {
+        guidance
+        for guidance in REQUIRED_README_STARTUP_GUIDANCE
+        if guidance not in normalized_readme
+    }
+    if missing_readme_startup_guidance:
+        errors.append(
+            "README is missing generated startup guidance "
+            f"{sorted(missing_readme_startup_guidance)}"
         )
 
     alpha_runtime = {
