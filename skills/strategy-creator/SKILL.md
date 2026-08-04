@@ -12,30 +12,23 @@ contains no provider or runtime code.
 ## Scope
 
 - Build one fully automated AlphaInsider paper-trading strategy per project.
-- Fix the project to the configured AlphaInsider strategy's explicit asset
-  class: `stock` or `cryptocurrency`. Every traded instrument must match that
-  class. Cross-asset and alternative data may inform signals but cannot expand
-  it.
-- Support fixed, dynamic, and constrained-dynamic instrument selection. Do not
-  require a predefined instrument list when the strategy selects candidates at
-  runtime.
-- Use AlphaInsider as the only order destination. Never instantiate a live
-  broker trading client.
-- Map the project to the user's AlphaInsider strategy through
-  `ALPHAINSIDER_STRATEGY_ID` in `.env`.
-- Never inspect or print existing `.env` values or API keys. When a required
-  value is missing, offer the user the credential setup choices below.
+- Use AlphaInsider as the only order destination; never create a live-broker
+  client. Select its strategy through `ALPHAINSIDER_STRATEGY_ID` in `.env`.
+- Keep the configured `stock` or `cryptocurrency` asset class. Signals may use
+  cross-asset or alternative data, but every traded instrument must match.
+- Support fixed, dynamic, and constrained-dynamic selection without requiring
+  a predefined runtime candidate list.
+- Never inspect or print existing `.env` values or API keys. Use the credential
+  workflow below when values are missing.
 - Treat this skill directory and the sibling `alphainsider` skill directory as
-  read-only sources. The setup helper may be executed from the selected project
-  root, but never create, edit, format, or delete files in either skill.
-- Write every generated strategy artifact inside the selected project root.
+  read-only sources. Run the setup helper only from the selected project root;
+  write all generated artifacts there and never modify either skill.
 
 ## Preflight
 
-1. Locate this skill and the sibling `alphainsider` skill. Require this skill's
-   `scripts/set_env_value.py` plus the sibling's `SKILL.md`,
-   `scripts/alphainsider_request.py`, and `scripts/runtime/` before doing any
-   work. If missing, stop and ask the user to install both skills:
+1. Require this skill's `scripts/set_env_value.py` and the sibling
+   `alphainsider` skill's `SKILL.md`, `scripts/alphainsider_request.py`, and
+   `scripts/runtime/`. If missing, stop and request both skills:
 
    ```bash
    npx skills@latest add https://github.com/AlphaInsider/skills \
@@ -44,203 +37,150 @@ contains no provider or runtime code.
 
 2. Read [references/interview.md](references/interview.md) and
    [references/plan-template.md](references/plan-template.md) in full.
-3. Ask for the project root, recommending the directory from which the user
-   invoked the skill. Accept a normal user-controlled project location,
-   including a suitable project directory beneath the user's home, when the
-   required files can be added safely. Reject an installed skill directory, an
-   obviously unsafe system location, or a location where the project cannot be
-   created. Use reasonable judgment; do not maintain an exhaustive path
-   denylist or perform elaborate filesystem checks. If unsuitable, explain why
-   and ask for another path.
-4. Inspect `docs/plan.md` without opening `.env`. Recognize the root as a
-   project created by this skill only when that file has a valid `draft`,
-   `confirmed`, or `implemented` status, the `# Strategy Plan` title, and every
-   section heading from the current plan template. Do not require the current
-   field wording; this stable signature covers earlier projects that use the
-   same plan lifecycle and sections.
-5. For a recognized project, ask exactly one question before any strategy
-   interview: whether to **update the existing plan** or **replace the trading
-   strategy with a new one**. Recommend updating because it preserves prior
-   decisions.
-   - For an update, preserve unaffected decisions, keep a `draft` plan in that
-     state, and return a `confirmed` or `implemented` plan to `draft` before
-     changing behavior. Interview only the affected decisions.
-   - For a replacement, follow the replacement lifecycle below. Do not alter
-     the current plan or implementation while interviewing the replacement.
-6. Inspect the rest of the selected project root without opening `.env`; list
-   only files this workflow would create or change that already exist. Treat
-   collisions other than recognized plan files as ordinary file conflicts and
-   obtain explicit overwrite approval. Preserve unrelated files.
+3. Ask for the project root; recommend the invocation directory. Accept a
+   normal user-controlled project location, including a suitable project
+   directory beneath the user's home, when writable. Reject an installed skill
+   directory, an obviously unsafe system location, or an unusable location.
+   Use judgment; do not maintain an exhaustive path denylist or perform
+   elaborate filesystem checks. Explain rejections and ask for another path.
+4. Without opening `.env`, recognize an existing project only when
+   `docs/plan.md` has a valid `draft`, `confirmed`, or `implemented` status,
+   the `# Strategy Plan` title, and every section heading from the current plan
+   template. Ignore field wording so earlier projects with this signature work.
+5. For a recognized project, ask exactly one question before the interview:
+   whether to **update the existing plan** or **replace the trading strategy
+   with a new one**. Recommend updating. For an update, preserve unaffected
+   decisions, keep `draft` as-is, return later states to `draft`, and interview
+   only affected decisions. For replacement, follow that lifecycle without
+   altering the current plan or implementation.
+6. Without opening `.env`, list only existing paths this workflow would change.
+   Treat other collisions as ordinary conflicts, obtain explicit overwrite
+   approval, and preserve unrelated files.
 
 Do not recognize or migrate legacy manifests, checkpoints, backups, generated
-runtime layouts, provider modules, or plan schemas. Do not create replacement
+runtime layouts, provider modules, or plan schemas; do not create replacement
 backups or management metadata.
 
 ## Environment setup
 
-When validation or a generated strategy reports a missing required environment
-variable:
+For each missing required variable:
 
-1. Name the missing variable or variables and show the exact selected-project
-   `.env` path without opening that file.
-2. Ask the user to either add the values to `.env` and tell you when ready, or
-   paste them in chat so you can add them. Warn that pasting credentials in
-   chat is less secure. For one missing variable, accept a bare value; for
-   several, request one `NAME=value` line per variable.
-3. Treat pasted values as approval to update only those names in `.env`. Never
-   echo, quote, summarize, log, or record them in plans, `.env.example`, source,
-   tests, documentation, or command arguments.
-4. For each pasted value, run the following from the selected project root and
-   supply the value only through the helper's non-echoing prompt:
+1. Name it and show the selected project's exact `.env` path without opening
+   the file.
+2. Ask the user to add the values to `.env` and tell you when ready, or paste
+   them in chat so you can add them. Warn that pasting credentials in chat is
+   less secure. Accept a bare value for one variable or one `NAME=value` line
+   per variable for several.
+3. Pasted values grant approval to update only those names. Never echo, quote,
+   summarize, log, or record values in plans, `.env.example`, source, tests,
+   documentation, or command arguments.
+4. From the project root, pass each value only through this non-echoing prompt:
 
    ```bash
    python /absolute/path/to/strategy-creator/scripts/set_env_value.py NAME
    ```
 
-   Do not open `.env` before or after the update. The helper preserves unrelated
-   entries and writes only the requested name. Pasted-value approval is also
-   approval for that exact `.env` update; do not ask a separate collision
-   question.
-5. Rerun the non-ordering validation that reported the missing value. For
-   AlphaInsider configuration, use the sibling request helper and report only
-   the validation result, never credentials or strategy IDs.
+   Do not open `.env` before or after the update. The helper preserves other
+   entries. Pasting grants approval to update only those names, so do not ask
+   again.
+5. Rerun the non-ordering check. For AlphaInsider configuration, use the sibling
+   request helper and report only the result, never credentials or strategy IDs.
 
 ## Plan lifecycle
 
-Use `docs/plan.md` as the source of truth for the current strategy. During a
-replacement, use `docs/replacement-plan.md` as the prospective plan while the
-current plan remains authoritative. Both plans use only `draft`, `confirmed`,
-and `implemented`.
+`docs/plan.md` is authoritative. Stage replacements in
+`docs/replacement-plan.md` while the current plan remains active. Both use only
+`draft`, `confirmed`, and `implemented`.
 
 ### Replacement
 
-1. When the user chooses replacement, resume `docs/replacement-plan.md` if it
-   has the current plan signature and is `draft` or `confirmed`. Treat any
-   other existing file at that path as an ordinary collision and obtain
-   explicit overwrite approval before starting a new replacement plan.
-2. For a new replacement, create `docs/replacement-plan.md` from the plan
-   template on the first confirmed interview answer. Follow the complete
-   interview from intent onward and update that file after every answer. Do not
-   modify `docs/plan.md` or any current implementation artifact.
-3. Explicit confirmation changes the replacement plan to `confirmed`, but does
-   not authorize deletion, plan promotion, or implementation. Inventory the
-   exact old artifacts attributable to this skill, using the current plan and
-   project contents. Include generated strategy source, tests, copied runtime,
-   dependency configuration, `.env.example`, `.gitignore`, `README.md`, and
-   `AGENTS.md` when present and attributable to the current strategy.
-4. Show the exact proposed deletion paths and ask for separate explicit
-   approval that also covers replacing `docs/plan.md` with the confirmed
-   replacement plan. Never recursively delete the project root. Never delete
-   `.env`, credentials, caches, unrelated files, or files whose ownership is
-   uncertain.
-5. If the user declines, leave the current plan and implementation unchanged
-   and retain the confirmed replacement plan for later resumption.
-6. If the user approves, delete only the approved paths, replace
-   `docs/plan.md` with `docs/replacement-plan.md`, remove the temporary path,
-   and follow the Confirmed workflow to build the replacement. After complete
-   offline verification, set the promoted plan to `implemented`.
+1. When replacing, resume `docs/replacement-plan.md` if it has the current plan
+   signature and is `draft` or `confirmed`. Treat any other existing file at
+   that path as an ordinary collision and obtain overwrite approval.
+2. Otherwise create it from the template after the first confirmed answer,
+   complete the full interview, and update it after every answer. Do not modify
+   `docs/plan.md` or any current implementation artifact.
+3. Confirmation sets the replacement to `confirmed` but does not authorize
+   deletion, plan promotion, or implementation. Inventory attributable source,
+   tests, copied runtime, dependencies, `.env.example`, `.gitignore`,
+   `README.md`, and `AGENTS.md` from the current plan and project.
+4. Show the exact proposed deletion paths and request separate explicit
+   approval to delete them and replace `docs/plan.md` with the confirmed plan.
+   Never recursively delete the project root. Never delete `.env`, credentials,
+   caches, unrelated files, or files whose ownership is uncertain.
+5. If the user declines, change nothing and retain the confirmed replacement
+   plan for later resumption.
+6. If approved, delete only the approved paths, replace `docs/plan.md` with
+   `docs/replacement-plan.md`, remove the temporary path, build through the
+   Confirmed workflow, verify offline, and set the promoted plan to
+   `implemented`.
 
 Plan confirmation and deletion approval are separate decisions. Never delete
-or reimplement the current strategy based only on replacement-plan
-confirmation.
+or reimplement from replacement confirmation alone.
 
 ### Draft
 
-1. On the first confirmed interview answer, create `docs/plan.md` from the
-   plan template after obtaining permission to create or replace that path.
-2. Follow the interview reference. Ask exactly one decision question per turn,
-   recommend an answer with a short reason, wait for the response, and write
-   the normalized answer immediately. Do not preserve the transcript.
-3. Research discoverable facts instead of asking the user. When requirements
-   are known, research current data sources and libraries using primary
-   documentation. Recommend the smallest feasible stack and obtain the user's
-   confirmation before recording it.
-4. Prefer Alpaca for equities and Coinbase for cryptocurrency when they meet
-   the requirements. Treat scraping as an explicitly approved, authorized
-   fallback when a supported API or feed is unsuitable.
-5. Prefer deterministic signal logic. Permit hosted models only when the plan
-   defines their inputs, outputs, version expectations, cost limits, timeouts,
-   failure behavior, and replay limitations.
-6. Before confirmation, use the sibling skill's request helper for read-only
-   validation of the configured AlphaInsider strategy and its asset class. If
-   the user explicitly names instruments, also validate their AlphaInsider
-   mappings. For dynamic selection, record the runtime resolution contract
-   without requiring candidate mappings in advance. Let the helper read
-   `.env`; never read it yourself. If configuration is missing, follow
-   **Environment setup** above. Record validation results without credentials
-   or strategy IDs.
-7. Offer backtesting only when every decision input can be reconstructed as it
-   was known at the decision time. If feasible, ask whether the user wants it;
-   if accepted, resolve the window and scope. Otherwise record why it would be
-   misleading or infeasible.
-8. Resolve contradictions and implementation-blocking decisions, then present
-   the complete normalized plan. Explicit confirmation of `docs/plan.md`
-   changes the status to `confirmed` and authorizes implementation immediately.
-   Confirmation of `docs/replacement-plan.md` stops at the separate deletion
-   gate above.
+1. After permission, create `docs/plan.md` from the template on the first
+   confirmed answer.
+2. Follow the interview reference: ask one decision per turn, record each
+   normalized answer immediately, research discoverable facts and the smallest
+   feasible stack, and obtain required confirmations. Do not keep a transcript.
+3. Before confirmation, let the sibling request helper read `.env` and validate
+   the AlphaInsider strategy and asset class. Validate explicit instrument
+   mappings; for dynamic selection, record runtime resolution instead. Follow
+   **Environment setup** when needed, and record no credentials or strategy IDs.
+4. Resolve contradictions and placeholders, then present the complete plan.
+   Explicit confirmation of `docs/plan.md` sets `confirmed` and authorizes
+   implementation immediately. Replacement confirmation stops at its deletion
+   gate.
 
-Do not generate strategy code while the plan is `draft`. Conservative agent
-defaults are allowed for incidental mechanics only when labeled in the plan;
-the final confirmation must make them visible and accepted.
+Do not code while the plan is `draft`. Label incidental conservative defaults
+for acceptance with the complete plan.
 
 ### Confirmed
 
-Read the relevant sibling AlphaInsider references before writing integration
-code, especially authentication, runtime-client, stocks, trades,
-input-multiplier, and WebSocket guidance as applicable.
-
-Before writing, inventory every exact project path the confirmed plan will
-create or change. Plan confirmation authorizes new files, but an existing file
-still requires explicit overwrite approval. Keep every write inside the
-selected project root. Use machine-specific absolute paths only to locate the
-project during the current run; persist project-relative paths in the project.
+Read the applicable sibling references for authentication, runtime-client,
+stocks, trades, input-multiplier, and WebSockets. Inventory every path before
+writing. Confirmation authorizes new files, but an existing file still requires
+explicit overwrite approval. Keep every write inside the selected project
+root; use absolute paths only during the run and persist project-relative paths
+in the project.
 
 Build the smallest standalone project that satisfies the plan:
 
-- Use Python by default. Use another language only when the plan records a
-  concrete ecosystem reason and an equivalent AlphaInsider integration.
-- Create `strategy/`, `tests/`, `.env.example`, ecosystem dependency
-  configuration, `.gitignore`, `README.md`, and `AGENTS.md`. Keep internal
-  modules specific to the strategy instead of imposing a generic framework.
+- Default to Python; use another language only for a recorded ecosystem reason
+  with equivalent AlphaInsider integration. Create `strategy/`, `tests/`,
+  `.env.example`, dependency configuration, `.gitignore`, `README.md`, and
+  `AGENTS.md` without a generic framework.
 - For Python, read the sibling `scripts/runtime/client.py` as an immutable
-  source and copy it into the project; copy `stream.py` only when WebSockets are
-  required. Preserve credential and normalized-value behavior and adjust the
-  project copies without modifying or duplicating clients in either skill.
-- Put only variable names and safe examples in `.env.example`. Keep `.env`,
-  credentials, caches, and build artifacts ignored; keep the plan, source,
-  tests, and documentation commit-ready. Use **Environment setup** for any
-  required value that is still missing.
+  source and copy it into the project; copy `stream.py` only for WebSockets.
+  Preserve credential and normalized-value behavior; modify only project copies.
+- Put only names and safe examples in `.env.example`. Ignore `.env`, secrets,
+  caches, and build outputs; keep plans, source, tests, and docs commit-ready.
+  Use **Environment setup** for missing values.
 - Expose project-native commands for one decision cycle, continuous operation,
   tests, and an optional backtest when selected. Do not add a dry-run mode.
-- Implement the plan's `fixed`, `dynamic`, or `constrained dynamic` instrument
-  selection mode. For each actionable runtime candidate that lacks an exact
-  AlphaInsider ID, use `search_stocks` and reject missing or ambiguous matches;
-  never guess a mapping. Validate resolved IDs with `get_stocks`, batching
-  candidates when practical, and require each returned `security` to equal the
-  configured strategy's `stock` or `cryptocurrency` type before ordering.
-- Never submit an order for an unvalidated, missing, ambiguous, or mismatched
-  instrument. Revalidate newly selected or changed candidates according to the
-  plan's freshness rule. On validation failure, follow the plan-specific choice
-  to continue with valid candidates or abort that decision cycle.
+- Implement `fixed`, `dynamic`, or `constrained dynamic` selection. For runtime
+  candidates without exact IDs, use `search_stocks`; reject missing or ambiguous
+  results and never guess a mapping. Validate resolved IDs with `get_stocks`,
+  batch when practical, and require the configured `stock` or `cryptocurrency`
+  `security` type before ordering. Revalidate per the plan's freshness rule.
+  Never order an invalid candidate; continue with valid candidates or abort as
+  planned.
 - Reconcile relevant AlphaInsider positions and open orders before decisions,
-  validate the configured strategy type at startup, and implement the plan's
-  stale-data, retry, duplicate-event, recovery, logging, sizing, and risk
-  behavior. Never treat a missing `input_multiplier` as `1`.
-- Keep decision logic independently testable. When backtesting is selected,
-  replay production decisions chronologically without AlphaInsider calls or
-  future information. For dynamic selection, reconstruct the historical
-  candidate set as it existed at each decision time without survivorship bias.
-  Add portfolio accounting only when its execution and cost assumptions are
-  credible and documented.
+  validate its type at startup, and implement planned data, retry, duplicate,
+  recovery, logging, sizing, and risk behavior. Never default a missing
+  `input_multiplier` to `1`.
+- Keep decisions testable. Backtests replay production logic chronologically
+  without AlphaInsider calls or future information; reconstruct dynamic
+  candidate sets without survivorship bias. Add portfolio accounting only with
+  credible, documented execution and cost assumptions.
+- Add offline tests for signals, risk, order mapping, orchestration, and any
+  backtest; mock external services. Verification must never submit an order or
+  run an order-submitting command.
 
-After implementation, create strategy-specific offline tests for signals,
-risk rules, order mapping, orchestration, and backtesting when selected. Mock
-all external services. Tests and implementation verification must never submit
-AlphaInsider orders; do not run an order-submitting command merely to verify
-the build.
-
-Write `README.md` for humans: purpose, behavior, prerequisites, setup,
-environment variable names, commands, monitoring, limitations, and recovery.
+Write `README.md` for humans with purpose, behavior, prerequisites, setup,
+environment names, commands, monitoring, limitations, and recovery.
 Include a short `## Start` section with ordered, copy-paste commands for
 dependency installation and `.env` preparation. Label the exact commands for
 one decision cycle and continuous operation equally. Match the selected
@@ -248,20 +188,16 @@ language and keep explanations brief. For Python, place
 `source .venv/bin/activate` immediately before the execution commands. For any
 other language, use the project's exact package-manager and runtime commands;
 do not include Python steps.
-Write `AGENTS.md` for agents: treat `docs/plan.md` as authoritative, preserve
-the credential boundary and missing-variable setup choices, identify code/test
-entry points, and require the maintenance workflow below.
+Write `AGENTS.md` to make `docs/plan.md` authoritative, preserve the credential
+boundary and missing-variable setup choices, identify code/test entry points,
+and require maintenance below.
 
-Run the complete offline suite and static checks. When code, tests, plan, and
-documentation agree, set the plan status to `implemented`. Deployment or
-hosting is outside this workflow unless the user separately requests it.
-Before handoff, confirm that every created or changed strategy path belongs to
-the selected project root and that no operation wrote to either skill
-directory.
+Run all offline tests and static checks. When code, tests, plan, and docs agree,
+set `implemented`. Exclude deployment unless separately requested. Before
+handoff, confirm every changed path is in the project and neither skill changed.
 
 ### Implemented
 
-For any behavior change, return the plan to `draft`, interview the affected
-decisions one at a time, and obtain confirmation before editing code. Then
-update implementation, tests, `README.md`, and `AGENTS.md` together and restore
-`implemented` only after verification passes.
+For behavior changes, return the plan to `draft`, interview affected decisions
+one at a time, and reconfirm before code edits. Update code, tests, `README.md`,
+and `AGENTS.md` together; restore `implemented` only after verification.
