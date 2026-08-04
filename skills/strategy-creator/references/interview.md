@@ -115,6 +115,20 @@ instead of repeating the interview.
    machine-specific absolute paths or write generated artifacts into an
    installed skill directory.
 
+## Missing environment values
+
+A missing environment value is a setup gap, not a strategy decision. Pause the
+interview and follow **Environment setup** in `SKILL.md`. Name the missing
+variables and exact project `.env` path, then ask the user to either add the
+values there and tell you when ready, or paste them in chat so you can add them.
+Always warn that pasting credentials in chat is less secure.
+
+For pasted values, run `scripts/set_env_value.py` from the project root once per
+variable and provide each value only through its non-echoing prompt. Never open
+`.env`, repeat a value, or put one in a plan or command argument. Resume the
+interview only after the relevant non-ordering validation succeeds; use the
+sibling request helper for AlphaInsider strategy configuration.
+
 ## Confirmation gate
 
 Before presenting the plan for confirmation:

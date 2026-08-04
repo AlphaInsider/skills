@@ -5,8 +5,9 @@ description: Interview users one decision at a time, maintain a decision-complet
 
 # AlphaInsider Strategy Creator
 
-Use this skill as an instruction manual. Build only the project justified by the
-confirmed strategy plan; this skill contains no provider or runtime code.
+Use this skill as an instruction manual with one local `.env` setup helper.
+Build only the project justified by the confirmed strategy plan; this skill
+contains no provider or runtime code.
 
 ## Scope
 
@@ -22,17 +23,19 @@ confirmed strategy plan; this skill contains no provider or runtime code.
   broker trading client.
 - Map the project to the user's AlphaInsider strategy through
   `ALPHAINSIDER_STRATEGY_ID` in `.env`.
-- Never inspect, print, request, or copy `.env` values or API keys.
+- Never inspect or print existing `.env` values or API keys. When a required
+  value is missing, offer the user the credential setup choices below.
 - Treat this skill directory and the sibling `alphainsider` skill directory as
-  read-only sources. Never create, edit, format, or delete files in either one
-  while planning, building, testing, or maintaining a user's strategy.
+  read-only sources. The setup helper may be executed from the selected project
+  root, but never create, edit, format, or delete files in either skill.
 - Write every generated strategy artifact inside the selected project root.
 
 ## Preflight
 
-1. Locate this skill and the sibling `alphainsider` skill. Require its
-   `SKILL.md`, `scripts/alphainsider_request.py`, and `scripts/runtime/` before
-   doing any work. If missing, stop and ask the user to install both skills:
+1. Locate this skill and the sibling `alphainsider` skill. Require this skill's
+   `scripts/set_env_value.py` plus the sibling's `SKILL.md`,
+   `scripts/alphainsider_request.py`, and `scripts/runtime/` before doing any
+   work. If missing, stop and ask the user to install both skills:
 
    ```bash
    npx skills@latest add https://github.com/AlphaInsider/skills \
@@ -72,6 +75,35 @@ confirmed strategy plan; this skill contains no provider or runtime code.
 Do not recognize or migrate legacy manifests, checkpoints, backups, generated
 runtime layouts, provider modules, or plan schemas. Do not create replacement
 backups or management metadata.
+
+## Environment setup
+
+When validation or a generated strategy reports a missing required environment
+variable:
+
+1. Name the missing variable or variables and show the exact selected-project
+   `.env` path without opening that file.
+2. Ask the user to either add the values to `.env` and tell you when ready, or
+   paste them in chat so you can add them. Warn that pasting credentials in
+   chat is less secure. For one missing variable, accept a bare value; for
+   several, request one `NAME=value` line per variable.
+3. Treat pasted values as approval to update only those names in `.env`. Never
+   echo, quote, summarize, log, or record them in plans, `.env.example`, source,
+   tests, documentation, or command arguments.
+4. For each pasted value, run the following from the selected project root and
+   supply the value only through the helper's non-echoing prompt:
+
+   ```bash
+   python /absolute/path/to/strategy-creator/scripts/set_env_value.py NAME
+   ```
+
+   Do not open `.env` before or after the update. The helper preserves unrelated
+   entries and writes only the requested name. Pasted-value approval is also
+   approval for that exact `.env` update; do not ask a separate collision
+   question.
+5. Rerun the non-ordering validation that reported the missing value. For
+   AlphaInsider configuration, use the sibling request helper and report only
+   the validation result, never credentials or strategy IDs.
 
 ## Plan lifecycle
 
@@ -134,8 +166,9 @@ confirmation.
    the user explicitly names instruments, also validate their AlphaInsider
    mappings. For dynamic selection, record the runtime resolution contract
    without requiring candidate mappings in advance. Let the helper read
-   `.env`; never read it yourself. Record validation results without
-   credentials or strategy IDs.
+   `.env`; never read it yourself. If configuration is missing, follow
+   **Environment setup** above. Record validation results without credentials
+   or strategy IDs.
 7. Offer backtesting only when every decision input can be reconstructed as it
    was known at the decision time. If feasible, ask whether the user wants it;
    if accepted, resolve the window and scope. Otherwise record why it would be
@@ -175,7 +208,8 @@ Build the smallest standalone project that satisfies the plan:
   project copies without modifying or duplicating clients in either skill.
 - Put only variable names and safe examples in `.env.example`. Keep `.env`,
   credentials, caches, and build artifacts ignored; keep the plan, source,
-  tests, and documentation commit-ready.
+  tests, and documentation commit-ready. Use **Environment setup** for any
+  required value that is still missing.
 - Expose project-native commands for one decision cycle, continuous operation,
   tests, and an optional backtest when selected. Do not add a dry-run mode.
 - Implement the plan's `fixed`, `dynamic`, or `constrained dynamic` instrument
@@ -208,8 +242,8 @@ the build.
 Write `README.md` for humans: purpose, behavior, prerequisites, setup,
 environment variable names, commands, monitoring, limitations, and recovery.
 Write `AGENTS.md` for agents: treat `docs/plan.md` as authoritative, preserve
-the credential boundary, identify code/test entry points, and require the
-maintenance workflow below.
+the credential boundary and missing-variable setup choices, identify code/test
+entry points, and require the maintenance workflow below.
 
 Run the complete offline suite and static checks. When code, tests, plan, and
 documentation agree, set the plan status to `implemented`. Deployment or

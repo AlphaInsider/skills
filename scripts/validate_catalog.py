@@ -13,6 +13,7 @@ SKILLS_DIR = ROOT / "skills"
 EXPECTED_SKILLS = {"alphainsider", "strategy-creator"}
 EXPECTED_ALPHA_RUNTIME = {"__init__.py", "client.py", "stream.py"}
 EXPECTED_STRATEGY_REFERENCES = {"interview.md", "plan-template.md"}
+EXPECTED_STRATEGY_SCRIPTS = {"set_env_value.py"}
 EXPECTED_PLAN_STATES = {"draft", "confirmed", "implemented"}
 REQUIRED_PLAN_SECTIONS = {
     "# Strategy Plan",
@@ -61,6 +62,23 @@ REQUIRED_README_REPLACEMENT_GUIDANCE = {
     "separate explicit approval",
     "never recursively deletes the project root",
     "never deletes `.env`",
+}
+REQUIRED_CREDENTIAL_GUIDANCE = {
+    "`scripts/set_env_value.py`",
+    "add the values to `.env` and tell you when ready",
+    "paste them in chat so you can add them",
+    "pasting credentials in chat is less secure",
+    "non-echoing prompt",
+    "Do not open `.env` before or after the update",
+    "approval to update only those names",
+    "use the sibling request helper",
+}
+REQUIRED_README_CREDENTIAL_GUIDANCE = {
+    "exact project `.env` path",
+    "chat is less secure",
+    "non-echoing helper",
+    "preserves unrelated `.env` content",
+    "never writes inside an installed skill directory",
 }
 
 
@@ -122,13 +140,16 @@ def validate() -> list[str]:
             f"{sorted(EXPECTED_STRATEGY_REFERENCES)}"
         )
 
-    strategy_scripts = [
-        path
+    strategy_scripts = {
+        path.relative_to(strategy / "scripts").as_posix()
         for path in (strategy / "scripts").rglob("*")
         if path.is_file() and "__pycache__" not in path.parts
-    ]
-    if strategy_scripts:
-        errors.append("strategy-creator must not contain scripts")
+    }
+    if strategy_scripts != EXPECTED_STRATEGY_SCRIPTS:
+        errors.append(
+            "strategy-creator scripts must be exactly "
+            f"{sorted(EXPECTED_STRATEGY_SCRIPTS)}"
+        )
 
     plan_template = strategy / "references" / "plan-template.md"
     if plan_template.is_file():
@@ -193,6 +214,17 @@ def validate() -> list[str]:
             f"{sorted(missing_replacement_guidance)}"
         )
 
+    missing_credential_guidance = {
+        guidance
+        for guidance in REQUIRED_CREDENTIAL_GUIDANCE
+        if guidance not in manual_text
+    }
+    if missing_credential_guidance:
+        errors.append(
+            "strategy-creator is missing credential setup guidance "
+            f"{sorted(missing_credential_guidance)}"
+        )
+
     readme_text = (ROOT / "README.md").read_text(encoding="utf-8")
     normalized_readme = " ".join(readme_text.split())
     missing_readme_guidance = {
@@ -204,6 +236,17 @@ def validate() -> list[str]:
         errors.append(
             "README is missing strategy replacement guidance "
             f"{sorted(missing_readme_guidance)}"
+        )
+
+    missing_readme_credential_guidance = {
+        guidance
+        for guidance in REQUIRED_README_CREDENTIAL_GUIDANCE
+        if guidance not in normalized_readme
+    }
+    if missing_readme_credential_guidance:
+        errors.append(
+            "README is missing credential setup guidance "
+            f"{sorted(missing_readme_credential_guidance)}"
         )
 
     alpha_runtime = {

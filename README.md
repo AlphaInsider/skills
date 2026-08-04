@@ -7,10 +7,10 @@ AlphaInsider paper-trading strategies.
 
 - `alphainsider` — API references, credential-safe request tooling, normalized
   sizing guidance, and reusable REST/WebSocket clients.
-- `strategy-creator` — a knowledge-only manual that interviews one decision at
-  a time, researches an appropriate data/tool stack, maintains a confirmed
-  plan, and builds, tests, documents, or changes one automated stock or
-  cryptocurrency strategy.
+- `strategy-creator` — an instruction manual with one local `.env` setup helper
+  that interviews one decision at a time, researches an appropriate data/tool
+  stack, maintains a confirmed plan, and builds, tests, documents, or changes
+  one automated stock or cryptocurrency strategy.
 
 ## Install
 
@@ -61,6 +61,14 @@ results after fees, and loss or behavior that would mean the strategy needs to
 change or stop. The user can accept or adjust each recommendation without
 having to supply formal planning terms or design performance measurements from
 scratch.
+
+If a required environment variable is missing, Strategy Creator names it and
+the exact project `.env` path, then asks the user either to add it there or to
+paste it in chat with a warning that chat is less secure. A pasted value is
+written through Strategy Creator's non-echoing helper, never displayed or
+recorded in project artifacts, and followed by non-ordering validation. The
+helper updates only the named entry, preserves unrelated `.env` content, and
+never writes inside an installed skill directory.
 
 Each project retains the configured AlphaInsider strategy's strict stock or
 cryptocurrency type. Its instruments may be fixed, selected dynamically at
