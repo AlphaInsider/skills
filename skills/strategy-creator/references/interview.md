@@ -68,10 +68,15 @@ instead of repeating the interview.
 4. **Timing** — Resolve bar or event timing, polling or streaming, schedule,
    market-hours behavior, decision latency, late events, and when an order is
    evaluated relative to its signal.
-5. **Execution** — Resolve fixed orders versus allocation rebalancing, order
-   types, sizing units, entries, reductions, exits, and existing position/open
-   order reconciliation. Apply the sibling AlphaInsider skill's normalized
-   sizing and order rules.
+5. **Execution** — Resolve fixed versus allocation orders, types, sizing,
+   entries, reductions, exits, and position/open-order reconciliation; apply
+   the sibling AlphaInsider skill's normalized sizing/order rules. For
+   allocations or webhook leverage, ask a separate maximum-exposure question:
+   100% is 1× portfolio value, while AlphaInsider permits up to 200% (2×).
+   Treat 200% as the platform ceiling, not a default; do not assume 100% is the
+   platform maximum. Record the user's chosen cap under sizing and exposure
+   constraints. Buying power, fees, and slippage may lower executable exposure.
+   Use `getMaxOrderSize` as the fixed-order authority.
 6. **Risk and operations** — Resolve position/exposure limits, stops or exit
    constraints, missing/stale data behavior, retries, duplicate events,
    restart state, automatic pause or shutdown conditions, logging, and

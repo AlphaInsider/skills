@@ -106,6 +106,14 @@ REQUIRED_STARTUP_GUIDANCE = {
     "`source .venv/bin/activate` immediately before the execution commands",
     "the project's exact package-manager and runtime commands",
 }
+REQUIRED_EXPOSURE_GUIDANCE = {
+    "100% is 1× portfolio value",
+    "up to 200% (2×)",
+    "platform ceiling, not a default",
+    "do not assume 100% is the platform maximum",
+    "Record the user's chosen cap",
+    "`getMaxOrderSize`",
+}
 README_MAX_WORDS = 450
 REQUIRED_README_SECTIONS = {
     "# AlphaInsider Skills",
@@ -281,6 +289,17 @@ def validate() -> list[str]:
         errors.append(
             "strategy-creator is missing generated README startup guidance "
             f"{sorted(missing_startup_guidance)}"
+        )
+
+    missing_exposure_guidance = {
+        guidance
+        for guidance in REQUIRED_EXPOSURE_GUIDANCE
+        if guidance not in manual_text
+    }
+    if missing_exposure_guidance:
+        errors.append(
+            "strategy-creator is missing portfolio exposure guidance "
+            f"{sorted(missing_exposure_guidance)}"
         )
 
     readme_text = (ROOT / "README.md").read_text(encoding="utf-8")
