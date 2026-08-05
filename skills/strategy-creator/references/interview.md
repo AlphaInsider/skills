@@ -14,7 +14,8 @@ questions and skip branches that cannot affect the project.
   example, describe drawdown as the largest drop from a previous high.
 - Make each question easy to answer by including a brief example or two or
   three short choices. Use earlier answers to recommend a concrete choice that
-  the user can accept or adjust instead of asking them to invent a measurement.
+  the user can accept or adjust instead of asking them to invent an answer from
+  scratch.
 - Research repository, API, and provider facts instead of asking the user.
 - Challenge lookahead, overfitting, unavailable data, timing mismatches,
   hidden cost, unreliable execution, and unnecessary complexity. Offer the
@@ -49,19 +50,8 @@ instead of repeating the interview.
 
 ## Decision tree
 
-1. **Intent** — Ask these as separate questions, in order when each still
-   applies:
-   - "What do you want this strategy to do?"
-   - "Why do you think this trading idea could work?"
-   - "After how much time or how many trades should we review the results?"
-   - "What results would tell you the strategy is working?"
-   - "What loss or behavior would make you change or stop it?"
-
-   Build the recommendation for each question from earlier answers. A concrete
-   result might be "profitable after fees over 50 trades without the account
-   falling more than 10% from a previous high." Treat these answers as a review
-   of whether the trading idea is working; keep them separate from automatic
-   safety limits and shutdown rules.
+1. **Intent** — Ask "What do you want this strategy to do?" and record the
+   answer as the strategy goal.
 2. **AlphaInsider target** — Resolve the configured strategy's strict `stock`
    or `cryptocurrency` type, then choose an instrument-selection mode:
    `fixed`, `dynamic`, or `constrained dynamic`. For fixed selection, record
@@ -85,32 +75,34 @@ instead of repeating the interview.
 6. **Risk and operations** — Resolve position/exposure limits, stops or exit
    constraints, missing/stale data behavior, retries, duplicate events,
    restart state, automatic pause or shutdown conditions, logging, and
-   recovery. These are immediate safeguards, not the longer-term review of
-   whether the strategy is working. For dynamic instruments, resolve validation
-   freshness and whether one invalid candidate causes the cycle to continue
-   with valid candidates or abort. Propose safe, simple defaults when the
-   strategy does not require a special choice.
+   recovery. For dynamic instruments, resolve validation freshness and whether
+   one invalid candidate causes the cycle to continue with valid candidates or
+   abort. Propose safe, simple defaults when the strategy does not require a
+   special choice.
 7. **Resources** — Derive technical requirements before selecting tools.
    Research current primary documentation for plausible sources and libraries;
    check coverage, history, timestamps, latency, authentication, price, rate
    limits, licensing, reliability, and maintenance burden. Recommend the
-   smallest stack and obtain confirmation. Prefer Alpaca for equity data and
-   Coinbase for cryptocurrency data when they fit. Use scraping only with
-   explicit approval, permitted access, no suitable supported feed, and a
-   documented failure/maintenance plan.
+   smallest stack and record routine selections as agent defaults. Ask the user
+   only when cost, credentials, scraping, or another meaningful tradeoff needs
+   approval. Prefer Alpaca for equity data and Coinbase for cryptocurrency data
+   when they fit. Use scraping only with explicit approval, permitted access,
+   no suitable supported feed, and a documented failure/maintenance plan.
 8. **Backtesting** — Determine whether every signal input and decision timestamp
    can be reconstructed without future information. For dynamic selection,
    require the historical candidate set and selection inputs as they existed at
    each decision time; reject current-universe substitution and survivorship
-   bias. If replay is infeasible, record the reason and do not offer a
-   misleading test. If feasible, ask whether to backtest, then resolve the
-   historical window, when results are measured, execution assumptions, costs,
-   and results to report. Reuse production decision logic and implement only
-   the smallest credible replay; signal-only evaluation is valid when portfolio
-   accounting would be speculative.
+   bias. If replay is infeasible, record the reason, explain it to the user, and
+   do not offer backtesting. If feasible, always ask whether to backtest, then
+   resolve the historical window, when results are measured, execution
+   assumptions, costs, and results to report. Reuse production decision logic
+   and implement only the smallest credible replay; signal-only evaluation is
+   valid when portfolio accounting would be speculative.
 9. **Implementation contract** — Resolve language when Python is unsuitable,
    module responsibilities, data flow, persistent state, configuration names,
    one-cycle and continuous commands, tests to run, and expected results.
+   Select routine implementation details as agent defaults; ask the user only
+   when a material tradeoff requires their decision.
    Require the generated README's short startup sequence to use those exact
    language-specific setup and run commands; for Python, include
    `source .venv/bin/activate` before the run choices.
@@ -144,7 +136,8 @@ Before presenting the plan for confirmation:
 - If the user explicitly named instruments, verify their mappings through the
   read-only stock lookup workflow. Otherwise ensure the plan defines runtime
   lookup, asset-class validation, freshness, and failure behavior.
-- Ensure the selected data and library stack is available and approved.
+- Ensure the selected data and library stack is available and obtain approval
+  for any cost, credentials, scraping, or other material tradeoff.
 - Ensure no implementation-blocking placeholder or contradiction remains.
 - State backtesting as unavailable, declined, or accepted with its exact scope.
 - Present the complete normalized plan, including every agent default, and ask

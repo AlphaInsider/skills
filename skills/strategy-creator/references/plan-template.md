@@ -11,10 +11,6 @@ keys, `.env` values, or the configured AlphaInsider strategy ID.
 ## Objective
 
 - Goal: _not yet decided_
-- Why the strategy could work: _not yet decided_
-- When results will be reviewed: _not yet decided_
-- What would show the strategy is working: _not yet decided_
-- What would show the strategy needs changes or should stop: _not yet decided_
 
 ## AlphaInsider target
 
@@ -66,5 +62,3 @@ keys, `.env` values, or the configured AlphaInsider strategy ID.
 
 - Unresolved decisions: _not yet decided_
 - Agent-provided defaults: _none yet_
-- User confirmation: _pending_
-- Confirmation time: _pending_

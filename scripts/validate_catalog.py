@@ -48,20 +48,22 @@ REQUIRED_PLAN_SECTIONS = {
 }
 REQUIRED_PLAIN_LANGUAGE_PLAN_FIELDS = {
     "- Goal:",
+    "- Automatic pause or shutdown conditions and logging:",
+    "- Tests to run and expected results:",
+}
+REMOVED_PLAN_FIELDS = {
     "- Why the strategy could work:",
     "- When results will be reviewed:",
     "- What would show the strategy is working:",
     "- What would show the strategy needs changes or should stop:",
-    "- Automatic pause or shutdown conditions and logging:",
-    "- Tests to run and expected results:",
+    "- User confirmation:",
+    "- Confirmation time:",
 }
-FORBIDDEN_USER_FACING_PHRASES = {
-    "acceptance criteria",
-    "evaluation horizon",
-    "success and failure criteria",
-    "success criteria",
-    "success criterion",
-    "success or failure criteria",
+REMOVED_INTERVIEW_QUESTIONS = {
+    "Why do you think this trading idea could work?",
+    "After how much time or how many trades should we review the results?",
+    "What results would tell you the strategy is working?",
+    "What loss or behavior would make you change or stop it?",
 }
 REQUIRED_REPLACEMENT_GUIDANCE = {
     "every section heading from the current plan template",
@@ -216,21 +218,14 @@ def validate() -> list[str]:
                 "strategy plan template is missing plain-language fields "
                 f"{sorted(missing_fields)}"
             )
-
-        interview_path = strategy / "references" / "interview.md"
-        if interview_path.is_file():
-            interview_text = interview_path.read_text(encoding="utf-8")
-            user_facing_text = f"{interview_text}\n{plan_text}".lower()
-            found_phrases = {
-                phrase
-                for phrase in FORBIDDEN_USER_FACING_PHRASES
-                if phrase in user_facing_text
-            }
-            if found_phrases:
-                errors.append(
-                    "strategy interview or plan uses replaced planning jargon "
-                    f"{sorted(found_phrases)}"
-                )
+        obsolete_fields = {
+            field for field in REMOVED_PLAN_FIELDS if field in plan_text
+        }
+        if obsolete_fields:
+            errors.append(
+                "strategy plan template contains removed evaluation fields "
+                f"{sorted(obsolete_fields)}"
+            )
 
     strategy_text = (strategy / "SKILL.md").read_text(encoding="utf-8")
     missing_states = {
@@ -244,6 +239,16 @@ def validate() -> list[str]:
     interview_text = (
         strategy / "references" / "interview.md"
     ).read_text(encoding="utf-8")
+    obsolete_questions = {
+        question
+        for question in REMOVED_INTERVIEW_QUESTIONS
+        if question in interview_text
+    }
+    if obsolete_questions:
+        errors.append(
+            "strategy interview contains removed evaluation questions "
+            f"{sorted(obsolete_questions)}"
+        )
     manual_text = " ".join(f"{strategy_text}\n{interview_text}".split())
     missing_replacement_guidance = {
         guidance
