@@ -15,6 +15,7 @@ from typing import Sequence
 
 
 ENV_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+_UNQUOTED_VALUE = re.compile(r"^[A-Za-z0-9_./:@%+=,-]+$")
 
 
 class EnvUpdateError(ValueError):
@@ -49,7 +50,12 @@ def validate_project_root(project_root: Path) -> None:
 
 
 def render_assignment(name: str, value: str) -> str:
-    return f"{name}={json.dumps(value, ensure_ascii=False)}\n"
+    rendered_value = (
+        value
+        if _UNQUOTED_VALUE.fullmatch(value)
+        else json.dumps(value, ensure_ascii=False)
+    )
+    return f"{name}={rendered_value}\n"
 
 
 def updated_contents(contents: str, name: str, value: str) -> str:

@@ -228,7 +228,17 @@ def _configured_value(name: str, cwd: str) -> str | None:
             key, value = line.split("=", 1)
             key = key.strip()
             if key == name:
-                return value.strip().strip("'\"") or None
+                value = value.strip()
+                if len(value) >= 2 and value[0] == value[-1] == '"':
+                    try:
+                        decoded = json.loads(value)
+                    except json.JSONDecodeError:
+                        decoded = value[1:-1]
+                    if isinstance(decoded, str):
+                        value = decoded
+                elif len(value) >= 2 and value[0] == value[-1] == "'":
+                    value = value[1:-1]
+                return value or None
     return None
 
 
