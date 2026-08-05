@@ -28,7 +28,7 @@ contains no provider or runtime code.
 
 1. Require this skill's `scripts/set_env_value.py` and the sibling
    `alphainsider` skill's `SKILL.md`, `scripts/alphainsider_request.py`, and
-   `scripts/runtime/`. If missing, stop and request both skills:
+   `scripts/alphainsider_stream.py`. If missing, stop and request both skills:
 
    ```bash
    npx skills@latest add https://github.com/AlphaInsider/skills \
@@ -46,7 +46,7 @@ contains no provider or runtime code.
 4. Without opening `.env`, recognize an existing project only when
    `docs/plan.md` has a valid `draft`, `confirmed`, or `implemented` status,
    the `# Strategy Plan` title, and every section heading from the current plan
-   template. Ignore field wording so earlier projects with this signature work.
+   template. Ignore field wording; only this signature determines recognition.
 5. For a recognized project, ask exactly one question before the interview:
    whether to **update the existing plan** or **replace the trading strategy
    with a new one**. Recommend updating. For an update, preserve unaffected
@@ -57,9 +57,7 @@ contains no provider or runtime code.
    Treat other collisions as ordinary conflicts, obtain explicit overwrite
    approval, and preserve unrelated files.
 
-Do not recognize or migrate legacy manifests, checkpoints, backups, generated
-runtime layouts, provider modules, or plan schemas; do not create replacement
-backups or management metadata.
+Do not create replacement backups or management metadata.
 
 ## Environment setup
 
@@ -67,24 +65,28 @@ For each missing required variable:
 
 1. Name it and show the selected project's exact `.env` path without opening
    the file.
-2. Ask the user to add the values to `.env` and tell you when ready, or paste
-   them in chat so you can add them. Warn that pasting credentials in chat is
-   less secure. Accept a bare value for one variable or one `NAME=value` line
-   per variable for several.
-3. Pasted values grant approval to update only those names. Never echo, quote,
+2. Recommend that the user add the values to `.env` themselves and tell you
+   when ready.
+3. If the user wants agent-assisted entry instead, they may paste the values in
+   chat. Warn first that pasting credentials is less secure because the value
+   is visible to the agent. Accept a bare value for one variable or one
+   `NAME=value` line per variable for several.
+4. Pasted values grant approval to update only those names. Never echo, quote,
    summarize, log, or record values in plans, `.env.example`, source, tests,
    documentation, or command arguments.
-4. From the project root, pass each value only through this non-echoing prompt:
+5. From the project root, pass each value only through this non-echoing prompt:
 
    ```bash
    python /absolute/path/to/strategy-creator/scripts/set_env_value.py NAME
    ```
 
-   Do not open `.env` before or after the update. The helper preserves other
-   entries. Pasting grants approval to update only those names, so do not ask
-   again.
-5. Rerun the non-ordering check. For AlphaInsider configuration, use the sibling
-   request helper and report only the result, never credentials or strategy IDs.
+   Never pass a credential in a command argument. Do not open `.env` before or
+   after the update. The helper preserves other entries. Pasting grants
+   approval to update only those names, so do not ask again.
+6. Rerun the non-ordering check. For AlphaInsider configuration, use the sibling
+   request helper and report only the result, never credentials. Strategy IDs
+   and other non-secret values may be reported when the user supplied them or
+   explicitly asks for them.
 
 ## Plan lifecycle
 
@@ -102,8 +104,8 @@ For each missing required variable:
    `docs/plan.md` or any current implementation artifact.
 3. Confirmation sets the replacement to `confirmed` but does not authorize
    deletion, plan promotion, or implementation. Inventory attributable source,
-   tests, copied runtime, dependencies, `.env.example`, `.gitignore`,
-   `README.md`, and `AGENTS.md` from the current plan and project.
+   tests, copied AlphaInsider helpers, dependencies, `.env.example`,
+   `.gitignore`, `README.md`, and `AGENTS.md` from the current plan and project.
 4. Show the exact proposed deletion paths and request separate explicit
    approval to delete them and replace `docs/plan.md` with the confirmed plan.
    Never recursively delete the project root. Never delete `.env`, credentials,
@@ -139,12 +141,12 @@ for acceptance with the complete plan.
 
 ### Confirmed
 
-Read the applicable sibling references for authentication, runtime-client,
-stocks, trades, input-multiplier, and WebSockets. Inventory every path before
-writing. Confirmation authorizes new files, but an existing file still requires
-explicit overwrite approval. Keep every write inside the selected project
-root; use absolute paths only during the run and persist project-relative paths
-in the project.
+Read the sibling `alphainsider` skill for helper usage and the applicable API
+references for authentication, stocks, trades, input-multiplier, and
+WebSockets. Inventory every path before writing. Confirmation authorizes new
+files, but an existing file still requires explicit overwrite approval. Keep
+every write inside the selected project root; use absolute paths only during
+the run and persist project-relative paths in the project.
 
 Build the smallest standalone project that satisfies the plan:
 
@@ -152,9 +154,13 @@ Build the smallest standalone project that satisfies the plan:
   with equivalent AlphaInsider integration. Create `strategy/`, `tests/`,
   `.env.example`, dependency configuration, `.gitignore`, `README.md`, and
   `AGENTS.md` without a generic framework.
-- For Python, read the sibling `scripts/runtime/client.py` as an immutable
-  source and copy it into the project; copy `stream.py` only for WebSockets.
-  Preserve credential and normalized-value behavior; modify only project copies.
+- For Python, read the sibling `scripts/alphainsider_request.py` as an immutable
+  source and copy it to `strategy/alphainsider_request.py`. Copy
+  `scripts/alphainsider_stream.py` to `strategy/alphainsider_stream.py` only
+  when the confirmed plan uses WebSockets. Import the generic request and
+  calculation helpers, and add project-local endpoint functions only for the
+  strategy's actual needs. Preserve credential and normalized-value behavior;
+  modify only project copies.
 - Put only names and safe examples in `.env.example`. Ignore `.env`, secrets,
   caches, and build outputs; keep plans, source, tests, and docs commit-ready.
   Use **Environment setup** for missing values.

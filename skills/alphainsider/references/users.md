@@ -2,8 +2,6 @@
 
 REST base URL: `https://alphainsider.com/api`.
 
-Credential boundary: Authentication fields below describe API wire format. Agents should not read `ALPHAINSIDER_API_KEY` from environment variables or `.env`, and should use `scripts/alphainsider_request.py` so the helper injects private credentials.
-
 Public user lookup and authenticated user profile settings.
 
 ## getUsers - GET `/getUsers`
@@ -36,11 +34,10 @@ Outputs:
 | `response[].subscriber_count` | string | Number of subscribers. |
 | `response[].strategy_count` | string | Number of strategies. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getUsers \
-  --query "user_id[]=user_1"
+```http
+GET /getUsers?user_id[]=user_1
 ```
 
 ## getUserInfo - GET `/getUserInfo`
@@ -75,10 +72,11 @@ Outputs:
 | `response.updated_at` | string | Last update timestamp. |
 | `response.created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getUserInfo
+```http
+GET /getUserInfo
+Authorization: <API_TOKEN>
 ```
 
 ## updateUserInfo - POST `/updateUserInfo`
@@ -118,11 +116,14 @@ Outputs:
 | `response.updated_at` | string | Last update timestamp. |
 | `response.created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /updateUserInfo \
-  --json '{"bio":"Systematic long-term strategies","website":"https://example.com"}'
+```http
+POST /updateUserInfo
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"bio":"Systematic long-term strategies","website":"https://example.com"}
 ```
 
 ## updateUserNotifications - POST `/updateUserNotifications`
@@ -158,9 +159,12 @@ Outputs:
 | `response.updated_at` | string | Last update timestamp. |
 | `response.created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /updateUserNotifications \
-  --json '{"notifications":["subscription","subscription_email"]}'
+```http
+POST /updateUserNotifications
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"notifications":["subscription","subscription_email"]}
 ```

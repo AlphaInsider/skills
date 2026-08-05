@@ -2,8 +2,6 @@
 
 REST base URL: `https://alphainsider.com/api`.
 
-Credential boundary: Authentication fields below describe API wire format. Agents should not read `ALPHAINSIDER_API_KEY` from environment variables or `.env`, and should use `scripts/alphainsider_request.py` so the helper injects private credentials.
-
 Token verification for AlphaInsider API credentials.
 
 ## verifyToken - POST `/verifyToken`
@@ -31,8 +29,11 @@ Outputs:
 | `response.name` | string | Display name. |
 | `response.scope` | array of string | Permissions granted to the token. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /verifyToken
+```http
+POST /verifyToken
+Content-Type: application/json
+
+{"token":"<API_TOKEN>"}
 ```

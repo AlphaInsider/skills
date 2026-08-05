@@ -2,8 +2,6 @@
 
 REST base URL: `https://alphainsider.com/api`.
 
-Credential boundary: Authentication fields below describe API wire format. Agents should not read `ALPHAINSIDER_API_KEY` from environment variables or `.env`, and should use `scripts/alphainsider_request.py` so the helper injects private credentials.
-
 Balances, payouts, payout fees, income, and Stripe account links.
 
 ## getUserBalance - GET `/getUserBalance`
@@ -26,10 +24,11 @@ Outputs:
 | `response.amount_on_hold` | string | Amount on hold. |
 | `response.amount_available` | string | Amount available. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getUserBalance
+```http
+GET /getUserBalance
+Authorization: <API_TOKEN>
 ```
 
 ## getPayouts - GET `/getPayouts`
@@ -61,11 +60,11 @@ Outputs:
 | `response[].updated_at` | string | Last update timestamp. |
 | `response[].created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getPayouts \
-  --query "limit=20"
+```http
+GET /getPayouts?limit=20
+Authorization: <API_TOKEN>
 ```
 
 ## newPayout - POST `/newPayout`
@@ -96,11 +95,14 @@ Outputs:
 | `response.updated_at` | string | Last update timestamp. |
 | `response.created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /newPayout \
-  --json '{"amount":1000}'
+```http
+POST /newPayout
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"amount":1000}
 ```
 
 ## getPayoutFees - GET `/getPayoutFees`
@@ -121,11 +123,11 @@ Outputs:
 | `success` | boolean | True when the request succeeded. |
 | `response` | string | Endpoint-specific response payload, or an error message when `success` is false. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getPayoutFees \
-  --query "amount=1000"
+```http
+GET /getPayoutFees?amount=1000
+Authorization: <API_TOKEN>
 ```
 
 ## getIncome - GET `/getIncome`
@@ -152,12 +154,11 @@ Outputs:
 | `response[].strategy_owner` | string | User ID of the strategy owner. |
 | `response[].promotion` | string | Promotion. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getIncome \
-  --query "interval=month" \
-  --query "start_date=2026-01-01T00:00:00Z"
+```http
+GET /getIncome?interval=month&start_date=2026-01-01T00:00:00Z
+Authorization: <API_TOKEN>
 ```
 
 ## getStripeAccountLink - GET `/getStripeAccountLink`
@@ -178,9 +179,9 @@ Outputs:
 | `success` | boolean | True when the request succeeded. |
 | `response` | string | Endpoint-specific response payload, or an error message when `success` is false. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getStripeAccountLink \
-  --query "country=US"
+```http
+GET /getStripeAccountLink?country=US
+Authorization: <API_TOKEN>
 ```

@@ -6,8 +6,6 @@ Send `ping` about every 30 seconds; the server responds with `pong`. Send one `s
 
 WebSocket strategy, position, order, and timeline payloads carry normalized strategy values. Read `input-multiplier.md` before displaying live strategy values, positions, orders, trades, or performance changes to users.
 
-Credential boundary: Authenticated WebSocket subscriptions require a token in the client payload, but the REST request helper does not manage WebSocket sessions. Agents should not read `ALPHAINSIDER_API_KEY` from environment variables or `.env` for WebSocket use; use a user-provided secure runtime/client or a future WebSocket helper to supply the token.
-
 ## Channel Summary
 
 | Channel | Cadence | Description |

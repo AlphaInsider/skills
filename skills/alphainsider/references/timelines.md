@@ -2,11 +2,7 @@
 
 REST base URL: `https://alphainsider.com/api`.
 
-Credential boundary: Authentication fields below describe API wire format. Agents should not read `ALPHAINSIDER_API_KEY` from environment variables or `.env`, and should use `scripts/alphainsider_request.py` so the helper injects private credentials.
-
 Strategy timeline events, posts, previews, likes, and unlikes.
-
-The request helper can supply a default strategy ID for endpoints that accept `strategy_id` when the user has not supplied an explicit ID.
 
 Timeline trade/order `data.amount`, `data.total`, and `data.strategy_value` fields are normalized. Read `input-multiplier.md` before displaying timeline trades, holdings changes, fees, totals, or percent fallback.
 
@@ -59,11 +55,10 @@ Outputs:
 | `response[].data.links` | object | External research and market-data links. |
 | `response[].data.stock_status` | string | Current stock status. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getTimelines \
-  --query "timeline_id[]=timeline_123"
+```http
+GET /getTimelines?timeline_id[]=timeline_123
 ```
 
 ## getStrategyTimelines - GET `/getStrategyTimelines`
@@ -121,11 +116,10 @@ Outputs:
 | `response[].data.links` | object | External research and market-data links. |
 | `response[].data.stock_status` | string | Current stock status. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getStrategyTimelines \
-  --query "limit=20"
+```http
+GET /getStrategyTimelines?strategy_id[]=<STRATEGY_ID>&limit=20
 ```
 
 ## newPost - POST `/newPost`
@@ -166,11 +160,14 @@ Outputs:
 | `response.data.content.title` | string | Preview title. |
 | `response.data.content.description` | string | Human-readable description. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /newPost \
-  --json '{"description":"Weekly update"}'
+```http
+POST /newPost
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"description":"Weekly update","strategy_id":"<STRATEGY_ID>"}
 ```
 
 ## previewPost - POST `/previewPost`
@@ -208,11 +205,14 @@ Outputs:
 | `response.data.content.description` | string | Human-readable description. |
 | `response.data.content.image` | string | Preview image URL. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /previewPost \
-  --json '{"url":"https://example.com/research"}'
+```http
+POST /previewPost
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"url":"https://example.com/research","strategy_id":"<STRATEGY_ID>"}
 ```
 
 ## deletePost - POST `/deletePost`
@@ -233,11 +233,14 @@ Outputs:
 | `success` | boolean | True when the request succeeded. |
 | `response` | string | Endpoint-specific response payload, or an error message when `success` is false. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /deletePost \
-  --json '{"timeline_id":"timeline_123"}'
+```http
+POST /deletePost
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"timeline_id":"timeline_123"}
 ```
 
 ## like - POST `/like`
@@ -258,11 +261,14 @@ Outputs:
 | `success` | boolean | True when the request succeeded. |
 | `response` | string | Endpoint-specific response payload, or an error message when `success` is false. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /like \
-  --json '{"timeline_id":"timeline_123"}'
+```http
+POST /like
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"timeline_id":"timeline_123"}
 ```
 
 ## unlike - POST `/unlike`
@@ -283,9 +289,12 @@ Outputs:
 | `success` | boolean | True when the request succeeded. |
 | `response` | string | Endpoint-specific response payload, or an error message when `success` is false. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /unlike \
-  --json '{"timeline_id":"timeline_123"}'
+```http
+POST /unlike
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"timeline_id":"timeline_123"}
 ```

@@ -2,8 +2,6 @@
 
 REST base URL: `https://alphainsider.com/api`.
 
-Credential boundary: Authentication fields below describe API wire format. Agents should not read `ALPHAINSIDER_API_KEY` from environment variables or `.env`, and should use `scripts/alphainsider_request.py` so the helper injects private credentials.
-
 Bot lifecycle, broker keys, settings, notifications, performance, allocations, and activities.
 
 Supported bot brokers are `alpaca`, `binance`, `bitfinex`, and `hyperliquid`. Broker keys are private credentials: never print, log, commit, quote, or summarize them, and send only the key fields required by the selected broker.
@@ -17,8 +15,6 @@ Workflow rules:
 - `getBotAllocations.response[].positions` contains normalized strategy positions. For high-level target exposure, multiply the real broker portfolio value by the allocation percent and let AlphaInsider compute broker orders.
 - Use `updateBotBrokerKeys` to rotate credentials or switch paper/live mode, and confirm `getBotInfo.response.broker_status` before starting or restarting. To change broker type, create a new bot.
 - Bot statuses include `on`, `scheduled_rebalance`, `rebalancing`, `scheduled_close`, `closing`, `stopping`, and `off`. Confirm status before assuming a lifecycle action completed.
-
-The request helper can supply a default bot ID for endpoints that accept `bot_id` when the user has not supplied an explicit ID.
 
 ## getBots - GET `/getBots`
 
@@ -52,10 +48,11 @@ Outputs:
 | `response[].updated_at` | string | Last update timestamp. |
 | `response[].created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getBots
+```http
+GET /getBots?bot_id[]=<BOT_ID>
+Authorization: <API_TOKEN>
 ```
 
 ## getBotInfo - GET `/getBotInfo`
@@ -95,10 +92,11 @@ Outputs:
 | `response.broker_details.positions[].bid` | string | Current bid price. |
 | `response.broker_details.positions[].ask` | string | Current ask price. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getBotInfo
+```http
+GET /getBotInfo?bot_id=<BOT_ID>
+Authorization: <API_TOKEN>
 ```
 
 ## newBot - POST `/newBot`
@@ -143,11 +141,14 @@ Outputs:
 | `response.updated_at` | string | Last update timestamp. |
 | `response.created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /newBot \
-  --json '{"broker":"alpaca","broker_keys":{"live":false,"alpaca_key":"<key>","alpaca_secret":"<secret>"}}'
+```http
+POST /newBot
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"broker":"alpaca","broker_keys":{"live":false,"alpaca_key":"<key>","alpaca_secret":"<secret>"}}
 ```
 
 ## updateBotSettings - POST `/updateBotSettings`
@@ -186,11 +187,14 @@ Outputs:
 | `response.updated_at` | string | Last update timestamp. |
 | `response.created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /updateBotSettings \
-  --json '{"leverage":2,"slippage":0.005,"rebalance_on_start":true}'
+```http
+POST /updateBotSettings
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"leverage":2,"slippage":0.005,"rebalance_on_start":true,"bot_id":"<BOT_ID>"}
 ```
 
 ## updateBotBrokerKeys - POST `/updateBotBrokerKeys`
@@ -235,11 +239,14 @@ Outputs:
 | `response.updated_at` | string | Last update timestamp. |
 | `response.created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /updateBotBrokerKeys \
-  --json '{"broker_keys":{"live":false,"alpaca_key":"<key>","alpaca_secret":"<secret>"}}'
+```http
+POST /updateBotBrokerKeys
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"broker_keys":{"live":false,"alpaca_key":"<key>","alpaca_secret":"<secret>"},"bot_id":"<BOT_ID>"}
 ```
 
 ## updateBotNotifications - POST `/updateBotNotifications`
@@ -275,11 +282,14 @@ Outputs:
 | `response.updated_at` | string | Last update timestamp. |
 | `response.created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /updateBotNotifications \
-  --json '{"notifications":["start","stop","error"]}'
+```http
+POST /updateBotNotifications
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"notifications":["start","stop","error"],"bot_id":"<BOT_ID>"}
 ```
 
 ## deleteBot - POST `/deleteBot`
@@ -300,10 +310,14 @@ Outputs:
 | `success` | boolean | True when the request succeeded. |
 | `response` | string | Endpoint-specific response payload, or an error message when `success` is false. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /deleteBot
+```http
+POST /deleteBot
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"bot_id":"<BOT_ID>"}
 ```
 
 ## startBot - POST `/startBot`
@@ -339,11 +353,14 @@ Outputs:
 | `response.updated_at` | string | Last update timestamp. |
 | `response.created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /startBot \
-  --json '{"rebalance_on_start":true}'
+```http
+POST /startBot
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"rebalance_on_start":true,"bot_id":"<BOT_ID>"}
 ```
 
 ## stopBot - POST `/stopBot`
@@ -379,11 +396,14 @@ Outputs:
 | `response.updated_at` | string | Last update timestamp. |
 | `response.created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /stopBot \
-  --json '{"close_on_stop":false}'
+```http
+POST /stopBot
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"close_on_stop":false,"bot_id":"<BOT_ID>"}
 ```
 
 ## resetBot - POST `/resetBot`
@@ -418,10 +438,14 @@ Outputs:
 | `response.updated_at` | string | Last update timestamp. |
 | `response.created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /resetBot
+```http
+POST /resetBot
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"bot_id":"<BOT_ID>"}
 ```
 
 ## getBotPerformance - GET `/getBotPerformance`
@@ -452,12 +476,11 @@ Outputs:
 | `response[].activity` | string | Trade activity label for a performance interval. |
 | `response[].created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getBotPerformance \
-  --query "start_date=2026-01-01T00:00:00Z" \
-  --query "interval=day"
+```http
+GET /getBotPerformance?bot_id=<BOT_ID>&start_date=2026-01-01T00:00:00Z&interval=day
+Authorization: <API_TOKEN>
 ```
 
 ## resetBotPerformance - POST `/resetBotPerformance`
@@ -478,10 +501,14 @@ Outputs:
 | `success` | boolean | True when the request succeeded. |
 | `response` | string | Endpoint-specific response payload, or an error message when `success` is false. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /resetBotPerformance
+```http
+POST /resetBotPerformance
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"bot_id":"<BOT_ID>"}
 ```
 
 ## getBotAllocations - GET `/getBotAllocations`
@@ -535,10 +562,11 @@ Outputs:
 | `response[].updated_at` | string | Last update timestamp. |
 | `response[].created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getBotAllocations
+```http
+GET /getBotAllocations?bot_id[]=<BOT_ID>
+Authorization: <API_TOKEN>
 ```
 
 ## updateBotAllocations - POST `/updateBotAllocations`
@@ -597,11 +625,14 @@ Outputs:
 | `response[].updated_at` | string | Last update timestamp. |
 | `response[].created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /updateBotAllocations \
-  --json '{"allocations":[{"strategy_id":"<STRATEGY_ID>","percent":0.5}]}'
+```http
+POST /updateBotAllocations
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"allocations":[{"strategy_id":"<STRATEGY_ID>","percent":0.5}],"bot_id":"<BOT_ID>"}
 ```
 
 ## getBotActivities - GET `/getBotActivities`
@@ -633,9 +664,9 @@ Outputs:
 | `response[].message` | string | Activity or status message. |
 | `response[].created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getBotActivities \
-  --query "limit=20"
+```http
+GET /getBotActivities?bot_id=<BOT_ID>&limit=20
+Authorization: <API_TOKEN>
 ```

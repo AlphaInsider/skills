@@ -2,8 +2,6 @@
 
 REST base URL: `https://alphainsider.com/api`.
 
-Credential boundary: Authentication fields below describe API wire format. Agents should not read `ALPHAINSIDER_API_KEY` from environment variables or `.env`, and should use `scripts/alphainsider_request.py` so the helper injects private credentials.
-
 Payment sources, invoices, invoice PDFs, invoice line items, and invoice retries.
 
 ## getPaymentSources - GET `/getPaymentSources`
@@ -39,10 +37,11 @@ Outputs:
 | `response[].updated_at` | string | Last update timestamp. |
 | `response[].created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getPaymentSources
+```http
+GET /getPaymentSources
+Authorization: <API_TOKEN>
 ```
 
 ## getUpcomingInvoice - GET `/getUpcomingInvoice`
@@ -88,10 +87,11 @@ Outputs:
 | `response.source.created_at` | string | Creation timestamp. |
 | `response.retryable` | boolean | Retryable. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getUpcomingInvoice
+```http
+GET /getUpcomingInvoice
+Authorization: <API_TOKEN>
 ```
 
 ## getInvoices - GET `/getInvoices`
@@ -142,12 +142,11 @@ Outputs:
 | `response[].source.created_at` | string | Creation timestamp. |
 | `response[].retryable` | boolean | Retryable. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getInvoices \
-  --query "status=paid" \
-  --query "limit=20"
+```http
+GET /getInvoices?status=paid&limit=20
+Authorization: <API_TOKEN>
 ```
 
 ## getInvoicePdf - GET `/getInvoicePdf`
@@ -168,11 +167,11 @@ Outputs:
 | `success` | boolean | True when the request succeeded. |
 | `response` | PDF file | Invoice PDF file payload, or an error message when `success` is false. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getInvoicePdf \
-  --query "invoice_id=invoice_123"
+```http
+GET /getInvoicePdf?invoice_id=invoice_123
+Authorization: <API_TOKEN>
 ```
 
 ## retryInvoice - POST `/retryInvoice`
@@ -219,11 +218,14 @@ Outputs:
 | `response[].source.created_at` | string | Creation timestamp. |
 | `response[].retryable` | boolean | Retryable. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /retryInvoice \
-  --json '{"invoice_id":"invoice_123"}'
+```http
+POST /retryInvoice
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"invoice_id":"invoice_123"}
 ```
 
 ## getUpcomingInvoiceItems - GET `/getUpcomingInvoiceItems`
@@ -256,10 +258,11 @@ Outputs:
 | `response[].name` | string | Display name. |
 | `response[].type` | string | Type or category for this object. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getUpcomingInvoiceItems
+```http
+GET /getUpcomingInvoiceItems
+Authorization: <API_TOKEN>
 ```
 
 ## getInvoiceItems - GET `/getInvoiceItems`
@@ -294,9 +297,9 @@ Outputs:
 | `response[].type` | string | Type or category for this object. |
 | `response[].type_id` | null or value | Type id. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getInvoiceItems \
-  --query "invoice_id=invoice_123"
+```http
+GET /getInvoiceItems?invoice_id=invoice_123
+Authorization: <API_TOKEN>
 ```

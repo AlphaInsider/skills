@@ -21,6 +21,11 @@ class EnvUpdateError(ValueError):
     """The requested .env update is invalid or unsafe."""
 
 
+class _SafeArgumentParser(argparse.ArgumentParser):
+    def error(self, _message: str) -> None:
+        self.exit(2, "error: invalid arguments; pass only the variable name\n")
+
+
 def validate_name(name: str) -> None:
     if not ENV_NAME.fullmatch(name):
         raise EnvUpdateError(
@@ -99,7 +104,7 @@ def update_env(env_path: Path, name: str, value: str) -> None:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(
+    parser = _SafeArgumentParser(
         description="Create or update one value in the current project's .env."
     )
     parser.add_argument("name", help="Environment variable name to create or update.")

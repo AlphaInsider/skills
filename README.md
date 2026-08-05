@@ -10,9 +10,8 @@ project.
 
 ## Skills
 
-- `alphainsider` documents the AlphaInsider API and includes reusable REST and
-  WebSocket clients, normalized trading calculations, and authenticated request
-  tooling.
+- `alphainsider` documents the AlphaInsider API and includes thin REST and
+  WebSocket helpers plus deterministic normalized-value calculations.
 - `strategy-creator` interviews the user, researches suitable data sources,
   maintains a confirmed strategy plan, and generates or updates one automated
   stock or cryptocurrency strategy.
@@ -37,7 +36,7 @@ npx skills@latest add https://github.com/AlphaInsider/skills \
 ## How it works
 
 Use `alphainsider` when you need endpoint behavior, request examples, market
-data guidance, or reusable clients for an existing application.
+data guidance, or credential-safe generic API transports.
 
 Use `strategy-creator` when you want a complete strategy project. It asks one
 decision at a time and records the agreed design in `docs/plan.md`. After the
@@ -50,11 +49,13 @@ ordering, reconcile existing positions and orders, and keep decision logic
 independently testable. Optional backtests are included only when the required
 historical inputs can be reconstructed without future information.
 
-Credentials remain in the generated project's `.env`. Credential-safe helpers
-avoid displaying or recording secret values, and generated artifacts contain
-only variable names and safe examples. Each generated README includes a short,
-language-specific `Start` section with copy-paste setup, one-cycle, continuous,
-and test commands.
+Credentials remain in the generated project's `.env`. Users are advised to add
+them directly; optional agent-assisted entry warns that pasted values are
+visible to the agent and uses a non-echoing helper. AlphaInsider transports
+redact credentials from output while allowing user-approved IDs and non-secret
+configuration. Generated artifacts contain only variable names and safe
+examples. Each generated README includes a short, language-specific `Start`
+section with copy-paste setup, one-cycle, continuous, and test commands.
 
 Existing Strategy Creator projects can be updated or replaced. Replacement is
 planned separately and requires explicit approval before attributable files are

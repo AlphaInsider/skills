@@ -2,8 +2,6 @@
 
 REST base URL: `https://alphainsider.com/api`.
 
-Credential boundary: Authentication fields below describe API wire format. Agents should not read `ALPHAINSIDER_API_KEY` from environment variables or `.env`, and should use `scripts/alphainsider_request.py` so the helper injects private credentials.
-
 Strategy subscriptions, relative calculations, account tiers, and account subscription changes.
 
 Read `input-multiplier.md` for how `input_value`, `input_date`, `input_multiplier`, and `strategy_value` control user-facing strategy values, positions, orders, and performance.
@@ -46,10 +44,11 @@ Outputs:
 | `response[].updated_at` | string | Last update timestamp. |
 | `response[].created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getStrategySubscriptions
+```http
+GET /getStrategySubscriptions?strategy_id[]=<STRATEGY_ID>
+Authorization: <API_TOKEN>
 ```
 
 ## newStrategySubscription - POST `/newStrategySubscription`
@@ -88,10 +87,14 @@ Outputs:
 | `response.updated_at` | string | Last update timestamp. |
 | `response.created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /newStrategySubscription
+```http
+POST /newStrategySubscription
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"strategy_id":"<STRATEGY_ID>"}
 ```
 
 ## deleteStrategySubscription - POST `/deleteStrategySubscription`
@@ -112,10 +115,14 @@ Outputs:
 | `success` | boolean | True when the request succeeded. |
 | `response` | string | Endpoint-specific response payload, or an error message when `success` is false. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /deleteStrategySubscription
+```http
+POST /deleteStrategySubscription
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"strategy_id":"<STRATEGY_ID>"}
 ```
 
 ## updateStrategySubscriptionNotifications - POST `/updateStrategySubscriptionNotifications`
@@ -155,11 +162,14 @@ Outputs:
 | `response.updated_at` | string | Last update timestamp. |
 | `response.created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /updateStrategySubscriptionNotifications \
-  --json '{"notifications":["trade","post"]}'
+```http
+POST /updateStrategySubscriptionNotifications
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"notifications":["trade","post"],"strategy_id":"<STRATEGY_ID>"}
 ```
 
 ## getStrategyCalculation - GET `/getStrategyCalculation`
@@ -189,12 +199,10 @@ Outputs:
 | `response.input_multiplier` | string | Multiplier for converting normalized strategy units to user-facing USD values. |
 | `response.strategy_value` | string | Normalized strategy value. Convert before displaying user-facing USD values. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getStrategyCalculation \
-  --query "input_value=10000" \
-  --query "input_date=2026-01-01T00:00:00Z"
+```http
+GET /getStrategyCalculation?strategy_id=<STRATEGY_ID>&input_value=10000&input_date=2026-01-01T00:00:00Z
 ```
 
 ## updateStrategyCalculation - POST `/updateStrategyCalculation`
@@ -237,11 +245,14 @@ Outputs:
 | `response.updated_at` | string | Last update timestamp. |
 | `response.created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /updateStrategyCalculation \
-  --json '{"input_value":"10000","input_date":"2026-01-01T00:00:00Z"}'
+```http
+POST /updateStrategyCalculation
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"input_value":"10000","input_date":"2026-01-01T00:00:00Z","strategy_id":"<STRATEGY_ID>"}
 ```
 
 ## deleteStrategyCalculation - POST `/deleteStrategyCalculation`
@@ -262,10 +273,14 @@ Outputs:
 | `success` | boolean | True when the request succeeded. |
 | `response` | string | Endpoint-specific response payload, or an error message when `success` is false. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /deleteStrategyCalculation
+```http
+POST /deleteStrategyCalculation
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"strategy_id":"<STRATEGY_ID>"}
 ```
 
 ## getAccountTiers - GET `/getAccountTiers`
@@ -299,10 +314,10 @@ Outputs:
 | `response[].limits.max_bots` | integer | Maximum number of bots. |
 | `response[].price` | integer | Price or execution price, depending on context. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getAccountTiers
+```http
+GET /getAccountTiers
 ```
 
 ## getAccountSubscription - GET `/getAccountSubscription`
@@ -351,10 +366,11 @@ Outputs:
 | `response.updated_at` | string | Last update timestamp. |
 | `response.created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getAccountSubscription
+```http
+GET /getAccountSubscription
+Authorization: <API_TOKEN>
 ```
 
 ## updateAccountSubscription - POST `/updateAccountSubscription`
@@ -403,9 +419,12 @@ Outputs:
 | `response.updated_at` | string | Last update timestamp. |
 | `response.created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /updateAccountSubscription \
-  --json '{"type":"pro","timeframe":"month"}'
+```http
+POST /updateAccountSubscription
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"type":"pro","timeframe":"month"}
 ```

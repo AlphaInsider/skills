@@ -17,14 +17,6 @@ Authorization: <api-token>
 
 Do not add a `Bearer` prefix. `verifyToken` uses a body field named `token`; `newOrderWebhook` uses a body field named `api_token`.
 
-Agents should not manually read `ALPHAINSIDER_API_KEY` from environment variables or `.env`, and should not manually populate `Authorization`, `token`, or `api_token`. Use `scripts/alphainsider_request.py` for REST calls so the helper can inject credentials privately.
-
-## Request Helper Configuration
-
-- `ALPHAINSIDER_API_KEY`: private token used by `scripts/alphainsider_request.py` for authenticated requests.
-- `ALPHAINSIDER_STRATEGY_ID`: optional helper default for endpoints that accept `strategy_id` or `strategy_id[]`.
-- `ALPHAINSIDER_BOT_ID`: optional helper default for endpoints that accept `bot_id` or `bot_id[]`.
-
 ## Response Shape
 
 Successful REST responses use `{ "success": true, "response": <data> }`. Failed responses use `{ "success": false, "response": "<message>" }`. Always inspect `success` first.

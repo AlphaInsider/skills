@@ -2,8 +2,6 @@
 
 REST base URL: `https://alphainsider.com/api`.
 
-Credential boundary: Authentication fields below describe API wire format. Agents should not read `ALPHAINSIDER_API_KEY` from environment variables or `.env`, and should use `scripts/alphainsider_request.py` so the helper injects private credentials.
-
 TradingView-style webhook order signals.
 
 ## newOrderWebhook - POST `/newOrderWebhook`
@@ -58,9 +56,11 @@ Outputs:
 | `response.last` | string | Last traded price. |
 | `response.order_dependencies` | array of string | Order IDs this order is waiting on; `[]` means the order has no outstanding dependencies. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /newOrderWebhook \
-  --json '{"stock_id":"SPY:ARCX","action":"buy","leverage":1,"pyramiding":5,"slippage":0.002}'
+```http
+POST /newOrderWebhook
+Content-Type: application/json
+
+{"stock_id":"SPY:ARCX","action":"buy","leverage":1,"pyramiding":5,"slippage":0.002,"strategy_id":"<STRATEGY_ID>","api_token":"<API_TOKEN>"}
 ```

@@ -122,15 +122,18 @@ instead of repeating the interview.
 
 A missing environment value is a setup gap, not a strategy decision. Pause the
 interview and follow **Environment setup** in `SKILL.md`. Name the missing
-variables and exact project `.env` path, then ask the user to either add the
-values there and tell you when ready, or paste them in chat so you can add them.
-Always warn that pasting credentials in chat is less secure.
+variables and exact project `.env` path, then recommend that the user add the
+values there themselves and tell you when ready. If the user wants
+agent-assisted entry, they may paste values in chat so you can add them. Always
+warn first that pasting credentials is less secure because each value is visible
+to the agent.
 
 For pasted values, run `scripts/set_env_value.py` from the project root once per
-variable and provide each value only through its non-echoing prompt. Never open
-`.env`, repeat a value, or put one in a plan or command argument. Resume the
-interview only after the relevant non-ordering validation succeeds; use the
-sibling request helper for AlphaInsider strategy configuration.
+variable and provide each value only through its non-echoing prompt. Never pass
+a credential in a command argument, open `.env`, repeat a value, or put one in a
+plan. Resume the interview only after the relevant non-ordering validation
+succeeds; use the sibling request helper for AlphaInsider strategy
+configuration.
 
 ## Confirmation gate
 

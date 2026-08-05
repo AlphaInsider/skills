@@ -11,7 +11,27 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = ROOT / "skills"
 EXPECTED_SKILLS = {"alphainsider", "strategy-creator"}
-EXPECTED_ALPHA_RUNTIME = {"__init__.py", "client.py", "stream.py"}
+EXPECTED_ALPHA_SCRIPTS = {
+    "alphainsider_request.py",
+    "alphainsider_stream.py",
+}
+EXPECTED_ALPHA_REFERENCES = {
+    "api-reference.md",
+    "authentication.md",
+    "bots.md",
+    "input-multiplier.md",
+    "limits.md",
+    "payments.md",
+    "stocks.md",
+    "strategies.md",
+    "subscriptions.md",
+    "timelines.md",
+    "trades.md",
+    "users.md",
+    "webhooks.md",
+    "websockets.md",
+    "withdrawals.md",
+}
 EXPECTED_STRATEGY_REFERENCES = {"interview.md", "plan-template.md"}
 EXPECTED_STRATEGY_SCRIPTS = {"set_env_value.py"}
 EXPECTED_PLAN_STATES = {"draft", "confirmed", "implemented"}
@@ -58,13 +78,22 @@ REQUIRED_REPLACEMENT_GUIDANCE = {
 }
 REQUIRED_CREDENTIAL_GUIDANCE = {
     "`scripts/set_env_value.py`",
-    "add the values to `.env` and tell you when ready",
-    "paste them in chat so you can add them",
-    "pasting credentials in chat is less secure",
+    "`scripts/alphainsider_request.py`",
+    "`scripts/alphainsider_stream.py`",
+    "Recommend that the user add the values to `.env` themselves",
+    "they may paste the values in chat",
+    "the value is visible to the agent",
     "non-echoing prompt",
+    "Never pass a credential in a command argument",
     "Do not open `.env` before or after the update",
     "approval to update only those names",
     "use the sibling request helper",
+}
+REQUIRED_ALPHA_CREDENTIAL_GUIDANCE = {
+    "never return the API key or arbitrary environment contents",
+    "not secrets like the API key",
+    "Never dump the process environment or complete `.env`",
+    "prevents accidental output exposure, not hostile same-process inspection",
 }
 REQUIRED_STARTUP_GUIDANCE = {
     "a short `## Start` section",
@@ -277,14 +306,54 @@ def validate() -> list[str]:
             f"{sorted(missing_readme_overview_guidance)}"
         )
 
-    alpha_runtime = {
-        path.name
-        for path in (SKILLS_DIR / "alphainsider" / "scripts" / "runtime").glob("*.py")
+    alphainsider = SKILLS_DIR / "alphainsider"
+    alphainsider_text = (alphainsider / "SKILL.md").read_text(encoding="utf-8")
+    missing_alpha_credential_guidance = {
+        guidance
+        for guidance in REQUIRED_ALPHA_CREDENTIAL_GUIDANCE
+        if guidance not in " ".join(alphainsider_text.split())
     }
-    if alpha_runtime != EXPECTED_ALPHA_RUNTIME:
+    if missing_alpha_credential_guidance:
         errors.append(
-            "alphainsider runtime files must be exactly "
-            f"{sorted(EXPECTED_ALPHA_RUNTIME)}"
+            "alphainsider is missing credential boundary guidance "
+            f"{sorted(missing_alpha_credential_guidance)}"
+        )
+
+    alpha_scripts = {
+        path.relative_to(alphainsider / "scripts").as_posix()
+        for path in (alphainsider / "scripts").rglob("*")
+        if path.is_file() and "__pycache__" not in path.parts
+    }
+    if alpha_scripts != EXPECTED_ALPHA_SCRIPTS:
+        errors.append(
+            "alphainsider scripts must be exactly "
+            f"{sorted(EXPECTED_ALPHA_SCRIPTS)}"
+        )
+
+    alpha_references = {
+        path.name for path in (alphainsider / "references").glob("*.md")
+    }
+    if alpha_references != EXPECTED_ALPHA_REFERENCES:
+        errors.append(
+            "alphainsider references must be exactly "
+            f"{sorted(EXPECTED_ALPHA_REFERENCES)}"
+        )
+
+    helper_markers = {
+        "scripts/alphainsider_request.py",
+        "scripts/alphainsider_stream.py",
+        "stream_events(",
+    }
+    references_with_helper_guidance = {
+        path.name
+        for path in (alphainsider / "references").glob("*.md")
+        if any(marker in path.read_text(encoding="utf-8") for marker in helper_markers)
+    }
+    if references_with_helper_guidance:
+        errors.append(
+            "alphainsider references must contain API information only; "
+            "helper guidance found in "
+            f"{sorted(references_with_helper_guidance)}"
         )
 
     return errors

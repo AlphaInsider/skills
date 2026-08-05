@@ -1,6 +1,6 @@
 ---
 name: alphainsider
-description: Build, debug, or document integrations with the AlphaInsider trading API, including strategies, subscriptions, normalized trading calculations, orders, positions, allocation rebalancing, bots, broker keys, webhooks, market data, timelines, billing, withdrawals, and WebSocket streams. Use for AlphaInsider endpoint behavior, request examples, authentication rules, helper-managed defaults, the request helper, or reusable REST and WebSocket clients.
+description: Navigate, use, debug, or document the AlphaInsider trading API, including strategies, subscriptions, normalized trading calculations, orders, positions, allocation rebalancing, bots, broker keys, webhooks, market data, timelines, billing, withdrawals, and WebSocket streams. Use for endpoint behavior, request examples, authentication rules, helper-managed defaults, thin REST requests, or WebSocket connections.
 ---
 
 # AlphaInsider API
@@ -16,23 +16,26 @@ Use this skill when working with AlphaInsider REST or WebSocket integrations.
 
 ## Core Workflow
 
-1. Identify the API area and read the matching file in `references/`.
+1. Start with `references/api-reference.md`, identify the API area, and read the matching focused reference.
 2. When current behavior or an unlisted detail matters, use `llms.txt` to find the focused Markdown page, then verify REST details in OpenAPI or WebSocket details in AsyncAPI. Use `llms-full.txt` only as a fallback.
-3. For authenticated REST calls, use `scripts/alphainsider_request.py`; do not manually read or inject credentials.
-4. Let the helper add the authorization token and any helper-managed default IDs.
-5. Check `success` before using `response`; errors use `{ "success": false, "response": "<message>" }`.
+3. Construct endpoint paths, parameters, bodies, and channel names from the references; the Python scripts are generic transports, not an endpoint SDK.
+4. For REST calls, use `scripts/alphainsider_request.py`; for WebSocket connections, use `scripts/alphainsider_stream.py`. Do not manually read or inject credentials.
+5. Let the helpers own authentication and helper-managed default IDs. Use the deterministic calculation functions only for the normalized-value formulas they cover.
 
-For a standalone Python integration, reuse `scripts/runtime/`. Its REST and
-WebSocket clients are the canonical runtime source for `$strategy-creator`;
-do not duplicate them in another skill.
+For a standalone Python integration, copy and import the request helper. Copy
+the stream helper only when WebSocket events are required. Add small local
+endpoint functions only for the integration's actual needs.
 
 ## Private Credential Boundary
 
 - `ALPHAINSIDER_API_KEY` is a private AlphaInsider credential. Agents must never inspect, print, request, echo, or inline its value.
 - Do not run commands intended to reveal the token, such as `env`, `printenv ALPHAINSIDER_API_KEY`, or opening `.env` for credential lookup.
 - Do not manually populate `Authorization`, `token`, or `api_token` fields from environment variables or `.env`.
-- Use `scripts/alphainsider_request.py` for authenticated REST calls. The helper may read `ALPHAINSIDER_API_KEY`, `ALPHAINSIDER_STRATEGY_ID`, and `ALPHAINSIDER_BOT_ID` from the process environment or `.env` in the invoking directory, inject auth safely, and redact token and broker-credential fields in dry-run output.
-- `ALPHAINSIDER_STRATEGY_ID` and `ALPHAINSIDER_BOT_ID` are helper-managed defaults, not secrets like the API key. A user may still provide explicit `strategy_id` or `bot_id` values in a request.
+- Use `scripts/alphainsider_request.py` for REST calls. The helper reads only `ALPHAINSIDER_API_KEY`, `ALPHAINSIDER_STRATEGY_ID`, and `ALPHAINSIDER_BOT_ID` from the process environment or `.env` in the invoking directory, injects auth safely, and redacts credentials from dry runs, responses, and errors.
+- Use `scripts/alphainsider_stream.py` for authenticated WebSocket subscriptions. It reads `ALPHAINSIDER_API_KEY` privately, never accepts it as a command-line argument, and redacts credentials from events and errors.
+- The documented importable interfaces never return the API key or arbitrary environment contents. They still transmit the key to AlphaInsider as required; this boundary prevents accidental output exposure, not hostile same-process inspection.
+- `ALPHAINSIDER_STRATEGY_ID` and `ALPHAINSIDER_BOT_ID` are helper-managed defaults, not secrets like the API key. A user may provide, request, and display explicit `strategy_id`, `bot_id`, or other non-secret configuration values.
+- Never dump the process environment or complete `.env`. Use non-secret values only when the user provides them or explicitly asks for them.
 - Broker keys and secrets passed to `newBot` or `updateBotBrokerKeys` are private credentials. Never print, log, commit, quote, or summarize them; send only the fields required by the selected broker.
 
 If a required `strategy_id` or `bot_id` is not supplied by the user and the helper/API cannot resolve it from defaults, ask the user for that ID. Do not inspect `.env` to find it.
@@ -50,9 +53,9 @@ AlphaInsider strategy performance, position, order, and trade values are normali
 - `newOrderWebhook` uses signal-style actions and no `input_multiplier` math. Alerts go fully in or out by default; `pyramiding` enables stepped entries.
 - Open order responses from `getOrders`, `newOrder`, `newOrderAllocations`, `newOrderWebhook`, and `wsOrders` include `order_dependencies` as an array of prerequisite order IDs; `[]` means there are no outstanding prerequisites.
 
-## Request Helper
+## Thin Helpers
 
-Use `scripts/alphainsider_request.py` for quick REST calls from a project directory:
+Use `scripts/alphainsider_request.py` for REST calls from a project directory:
 
 ```bash
 python scripts/alphainsider_request.py GET /getStrategyPerformance \
@@ -62,12 +65,26 @@ python scripts/alphainsider_request.py POST /newOrder \
   --json '{"stock_id":"SPY:ARCX","action":"buy","type":"market","total":"100"}'
 ```
 
-The helper owns credential/default lookup. Do not read these values directly from the environment or `.env`; run the helper and let it inject auth plus default strategy or bot IDs only for endpoints documented as accepting those IDs.
+It is also importable as `request(method, path, query=..., body=...)`. Use
+`--output` for binary responses such as invoice PDFs.
+
+Use `scripts/alphainsider_stream.py` with one or more reference-defined channels:
+
+```bash
+python scripts/alphainsider_stream.py \
+  --channel "wsStrategyValue:<STRATEGY_ID>" \
+  --channel "wsOrders:<STRATEGY_ID>"
+```
+
+The helpers own credential/default lookup. Do not read these values directly
+from the environment or `.env`. Their public Python interfaces expose only
+requests, streams, and deterministic calculations, not generic environment
+readers. They deliberately do not model individual endpoints, choose channels,
+retry requests, or implement trading policy.
 
 ## References
 
 - Start with `references/api-reference.md` for the endpoint map.
-- Use `references/runtime-client.md` for the reusable REST/WebSocket package.
 - Use `references/limits.md` for account tiers, endpoint caps, withdrawal minimums, and 429 handling.
 - Use `references/input-multiplier.md` for normalized strategy values, position/order display, performance display, and `newOrder` amount/total conversion.
 - Use `references/authentication.md` for token verification.

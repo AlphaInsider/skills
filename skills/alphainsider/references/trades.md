@@ -2,11 +2,7 @@
 
 REST base URL: `https://alphainsider.com/api`.
 
-Credential boundary: Authentication fields below describe API wire format. Agents should not read `ALPHAINSIDER_API_KEY` from environment variables or `.env`, and should use `scripts/alphainsider_request.py` so the helper injects private credentials.
-
 Positions, open orders, max order sizing, fixed orders, allocation orders, and order deletion.
-
-The request helper can supply a default strategy ID for endpoints that accept `strategy_id` when the user has not supplied an explicit ID.
 
 Read `input-multiplier.md` before displaying positions or orders, calculating user-facing order size, or converting user-entered quantities into `newOrder`.
 
@@ -55,10 +51,10 @@ Outputs:
 | `response[].ask` | string | Current ask price. |
 | `response[].last` | string | Last traded price. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getPositions
+```http
+GET /getPositions?strategy_id=<STRATEGY_ID>
 ```
 
 ## getOrders - GET `/getOrders`
@@ -108,10 +104,11 @@ Outputs:
 | `response[].last` | string | Last traded price. |
 | `response[].order_dependencies` | array of string | Order IDs this order is waiting on; `[]` means the order has no outstanding dependencies. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getOrders
+```http
+GET /getOrders?strategy_id=<STRATEGY_ID>
+Authorization: <API_TOKEN>
 ```
 
 ## getMaxOrderSize - GET `/getMaxOrderSize`
@@ -143,11 +140,11 @@ Outputs:
 | `response.slippage` | string | Slippage value or configured slippage fraction. |
 | `response.fee` | string | Fee value. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getMaxOrderSize \
-  --query "stock_id=SPY:ARCX"
+```http
+GET /getMaxOrderSize?strategy_id=<STRATEGY_ID>&stock_id=SPY:ARCX
+Authorization: <API_TOKEN>
 ```
 
 ## newOrder - POST `/newOrder`
@@ -207,11 +204,14 @@ Outputs:
 | `response.last` | string | Last traded price. |
 | `response.order_dependencies` | array of string | Order IDs this order is waiting on; `[]` means the order has no outstanding dependencies. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /newOrder \
-  --json '{"stock_id":"SPY:ARCX","action":"buy","type":"market","total":"100"}'
+```http
+POST /newOrder
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"stock_id":"SPY:ARCX","action":"buy","type":"market","total":"100","strategy_id":"<STRATEGY_ID>"}
 ```
 
 ## newOrderAllocations - POST `/newOrderAllocations`
@@ -266,11 +266,14 @@ Outputs:
 | `response[].last` | string | Last traded price. |
 | `response[].order_dependencies` | array of string | Order IDs this order is waiting on; `[]` means the order has no outstanding dependencies. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /newOrderAllocations \
-  --json '{"allocations":[{"stock_id":"SPY:ARCX","action":"buy","percent":0.8}],"slippage":0.003}'
+```http
+POST /newOrderAllocations
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"allocations":[{"stock_id":"SPY:ARCX","action":"buy","percent":0.8}],"slippage":0.003,"strategy_id":"<STRATEGY_ID>"}
 ```
 
 ## deleteOrder - POST `/deleteOrder`
@@ -292,9 +295,12 @@ Outputs:
 | `success` | boolean | True when the request succeeded. |
 | `response` | string | Endpoint-specific response payload, or an error message when `success` is false. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /deleteOrder \
-  --json '{"order_id":"order_123"}'
+```http
+POST /deleteOrder
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"order_id":"order_123","strategy_id":"<STRATEGY_ID>"}
 ```

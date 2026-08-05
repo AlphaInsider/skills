@@ -2,11 +2,7 @@
 
 REST base URL: `https://alphainsider.com/api`.
 
-Credential boundary: Authentication fields below describe API wire format. Agents should not read `ALPHAINSIDER_API_KEY` from environment variables or `.env`, and should use `scripts/alphainsider_request.py` so the helper injects private credentials.
-
 Strategy lookup, search, creation, updates, pricing, values, and performance.
-
-The request helper can supply a default strategy ID for endpoints that accept `strategy_id` when the user has not supplied an explicit ID.
 
 Read `input-multiplier.md` before displaying `strategy_value`, timeframe values, or performance gain/loss to users.
 
@@ -49,11 +45,10 @@ Outputs:
 | `response[].timeframes[].max_drawdown` | string | Maximum drawdown for the timeframe. |
 | `response[].timeframes[].past_value` | string | Strategy value at the start of the timeframe. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getStrategies \
-  --query "timeframe=month"
+```http
+GET /getStrategies?strategy_id[]=<STRATEGY_ID>&timeframe=month
 ```
 
 ## getStrategyValues - GET `/getStrategyValues`
@@ -78,10 +73,10 @@ Outputs:
 | `response[].strategy_id` | string | AlphaInsider strategy identifier. |
 | `response[].strategy_value` | string | Normalized strategy value. Convert before displaying user-facing USD values. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getStrategyValues
+```http
+GET /getStrategyValues?strategy_id[]=<STRATEGY_ID>
 ```
 
 ## getUserStrategies - GET `/getUserStrategies`
@@ -123,12 +118,10 @@ Outputs:
 | `response[].timeframes[].max_drawdown` | string | Maximum drawdown for the timeframe. |
 | `response[].timeframes[].past_value` | string | Strategy value at the start of the timeframe. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getUserStrategies \
-  --query "user_id=user_1" \
-  --query "timeframe=year"
+```http
+GET /getUserStrategies?user_id=user_1&timeframe=year
 ```
 
 ## getStrategyPerformance - GET `/getStrategyPerformance`
@@ -160,12 +153,10 @@ Outputs:
 | `response[].activity` | string | Trade activity label for a performance interval. |
 | `response[].trade_count` | string | Number of trades in the interval. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getStrategyPerformance \
-  --query "start_date=2026-01-01T00:00:00Z" \
-  --query "interval=day"
+```http
+GET /getStrategyPerformance?strategy_id=<STRATEGY_ID>&start_date=2026-01-01T00:00:00Z&interval=day
 ```
 
 ## getRecommendedStrategies - GET `/getRecommendedStrategies`
@@ -208,11 +199,10 @@ Outputs:
 | `response[].timeframes[].max_drawdown` | string | Maximum drawdown for the timeframe. |
 | `response[].timeframes[].past_value` | string | Strategy value at the start of the timeframe. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getRecommendedStrategies \
-  --query "limit=10"
+```http
+GET /getRecommendedStrategies?strategy_id[]=<STRATEGY_ID>&limit=10
 ```
 
 ## searchStrategies - POST `/searchStrategies`
@@ -276,11 +266,13 @@ Outputs:
 | `response[].timeframes[].max_drawdown` | string | Maximum drawdown for the timeframe. |
 | `response[].timeframes[].past_value` | string | Strategy value at the start of the timeframe. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /searchStrategies \
-  --json '{"search":"momentum","type":"stock","sort":"performance","limit":10}'
+```http
+POST /searchStrategies
+Content-Type: application/json
+
+{"search":"momentum","type":"stock","sort":"performance","limit":10}
 ```
 
 ## newStrategy - POST `/newStrategy`
@@ -326,11 +318,14 @@ Outputs:
 | `response.timeframes[].max_drawdown` | string | Maximum drawdown for the timeframe. |
 | `response.timeframes[].past_value` | string | Strategy value at the start of the timeframe. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /newStrategy \
-  --json '{"type":"stock","name":"Example Strategy","input_value":"100000","private":true}'
+```http
+POST /newStrategy
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"type":"stock","name":"Example Strategy","input_value":"100000","private":true}
 ```
 
 ## updateStrategy - POST `/updateStrategy`
@@ -374,11 +369,14 @@ Outputs:
 | `response.timeframes[].max_drawdown` | string | Maximum drawdown for the timeframe. |
 | `response.timeframes[].past_value` | string | Strategy value at the start of the timeframe. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /updateStrategy \
-  --json '{"name":"Updated Strategy","input_value":"100000"}'
+```http
+POST /updateStrategy
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"name":"Updated Strategy","input_value":"100000","strategy_id":"<STRATEGY_ID>"}
 ```
 
 ## updateStrategyPrice - POST `/updateStrategyPrice`
@@ -420,11 +418,14 @@ Outputs:
 | `response.timeframes[].max_drawdown` | string | Maximum drawdown for the timeframe. |
 | `response.timeframes[].past_value` | string | Strategy value at the start of the timeframe. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /updateStrategyPrice \
-  --json '{"price":"10"}'
+```http
+POST /updateStrategyPrice
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"price":"10","strategy_id":"<STRATEGY_ID>"}
 ```
 
 ## deleteStrategy - POST `/deleteStrategy`
@@ -445,8 +446,12 @@ Outputs:
 | `success` | boolean | True when the request succeeded. |
 | `response` | string | Endpoint-specific response payload, or an error message when `success` is false. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /deleteStrategy
+```http
+POST /deleteStrategy
+Authorization: <API_TOKEN>
+Content-Type: application/json
+
+{"strategy_id":"<STRATEGY_ID>"}
 ```

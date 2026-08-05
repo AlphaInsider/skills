@@ -40,11 +40,10 @@ Outputs:
 | `response[].ask` | string | Current ask price. |
 | `response[].last` | string | Last traded price. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getStocks \
-  --query "stock_id[]=SPY:ARCX"
+```http
+GET /getStocks?stock_id[]=SPY:ARCX
 ```
 
 ## getAllStocks - GET `/getAllStocks`
@@ -83,10 +82,10 @@ Outputs:
 | `response[].ask` | string | Current ask price. |
 | `response[].last` | string | Last traded price. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getAllStocks
+```http
+GET /getAllStocks
 ```
 
 ## getStockPriceHistory - GET `/getStockPriceHistory`
@@ -115,12 +114,10 @@ Outputs:
 | `response[].last` | string | Last traded price. |
 | `response[].created_at` | string | Creation timestamp. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getStockPriceHistory \
-  --query "stock_id=SPY:ARCX" \
-  --query "start_date=2026-01-01T00:00:00Z"
+```http
+GET /getStockPriceHistory?stock_id=SPY:ARCX&start_date=2026-01-01T00:00:00Z
 ```
 
 ## searchStocks - POST `/searchStocks`
@@ -159,11 +156,13 @@ Outputs:
 | `response[].ask` | string | Current ask price. |
 | `response[].last` | string | Last traded price. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py POST /searchStocks \
-  --json '{"search":"SPY","type":"stock","limit":5}'
+```http
+POST /searchStocks
+Content-Type: application/json
+
+{"search":"SPY","type":"stock","limit":5}
 ```
 
 ## getExchangeStatus - GET `/getExchangeStatus`
@@ -187,8 +186,8 @@ Outputs:
 | `response.stock` | string | Stock symbol as stored by AlphaInsider. |
 | `response.cryptocurrency` | string | Cryptocurrency. |
 
-Example:
+Example request:
 
-```bash
-python scripts/alphainsider_request.py GET /getExchangeStatus
+```http
+GET /getExchangeStatus
 ```
