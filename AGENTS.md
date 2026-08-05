@@ -11,6 +11,9 @@ This repository publishes reusable AlphaInsider agent skills from `skills/`.
   vendor-specific metadata or behavior.
 - Keep `SKILL.md` concise and route detailed material to one-level-deep
   `references/` files.
+- Keep `skills/alphainsider/SKILL.md` and its `references/` aligned with the
+  AlphaInsider API docs at `https://api.alphainsider.com`, including the
+  current OpenAPI and AsyncAPI contracts.
 - Put deterministic reusable code in `scripts/`; never place credentials,
   `.env`, user plans, or generated strategies in this repository.
 - When a design decision changes the strategy interview, plan schema, or

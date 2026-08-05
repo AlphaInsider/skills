@@ -106,7 +106,7 @@ Inputs:
 | query | `invoice_id[]` | No | array of string (max 100) | One or more invoice IDs. Repeat this query parameter for multiple invoices. |
 | query | `source_id` | No | string | Source ID. |
 | query | `status` | No | string: `pending`, `paid`, `failed`, `chargeback` | Invoice status. |
-| query | `limit` | No | number | Number of results to return. |
+| query | `limit` | No | number (default `10`) | Number of results to return. |
 | query | `offset_id` | No | string | Offet by ID. Used for pagination. |
 
 Outputs:

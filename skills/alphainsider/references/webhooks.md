@@ -8,7 +8,7 @@ TradingView-style webhook order signals.
 
 New order from webhook. [Tutorial setup](https://alphainsider.com/resources#trading-view). By default, each alert goes fully in or out of the position at `leverage`; set `pyramiding` to scale into a position over multiple same-direction alerts.
 
-Note: This endpoint sends the token in the JSON body as `api_token`; do not send an `Authorization` header. Webhook signal actions do not use `input_multiplier` math.
+Note: Before submitting a new order, this endpoint cancels any existing open orders for the strategy. It sends the token in the JSON body as `api_token`; do not send an `Authorization` header. Webhook signal actions do not use `input_multiplier` math.
 
 Inputs:
 

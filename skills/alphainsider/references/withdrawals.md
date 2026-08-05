@@ -40,7 +40,7 @@ Inputs:
 | Location | Name | Required | Type / values | Description |
 | --- | --- | --- | --- | --- |
 | header | `Authorization` | Yes | string (JWT) | AlphaInsider API token sent exactly as the header value; do not prepend `Bearer`. |
-| query | `limit` | No | number | Number of results to return. |
+| query | `limit` | No | number (default `10`) | Number of results to return. |
 | query | `offset_id` | No | string | Offet by ID. Used for pagination. |
 
 Outputs:

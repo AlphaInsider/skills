@@ -51,6 +51,7 @@ AlphaInsider strategy performance, position, order, and trade values are normali
 - API numeric values commonly arrive as strings; convert before math and preserve precision when sending normalized order values.
 - `getMaxOrderSize` returns user-facing limits; do not apply `input_multiplier` to them. Use it before large, leveraged, or otherwise risky fixed orders.
 - `newOrderWebhook` uses signal-style actions and no `input_multiplier` math. Alerts go fully in or out by default; `pyramiding` enables stepped entries.
+- `newOrderAllocations` and `newOrderWebhook` cancel any existing open orders for the strategy before submitting new orders.
 - Open order responses from `getOrders`, `newOrder`, `newOrderAllocations`, `newOrderWebhook`, and `wsOrders` include `order_dependencies` as an array of prerequisite order IDs; `[]` means there are no outstanding prerequisites.
 
 ## Thin Helpers

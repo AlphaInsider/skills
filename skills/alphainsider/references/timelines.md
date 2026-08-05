@@ -75,7 +75,7 @@ Inputs:
 | query | `is_notification` | No | boolean | If true, only show timelines you receive notifications from. |
 | query | `start_date` | No | string (date-time) | Start date. |
 | query | `end_date` | No | string (date-time) | End date. |
-| query | `limit` | Yes | number | Number of results to return. |
+| query | `limit` | No | number (default `10`) | Number of results to return. |
 | query | `offset_id` | No | string | Offet by ID. Used for pagination. |
 
 Outputs:

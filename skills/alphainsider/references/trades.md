@@ -218,7 +218,7 @@ Content-Type: application/json
 
 Create new orders based on percentage allocations.
 
-Note: Creates market orders to move a strategy toward target percentage allocations. Do not send `order_dependencies` in this request. Allocation-generated increase orders may depend on reduce orders, so inspect each returned `order_dependencies` array before assuming the order can execute immediately.
+Note: Before submitting allocation-generated orders, this endpoint cancels any existing open orders for the strategy. It then creates market orders to move the strategy toward target percentage allocations. Do not send `order_dependencies` in this request. Allocation-generated increase orders may depend on reduce orders, so inspect each returned `order_dependencies` array before assuming the order can execute immediately.
 
 Inputs:
 

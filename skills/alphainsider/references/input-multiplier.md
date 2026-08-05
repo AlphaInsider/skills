@@ -188,3 +188,5 @@ For owner-managed trades, do not place a user-denominated `newOrder` until the o
 `newOrderAllocations` uses target percentages and does not use `input_multiplier`.
 
 `newOrderWebhook` uses signal-style actions and does not use `input_multiplier`. By default an alert goes fully in or out at `leverage`; `pyramiding` steps exposure by `leverage / pyramiding` for each same-direction alert.
+
+Both endpoints cancel any existing open orders for the strategy before submitting new orders.
