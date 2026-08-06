@@ -38,7 +38,7 @@ Outputs:
 | `response[].input_value` | string | User-provided starting value for relative strategy calculations. |
 | `response[].input_date` | string | Starting timestamp for relative strategy calculations. |
 | `response[].input_multiplier` | string | Multiplier for converting normalized strategy units to user-facing USD values. |
-| `response[].notifications` | array | Enabled notification types. |
+| `response[].notifications` | array of string | Enabled notification types. |
 | `response[].renew` | boolean | Whether the subscription renews. |
 | `response[].status` | string | Current status. |
 | `response[].updated_at` | string | Last update timestamp. |
@@ -81,7 +81,7 @@ Outputs:
 | `response.input_value` | null or value | User-provided starting value for relative strategy calculations. |
 | `response.input_date` | null or value | Starting timestamp for relative strategy calculations. |
 | `response.input_multiplier` | null or value | Multiplier for converting normalized strategy units to user-facing USD values. |
-| `response.notifications` | array | Enabled notification types. |
+| `response.notifications` | array of string | Enabled notification types. |
 | `response.renew` | boolean | Whether the subscription renews. |
 | `response.status` | string | Current status. |
 | `response.updated_at` | string | Last update timestamp. |
@@ -239,7 +239,7 @@ Outputs:
 | `response.input_value` | string | User-provided starting value for relative strategy calculations. |
 | `response.input_date` | string | Starting timestamp for relative strategy calculations. |
 | `response.input_multiplier` | string | Multiplier for converting normalized strategy units to user-facing USD values. |
-| `response.notifications` | array | Enabled notification types. |
+| `response.notifications` | array of string | Enabled notification types. |
 | `response.renew` | boolean | Whether the subscription renews. |
 | `response.status` | string | Current status. |
 | `response.updated_at` | string | Last update timestamp. |
@@ -343,7 +343,7 @@ Outputs:
 | `response.status` | string | Current status. |
 | `response.product_id` | string | Billing product identifier. |
 | `response.type` | string | Type or category for this object. |
-| `response.timeframe` | string | Time window used for ranking or performance data. |
+| `response.timeframe` | string | Billing period for account or product subscriptions. |
 | `response.level` | integer | Subscription tier level. |
 | `response.name` | string | Display name. |
 | `response.next_product_id` | string | Next billing product identifier after a pending change. |
@@ -396,7 +396,7 @@ Outputs:
 | `response.status` | string | Current status. |
 | `response.product_id` | string | Billing product identifier. |
 | `response.type` | string | Type or category for this object. |
-| `response.timeframe` | string | Time window used for ranking or performance data. |
+| `response.timeframe` | string | Billing period for account or product subscriptions. |
 | `response.level` | integer | Subscription tier level. |
 | `response.name` | string | Display name. |
 | `response.next_product_id` | string | Next billing product identifier after a pending change. |

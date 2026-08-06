@@ -44,7 +44,7 @@ Outputs:
 | `response[].live` | boolean | Whether the broker account is live rather than paper. |
 | `response[].account_id` | string | Broker account identifier. |
 | `response[].status` | string | Current status. |
-| `response[].notifications` | array | Enabled notification types. |
+| `response[].notifications` | array of string | Enabled notification types. |
 | `response[].updated_at` | string | Last update timestamp. |
 | `response[].created_at` | string | Creation timestamp. |
 
@@ -137,7 +137,7 @@ Outputs:
 | `response.live` | boolean | Whether the broker account is live rather than paper. |
 | `response.account_id` | string | Broker account identifier. |
 | `response.status` | string | Current status. |
-| `response.notifications` | array | Enabled notification types. |
+| `response.notifications` | array of string | Enabled notification types. |
 | `response.updated_at` | string | Last update timestamp. |
 | `response.created_at` | string | Creation timestamp. |
 
@@ -183,7 +183,7 @@ Outputs:
 | `response.live` | boolean | Whether the broker account is live rather than paper. |
 | `response.account_id` | string | Broker account identifier. |
 | `response.status` | string | Current status. |
-| `response.notifications` | array | Enabled notification types. |
+| `response.notifications` | array of string | Enabled notification types. |
 | `response.updated_at` | string | Last update timestamp. |
 | `response.created_at` | string | Creation timestamp. |
 
@@ -235,7 +235,7 @@ Outputs:
 | `response.live` | boolean | Whether the broker account is live rather than paper. |
 | `response.account_id` | string | Broker account identifier. |
 | `response.status` | string | Current status. |
-| `response.notifications` | array | Enabled notification types. |
+| `response.notifications` | array of string | Enabled notification types. |
 | `response.updated_at` | string | Last update timestamp. |
 | `response.created_at` | string | Creation timestamp. |
 
@@ -434,7 +434,7 @@ Outputs:
 | `response.live` | boolean | Whether the broker account is live rather than paper. |
 | `response.account_id` | string | Broker account identifier. |
 | `response.status` | string | Current status. |
-| `response.notifications` | array | Enabled notification types. |
+| `response.notifications` | array of string | Enabled notification types. |
 | `response.updated_at` | string | Last update timestamp. |
 | `response.created_at` | string | Creation timestamp. |
 

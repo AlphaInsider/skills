@@ -150,6 +150,7 @@ Outputs:
 | Field | Type | Description |
 | --- | --- | --- |
 | `[].event` | string | WebSocket event name. |
+| `[].channel` | string | WebSocket channel name when the error applies to a specific channel. |
 | `[].response` | string | Endpoint-specific response payload, or an error message when `success` is false. |
 
 Example:

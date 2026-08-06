@@ -304,7 +304,7 @@ Outputs:
 | `response.private` | boolean | Whether the strategy is private. |
 | `response.name` | string | Display name. |
 | `response.description` | string | Human-readable description. |
-| `response.categories` | array | Strategy category labels. |
+| `response.categories` | array of string | Strategy category labels. |
 | `response.updated_at` | string | Last update timestamp. |
 | `response.created_at` | string | Creation timestamp. |
 | `response.price` | integer | Price or execution price, depending on context. |

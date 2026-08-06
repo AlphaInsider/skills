@@ -76,7 +76,7 @@ Inputs:
 | Location | Name | Required | Type / values | Description |
 | --- | --- | --- | --- | --- |
 | header | `Authorization` | Yes | string (JWT) | AlphaInsider API token sent exactly as the header value; do not prepend `Bearer`. |
-| body | `amount` | Yes | number (int) | Order amount, position amount, or withdrawal amount depending on endpoint. See endpoint notes. |
+| body | `amount` | Yes | number (int) | Amount to withdraw in cents. See `limits.md` for the minimum withdrawal amount. |
 
 Outputs:
 
@@ -114,7 +114,7 @@ Inputs:
 | Location | Name | Required | Type / values | Description |
 | --- | --- | --- | --- | --- |
 | header | `Authorization` | Yes | string (JWT) | AlphaInsider API token sent exactly as the header value; do not prepend `Bearer`. |
-| query | `amount` | Yes | number (int) | Order amount, position amount, or withdrawal amount depending on endpoint. See endpoint notes. |
+| query | `amount` | Yes | number (int) | Amount to withdraw in cents. |
 
 Outputs:
 
