@@ -19,6 +19,11 @@ This repository publishes reusable AlphaInsider agent skills from `skills/`.
 - When a design decision changes the strategy interview, plan schema, or
   generated-workspace contract, update the skill references, catalog
   validation, and repository documentation in the same change.
+- After the initial Strategy Creator `1.0.0` release, bump its shared SemVer
+  for every subsequent change affecting `strategy-creator` before pushing to
+  `master`. Follow `skills/strategy-creator/references/versioning.md` and keep
+  its `current_version` aligned with the `contract_version` in
+  `skills/strategy-creator/references/plan-template.md`.
 - Preserve the AlphaInsider credential boundary: agents never inspect or print
   existing API keys or `.env` values. Strategy Creator may accept values the
   user deliberately pastes in chat and write them to the selected project's

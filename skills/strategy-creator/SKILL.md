@@ -26,8 +26,9 @@ contains no provider or runtime code.
 
 ## Preflight
 
-1. Require this skill's `scripts/set_env_value.py` and the sibling
-   `alphainsider` skill's `SKILL.md`, `scripts/alphainsider_request.py`, and
+1. Require this skill's `scripts/check_for_update.py` and
+   `scripts/set_env_value.py`, plus the sibling `alphainsider` skill's
+   `SKILL.md`, `scripts/alphainsider_request.py`, and
    `scripts/alphainsider_stream.py`. If missing, stop and request both skills:
 
    ```bash
@@ -35,25 +36,39 @@ contains no provider or runtime code.
      --skill alphainsider --skill strategy-creator
    ```
 
-2. Read [references/interview.md](references/interview.md) and
-   [references/plan-template.md](references/plan-template.md) in full.
-3. Ask for the project root; recommend the invocation directory. Accept a
+2. Run the advisory repository check once per invocation before other work:
+
+   ```bash
+   python /absolute/path/to/strategy-creator/scripts/check_for_update.py
+   ```
+
+   If it prints a notice, show it once but never run or offer to run its update
+   command. Continue with this installed skill. If it prints nothing or the
+   check cannot run, continue silently.
+3. Read [references/interview.md](references/interview.md),
+   [references/plan-template.md](references/plan-template.md), and
+   [references/versioning.md](references/versioning.md) in full.
+4. Ask for the project root; recommend the invocation directory. Accept a
    normal user-controlled project location, including a suitable project
    directory beneath the user's home, when writable. Reject an installed skill
    directory, an obviously unsafe system location, or an unusable location.
    Use judgment; do not maintain an exhaustive path denylist or perform
    elaborate filesystem checks. Explain rejections and ask for another path.
-4. Without opening `.env`, recognize an existing project only when
-   `docs/plan.md` has a valid `draft`, `confirmed`, or `implemented` status,
-   the `# Strategy Plan` title, and every section heading from the current plan
-   template. Ignore field wording; only this signature determines recognition.
-5. For a recognized project, ask exactly one question before the interview:
+5. Without opening `.env`, recognize and compare existing projects exactly as
+   specified in `references/versioning.md`. A valid version marker takes
+   precedence; only an unversioned plan with the complete current signature is
+   legacy `0.0.0`. Stop on malformed or newer project versions. Compare only
+   with the installed version, never the repository version reported by the
+   advisory check.
+6. For a recognized project, ask exactly one question before the interview:
    whether to **update the existing plan** or **replace the trading strategy
    with a new one**. Recommend updating. For an update, preserve unaffected
    decisions, keep `draft` as-is, return later states to `draft`, and interview
-   only affected decisions. For replacement, follow that lifecycle without
-   altering the current plan or implementation.
-6. Without opening `.env`, list only existing paths this workflow would change.
+   only affected decisions. If its version is older, follow the direct target
+   audit and approval gate in `references/versioning.md` first. For replacement,
+   start on the installed version and follow that lifecycle without upgrading
+   or altering the current plan or implementation.
+7. Without opening `.env`, list only existing paths this workflow would change.
    Treat other collisions as ordinary conflicts, obtain explicit overwrite
    approval, and preserve unrelated files.
 
@@ -92,13 +107,15 @@ For each missing required variable:
 
 `docs/plan.md` is authoritative. Stage replacements in
 `docs/replacement-plan.md` while the current plan remains active. Both use only
-`draft`, `confirmed`, and `implemented`.
+`draft`, `confirmed`, and `implemented` and preserve their `contract_version`
+until the versioning workflow authorizes advancing it.
 
 ### Replacement
 
-1. When replacing, resume `docs/replacement-plan.md` if it has the current plan
-   signature and is `draft` or `confirmed`. Treat any other existing file at
-   that path as an ordinary collision and obtain overwrite approval.
+1. When replacing, resume `docs/replacement-plan.md` if versioning recognizes
+   it as a strategy plan and it is `draft` or `confirmed`. Apply the installed
+   version to a new replacement plan. Treat any other existing file at that
+   path as an ordinary collision and obtain overwrite approval.
 2. Otherwise create it from the template after the first confirmed answer,
    complete the full interview, and update it after every answer. Do not modify
    `docs/plan.md` or any current implementation artifact.
@@ -196,7 +213,9 @@ other language, use the project's exact package-manager and runtime commands;
 do not include Python steps.
 Write `AGENTS.md` to make `docs/plan.md` authoritative, preserve the credential
 boundary and missing-variable setup choices, identify code/test entry points,
-and require maintenance below.
+and require maintenance below. Require agents to preserve `contract_version`,
+follow Strategy Creator's installed-version workflow before behavior changes,
+and never advance the version before applicable conformance and tests pass.
 
 Run all offline tests and static checks. When code, tests, plan, and docs agree,
 set `implemented`. Exclude deployment unless separately requested. Before

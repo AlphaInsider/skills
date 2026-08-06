@@ -23,24 +23,28 @@ questions and skip branches that cannot affect the project.
 - Update the matching active plan section after every answer: `docs/plan.md`
   for a new or updated strategy and `docs/replacement-plan.md` for a staged
   replacement. Surface contradictions immediately rather than collecting
-  incompatible requirements.
+  incompatible requirements. Preserve `contract_version` until the versioning
+  workflow authorizes advancing it.
 - Allow conservative defaults for incidental mechanics. Label them as agent
   defaults so the user accepts them with the complete plan.
 
 ## Existing project branch
 
-After preflight recognizes a project from the status, `# Strategy Plan` title,
-and current template sections in `docs/plan.md`, ask exactly one question:
+After preflight recognizes and checks a project under `versioning.md`, ask
+exactly one question:
 "Would you like to update the existing plan or replace the trading strategy
 with a new one?" Present those as two short choices and recommend updating
 because it preserves prior decisions.
 
 - For **update**, preserve unaffected decisions and interview only the choices
-  the requested change affects. Return a `confirmed` or `implemented` plan to
-  `draft` before recording behavior changes.
+  the requested change affects. For an older project, first complete the
+  direct target audit and exact-path approval in `versioning.md`. Return a
+  `confirmed` or `implemented` plan to `draft` before recording
+  behavior-affecting gaps; do not interview for a documentation-only gap.
 - For **replace**, leave the current plan and implementation untouched. Create
-  or resume `docs/replacement-plan.md` and run the complete decision tree for
-  the new strategy. A confirmed replacement plan proceeds only to the separate
+  or resume `docs/replacement-plan.md` on the installed version and run the
+  complete decision tree for the new strategy. Do not upgrade the outgoing
+  strategy. A confirmed replacement plan proceeds only to the separate
   deletion-approval gate in `SKILL.md`; it does not authorize deletion, plan
   promotion, or implementation.
 
@@ -90,19 +94,29 @@ instead of repeating the interview.
    limits, licensing, reliability, and maintenance burden. Recommend the
    smallest stack and record routine selections as agent defaults. Ask the user
    only when cost, credentials, scraping, or another meaningful tradeoff needs
-   approval. Prefer Alpaca for equity data and Coinbase for cryptocurrency data
-   when they fit. Use scraping only with explicit approval, permitted access,
-   no suitable supported feed, and a documented failure/maintenance plan.
+   approval. Prefer AlphaInsider's applicable stock REST endpoints and
+   `wsStockPrice` for supported current instrument metadata, exchange status,
+   and bid, ask, or last prices when their coverage, freshness, and cadence fit.
+   Use an external provider when AlphaInsider does not supply the required live
+   market, cadence, freshness, or signal-specific input. For historical inputs
+   used by live operation, compare AlphaInsider and external sources case by
+   case under the same research criteria. Use scraping only with explicit
+   approval, permitted access, no suitable supported feed, and a documented
+   failure/maintenance plan.
 8. **Backtesting** — Determine whether every signal input and decision timestamp
    can be reconstructed without future information. For dynamic selection,
    require the historical candidate set and selection inputs as they existed at
    each decision time; reject current-universe substitution and survivorship
-   bias. If replay is infeasible, record the reason, explain it to the user, and
-   do not offer backtesting. If feasible, always ask whether to backtest, then
-   resolve the historical window, when results are measured, execution
-   assumptions, costs, and results to report. Reuse production decision logic
-   and implement only the smallest credible replay; signal-only evaluation is
-   valid when portfolio accounting would be speculative.
+   bias. Never use AlphaInsider's `getStockPriceHistory` for a backtest. Require
+   a credible external historical source; if none is feasible, record the
+   reason, mark backtesting unavailable, and do not offer it. If replay is
+   otherwise feasible, always ask whether to backtest, then resolve the
+   historical window, when results are measured, execution assumptions, costs,
+   and results to report. Reuse production decision logic and implement only
+   the smallest credible replay; signal-only evaluation is valid when portfolio
+   accounting would be speculative. When production and replay use different
+   providers, normalize them to the same decision-logic input contract and
+   document timestamp, symbol, price-adjustment, and coverage differences.
 9. **Implementation contract** — Resolve language when Python is unsuitable,
    module responsibilities, data flow, persistent state, configuration names,
    one-cycle and continuous commands, tests to run, and expected results.
@@ -144,6 +158,9 @@ Before presenting the plan for confirmation:
 - Ensure the selected data and library stack is available and obtain approval
   for any cost, credentials, scraping, or other material tradeoff.
 - Ensure no implementation-blocking placeholder or contradiction remains.
+- For an upgrade, ensure the installed target contract and its applicable tests
+  conform before advancing `contract_version`; never advance to a remote
+  version that this installed skill does not contain.
 - State backtesting as unavailable, declined, or accepted with its exact scope.
 - Present the complete normalized plan, including every agent default, and ask
   for explicit confirmation.

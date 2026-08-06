@@ -32,9 +32,16 @@ EXPECTED_ALPHA_REFERENCES = {
     "websockets.md",
     "withdrawals.md",
 }
-EXPECTED_STRATEGY_REFERENCES = {"interview.md", "plan-template.md"}
-EXPECTED_STRATEGY_SCRIPTS = {"set_env_value.py"}
+EXPECTED_STRATEGY_REFERENCES = {
+    "interview.md",
+    "plan-template.md",
+    "versioning.md",
+}
+EXPECTED_STRATEGY_SCRIPTS = {"check_for_update.py", "set_env_value.py"}
 EXPECTED_PLAN_STATES = {"draft", "confirmed", "implemented"}
+STRICT_SEMVER_PATTERN = re.compile(
+    r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$"
+)
 REQUIRED_PLAN_SECTIONS = {
     "# Strategy Plan",
     "## Objective",
@@ -114,6 +121,42 @@ REQUIRED_EXPOSURE_GUIDANCE = {
     "Record the user's chosen cap",
     "`getMaxOrderSize`",
 }
+REQUIRED_MARKET_DATA_GUIDANCE = {
+    "Prefer AlphaInsider's applicable stock REST endpoints and `wsStockPrice`",
+    "supported current instrument metadata, exchange status, and bid, ask, or last prices",
+    "Use an external provider when AlphaInsider does not supply the required live",
+    "For historical inputs used by live operation",
+    "compare AlphaInsider and external sources case by case",
+    "Never use AlphaInsider's `getStockPriceHistory` for a backtest",
+    "Require a credible external historical source",
+    "mark backtesting unavailable",
+    "same decision-logic input contract",
+    "timestamp, symbol, price-adjustment, and coverage differences",
+}
+REQUIRED_VERSION_GUIDANCE = {
+    "`scripts/check_for_update.py` once at the start of every invocation",
+    "never run its update command or ask for permission to run it",
+    "`MAJOR.MINOR.PATCH`",
+    "Increment the version for every published Strategy Creator change",
+    "Treat that exact legacy shape as `0.0.0`",
+    "Compare the project with the installed version",
+    "never a remote version",
+    "npx skills@latest update alphainsider strategy-creator",
+    "Audit the project directly against the installed skill",
+    "every exact create, modify, and delete path",
+    "renewed approval before touching any newly discovered path",
+    "Advance `contract_version` only after",
+    "interrupted or failed upgrade",
+    "does not change runtime code, tests, dependencies, or the generated `README.md`",
+}
+REQUIRED_UPDATE_CHECKER_SOURCE = {
+    "https://raw.githubusercontent.com/AlphaInsider/skills/master/",
+    "skills/strategy-creator/references/versioning.md",
+    'UPDATE_COMMAND = "npx skills@latest update alphainsider strategy-creator"',
+    "TIMEOUT_SECONDS = 3",
+    "MAX_RESPONSE_BYTES = 64 * 1024",
+    "response.geturl() != REMOTE_VERSION_URL",
+}
 README_MAX_WORDS = 450
 REQUIRED_README_SECTIONS = {
     "# AlphaInsider Skills",
@@ -134,6 +177,11 @@ REQUIRED_README_OVERVIEW_GUIDANCE = {
     "language-specific `Start` section",
     "explicit approval",
     "never submits AlphaInsider orders",
+    "prefer it for supported current market data",
+    "Backtests require credible external history",
+    "`contract_version`",
+    "npx skills@latest update alphainsider strategy-creator",
+    "never installed automatically",
 }
 
 
@@ -204,6 +252,26 @@ def validate() -> list[str]:
         )
 
     plan_template = strategy / "references" / "plan-template.md"
+    version_reference = strategy / "references" / "versioning.md"
+    current_version: str | None = None
+    if version_reference.is_file():
+        try:
+            version_fields = frontmatter(version_reference)
+        except ValueError as exc:
+            errors.append(str(exc))
+        else:
+            if set(version_fields) != {"current_version"}:
+                errors.append(
+                    "strategy version reference must declare only current_version"
+                )
+            current_version = version_fields.get("current_version")
+            if current_version is None or STRICT_SEMVER_PATTERN.fullmatch(
+                current_version
+            ) is None:
+                errors.append(
+                    "strategy version reference must use strict MAJOR.MINOR.PATCH"
+                )
+
     if plan_template.is_file():
         plan_text = plan_template.read_text(encoding="utf-8")
         try:
@@ -211,8 +279,25 @@ def validate() -> list[str]:
         except ValueError as exc:
             errors.append(str(exc))
         else:
-            if plan_fields != {"status": "draft"}:
+            if plan_fields.get("status") != "draft":
                 errors.append("strategy plan template must start in draft status")
+            if set(plan_fields) != {"status", "contract_version"}:
+                errors.append(
+                    "strategy plan template must declare status and contract_version"
+                )
+            plan_version = plan_fields.get("contract_version")
+            if plan_version is None or STRICT_SEMVER_PATTERN.fullmatch(
+                plan_version
+            ) is None:
+                errors.append(
+                    "strategy plan template contract_version must use strict "
+                    "MAJOR.MINOR.PATCH"
+                )
+            elif current_version is not None and plan_version != current_version:
+                errors.append(
+                    "strategy plan template contract_version must match the "
+                    "strategy version reference"
+                )
         missing_sections = REQUIRED_PLAN_SECTIONS - set(plan_text.splitlines())
         if missing_sections:
             errors.append(
@@ -257,7 +342,14 @@ def validate() -> list[str]:
             "strategy interview contains removed evaluation questions "
             f"{sorted(obsolete_questions)}"
         )
-    manual_text = " ".join(f"{strategy_text}\n{interview_text}".split())
+    version_text = (
+        version_reference.read_text(encoding="utf-8")
+        if version_reference.is_file()
+        else ""
+    )
+    manual_text = " ".join(
+        f"{strategy_text}\n{interview_text}\n{version_text}".split()
+    )
     missing_replacement_guidance = {
         guidance
         for guidance in REQUIRED_REPLACEMENT_GUIDANCE
@@ -301,6 +393,42 @@ def validate() -> list[str]:
             "strategy-creator is missing portfolio exposure guidance "
             f"{sorted(missing_exposure_guidance)}"
         )
+
+    missing_market_data_guidance = {
+        guidance
+        for guidance in REQUIRED_MARKET_DATA_GUIDANCE
+        if guidance not in manual_text
+    }
+    if missing_market_data_guidance:
+        errors.append(
+            "strategy-creator is missing market-data source guidance "
+            f"{sorted(missing_market_data_guidance)}"
+        )
+
+    missing_version_guidance = {
+        guidance
+        for guidance in REQUIRED_VERSION_GUIDANCE
+        if guidance not in manual_text
+    }
+    if missing_version_guidance:
+        errors.append(
+            "strategy-creator is missing versioning guidance "
+            f"{sorted(missing_version_guidance)}"
+        )
+
+    update_checker = strategy / "scripts" / "check_for_update.py"
+    if update_checker.is_file():
+        checker_source = update_checker.read_text(encoding="utf-8")
+        missing_checker_source = {
+            marker
+            for marker in REQUIRED_UPDATE_CHECKER_SOURCE
+            if marker not in checker_source
+        }
+        if missing_checker_source:
+            errors.append(
+                "strategy update checker is missing required safeguards "
+                f"{sorted(missing_checker_source)}"
+            )
 
     readme_text = (ROOT / "README.md").read_text(encoding="utf-8")
     normalized_readme = " ".join(readme_text.split())

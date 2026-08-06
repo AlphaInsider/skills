@@ -44,10 +44,9 @@ plan is confirmed, it builds the smallest project that implements it, including
 strategy code, dependency configuration, documentation, and offline tests.
 
 Generated strategies use AlphaInsider as their only paper-trading order
-destination. They validate the configured asset class and instruments before
-ordering, reconcile existing positions and orders, and keep decision logic
-independently testable. Optional backtests are included only when the required
-historical inputs can be reconstructed without future information.
+destination and prefer it for supported current market data. They validate
+instruments, reconcile positions and orders, and keep decision logic testable.
+Backtests require credible external history and are unavailable without it.
 
 Credentials remain in the generated project's `.env`. Users are advised to add
 them directly; optional agent-assisted entry warns that pasted values are
@@ -61,6 +60,13 @@ Existing Strategy Creator projects can be updated or replaced. Replacement is
 planned separately and requires explicit approval before attributable files are
 removed. Offline verification mocks external services and never submits
 AlphaInsider orders.
+
+Strategy Creator plans carry the skill's shared `contract_version`. On every
+invocation, a read-only check compares the installed version with the canonical
+repository. A newer release is reported with
+`npx skills@latest update alphainsider strategy-creator`, but is never installed
+automatically. Project upgrades use only the installed contract and remain
+approval-gated.
 
 Detailed lifecycle, safety, and implementation rules remain in each skill's
 `SKILL.md` and references.
