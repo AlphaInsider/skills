@@ -5,7 +5,8 @@ description: Interview users one decision at a time, maintain a decision-complet
 
 # AlphaInsider Strategy Creator
 
-Use this skill as an instruction manual with one local `.env` setup helper.
+Use this skill as an instruction manual with one local `.env` setup and cleanup
+helper.
 Build only the project justified by the confirmed strategy plan; this skill
 contains no provider or runtime code.
 
@@ -13,7 +14,8 @@ contains no provider or runtime code.
 
 - Build one fully automated AlphaInsider paper-trading strategy per project.
 - Use AlphaInsider as the only order destination; never create a live-broker
-  client. Select its strategy through `ALPHAINSIDER_STRATEGY_ID` in `.env`.
+  client. Select an owned strategy or create one after plan confirmation, then
+  persist it through `ALPHAINSIDER_STRATEGY_ID` in `.env`.
 - Keep the configured `stock` or `cryptocurrency` asset class. Signals may use
   cross-asset or alternative data, but every traded instrument must match.
 - Support fixed, dynamic, and constrained-dynamic selection without requiring
@@ -46,6 +48,7 @@ contains no provider or runtime code.
    command. Continue with this installed skill. If it prints nothing or the
    check cannot run, continue silently.
 3. Read [references/interview.md](references/interview.md),
+   [references/alphainsider-target.md](references/alphainsider-target.md),
    [references/plan-template.md](references/plan-template.md), and
    [references/versioning.md](references/versioning.md) in full.
 4. Ask for the project root; recommend the invocation directory. Accept a
@@ -74,9 +77,18 @@ contains no provider or runtime code.
 
 Do not create replacement backups or management metadata.
 
+## AlphaInsider target
+
+Read and follow
+[references/alphainsider-target.md](references/alphainsider-target.md) for the
+complete API-key permission gate, existing-strategy discovery, new-strategy
+approval and creation, ID persistence, failure cleanup, and remote-description
+synchronization. Complete its permission gate before the interview and its
+target resolution before plan confirmation.
+
 ## Environment setup
 
-For each missing required variable:
+For each missing required credential or configuration value:
 
 1. Name it and show the selected project's exact `.env` path without opening
    the file.
@@ -100,8 +112,14 @@ For each missing required variable:
    approval to update only those names, so do not ask again.
 6. Rerun the non-ordering check. For AlphaInsider configuration, use the sibling
    request helper and report only the result, never credentials. Strategy IDs
-   and other non-secret values may be reported when the user supplied them or
-   explicitly asks for them.
+   and other non-secret values may be reported when the user supplied them,
+   explicitly asks for them, or approved their creation in this workflow.
+
+A missing `ALPHAINSIDER_API_KEY` must pass the target reference's permission
+gate before work continues. A missing `ALPHAINSIDER_STRATEGY_ID` is not a
+credential failure; follow the target reference. When that flow selects or
+creates a strategy, the user's selection or creation approval authorizes
+writing only `ALPHAINSIDER_STRATEGY_ID` through the non-echoing helper.
 
 ## Plan lifecycle
 
@@ -144,14 +162,18 @@ or reimplement from replacement confirmation alone.
 2. Follow the interview reference: ask one decision per turn, record each
    normalized answer immediately, research discoverable facts and the smallest
    feasible stack, and obtain required confirmations. Do not keep a transcript.
-3. Before confirmation, let the sibling request helper read `.env` and validate
-   the AlphaInsider strategy and asset class. Validate explicit instrument
-   mappings; for dynamic selection, record runtime resolution instead. Follow
-   **Environment setup** when needed, and record no credentials or strategy IDs.
+3. Before confirmation, complete the target reference's permission gate and
+   target resolution. Validate an existing target and its asset class, or record
+   approved core fields for a new target without creating it. Validate explicit
+   instrument mappings; for dynamic selection, record runtime resolution
+   instead. Follow **Environment setup** when needed, and record no credentials
+   or strategy IDs.
 4. Resolve contradictions and placeholders, then present the complete plan.
-   Explicit confirmation of `docs/plan.md` sets `confirmed` and authorizes
-   implementation immediately. Replacement confirmation stops at its deletion
-   gate.
+   Include the exact generated AlphaInsider description. Explicit confirmation
+   of `docs/plan.md` sets `confirmed` and authorizes implementation immediately,
+   including creation of a new target with that description. It authorizes
+   synchronization of an existing target after offline verification.
+   Replacement confirmation stops at its deletion gate.
 
 Do not code while the plan is `draft`. Label incidental conservative defaults
 for acceptance with the complete plan.
@@ -164,6 +186,10 @@ WebSockets. Inventory every path before writing. Confirmation authorizes new
 files, but an existing file still requires explicit overwrite approval. Keep
 every write inside the selected project root; use absolute paths only during
 the run and persist project-relative paths in the project.
+
+Before writing implementation files, complete **Confirmed provisioning** in
+the target reference. Its creation, validation, reporting, and approval-gated
+cleanup rules are part of this lifecycle.
 
 Build the smallest standalone project that satisfies the plan:
 
@@ -203,7 +229,8 @@ Build the smallest standalone project that satisfies the plan:
   run an order-submitting command.
 
 Write `README.md` for humans with purpose, behavior, prerequisites, setup,
-environment names, commands, monitoring, limitations, and recovery.
+environment names, commands, monitoring, limitations, and recovery. Apply the
+target reference's exact API-key and failed-creation-cleanup requirements.
 Include a short `## Start` section with ordered, copy-paste commands for
 dependency installation and `.env` preparation. Label the exact commands for
 one decision cycle and continuous operation equally. Match the selected
@@ -215,14 +242,17 @@ Write `AGENTS.md` to make `docs/plan.md` authoritative, preserve the credential
 boundary and missing-variable setup choices, identify code/test entry points,
 and require maintenance below. Require agents to preserve `contract_version`,
 follow Strategy Creator's installed-version workflow before behavior changes,
-and never advance the version before applicable conformance and tests pass.
+never advance the version before applicable conformance and tests pass, and
+preserve the target reference's remote-management boundaries.
 
-Run all offline tests and static checks. When code, tests, plan, and docs agree,
-set `implemented`. Exclude deployment unless separately requested. Before
+Run all offline tests and static checks, then complete **Description
+synchronization** in the target reference. Set `implemented` only after its
+remote gate passes. Exclude deployment unless separately requested. Before
 handoff, confirm every changed path is in the project and neither skill changed.
 
 ### Implemented
 
 For behavior changes, return the plan to `draft`, interview affected decisions
 one at a time, and reconfirm before code edits. Update code, tests, `README.md`,
-and `AGENTS.md` together; restore `implemented` only after verification.
+and `AGENTS.md` together; regenerate the exact remote description and follow
+the target reference before restoring `implemented`.

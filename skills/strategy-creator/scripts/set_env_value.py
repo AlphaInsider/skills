@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Safely create or update one value in a strategy project's .env file."""
+"""Safely create, update, or remove one value in a strategy project's .env."""
 
 from __future__ import annotations
 
@@ -24,7 +24,10 @@ class EnvUpdateError(ValueError):
 
 class _SafeArgumentParser(argparse.ArgumentParser):
     def error(self, _message: str) -> None:
-        self.exit(2, "error: invalid arguments; pass only the variable name\n")
+        self.exit(
+            2,
+            "error: invalid arguments; pass only [--remove] and the variable name\n",
+        )
 
 
 def validate_name(name: str) -> None:
@@ -80,6 +83,30 @@ def updated_contents(contents: str, name: str, value: str) -> str:
     return "".join(output)
 
 
+def removed_contents(contents: str, name: str) -> str:
+    definition = re.compile(rf"^\s*(?:export\s+)?{re.escape(name)}\s*=")
+    return "".join(
+        line
+        for line in contents.splitlines(keepends=True)
+        if not definition.match(line)
+    )
+
+
+def _replace_file(env_path: Path, replacement: str, mode: int) -> None:
+    descriptor, temporary_name = tempfile.mkstemp(
+        dir=env_path.parent, prefix=".env.", text=True
+    )
+    temporary_path = Path(temporary_name)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8", newline="") as handle:
+            handle.write(replacement)
+        os.chmod(temporary_path, mode)
+        os.replace(temporary_path, env_path)
+    finally:
+        if temporary_path.exists():
+            temporary_path.unlink()
+
+
 def update_env(env_path: Path, name: str, value: str) -> None:
     validate_name(name)
     validate_value(value)
@@ -95,25 +122,36 @@ def update_env(env_path: Path, name: str, value: str) -> None:
         stat.S_IMODE(env_path.stat().st_mode) if env_path.exists() else 0o600
     )
 
-    descriptor, temporary_name = tempfile.mkstemp(
-        dir=env_path.parent, prefix=".env.", text=True
-    )
-    temporary_path = Path(temporary_name)
-    try:
-        with os.fdopen(descriptor, "w", encoding="utf-8", newline="") as handle:
-            handle.write(replacement)
-        os.chmod(temporary_path, existing_mode)
-        os.replace(temporary_path, env_path)
-    finally:
-        if temporary_path.exists():
-            temporary_path.unlink()
+    _replace_file(env_path, replacement, existing_mode)
+
+
+def remove_env(env_path: Path, name: str) -> None:
+    validate_name(name)
+
+    if env_path.is_symlink():
+        raise EnvUpdateError("refusing to replace a symbolic-link .env")
+    if not env_path.exists():
+        return
+    if not env_path.is_file():
+        raise EnvUpdateError(".env exists but is not a regular file")
+
+    contents = env_path.read_text(encoding="utf-8")
+    replacement = removed_contents(contents, name)
+    if replacement == contents:
+        return
+    _replace_file(env_path, replacement, stat.S_IMODE(env_path.stat().st_mode))
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = _SafeArgumentParser(
-        description="Create or update one value in the current project's .env."
+        description="Create, update, or remove one value in the project's .env."
     )
-    parser.add_argument("name", help="Environment variable name to create or update.")
+    parser.add_argument(
+        "--remove",
+        action="store_true",
+        help="Remove the named variable without prompting for a value.",
+    )
+    parser.add_argument("name", help="Environment variable name to create, update, or remove.")
     args = parser.parse_args(argv)
 
     project_root = Path.cwd()
@@ -121,14 +159,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         validate_project_root(project_root)
         validate_name(args.name)
-        value = getpass.getpass(f"Value for {args.name}: ")
-        update_env(env_path, args.name, value)
+        if args.remove:
+            remove_env(env_path, args.name)
+        else:
+            value = getpass.getpass(f"Value for {args.name}: ")
+            update_env(env_path, args.name, value)
     except (EnvUpdateError, OSError, UnicodeError) as exc:
         parser.exit(1, f"error: {exc}\n")
     except (EOFError, KeyboardInterrupt):
         parser.exit(1, "error: no value received\n")
 
-    print(f"Updated {args.name} in {env_path.resolve()}")
+    action = "Removed" if args.remove else "Updated"
+    print(f"{action} {args.name} in {env_path.resolve()}")
     return 0
 
 

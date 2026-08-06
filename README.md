@@ -48,13 +48,15 @@ destination and prefer it for supported current market data. They validate
 instruments, reconcile positions and orders, and keep decision logic testable.
 Backtests require credible external history and are unavailable without it.
 
-Credentials remain in the generated project's `.env`. Users are advised to add
-them directly; optional agent-assisted entry warns that pasted values are
-visible to the agent and uses a non-echoing helper. AlphaInsider transports
-redact credentials from output while allowing user-approved IDs and non-secret
-configuration. Generated artifacts contain only variable names and safe
-examples. Each generated README includes a short, language-specific `Start`
-section with copy-paste setup, one-cycle, continuous, and test commands.
+Credentials remain in the generated project's `.env`. Strategy Creator lists
+and verifies its required API-key permissions without exposing the key. If no
+strategy ID is configured, it discovers owned strategies or approval-gates a
+new remote strategy after plan confirmation, safely stores its ID, and syncs
+the confirmed description. Users are advised to add credentials directly;
+optional agent-assisted entry warns that pasted values are visible and uses a
+non-echoing helper. Generated artifacts contain only safe examples. Each
+generated README includes a short, language-specific `Start` section with
+copy-paste setup, one-cycle, continuous, and test commands.
 
 Existing Strategy Creator projects can be updated or replaced. Replacement is
 planned separately and requires explicit approval before attributable files are

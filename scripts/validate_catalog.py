@@ -33,6 +33,7 @@ EXPECTED_ALPHA_REFERENCES = {
     "withdrawals.md",
 }
 EXPECTED_STRATEGY_REFERENCES = {
+    "alphainsider-target.md",
     "interview.md",
     "plan-template.md",
     "versioning.md",
@@ -57,6 +58,17 @@ REQUIRED_PLAIN_LANGUAGE_PLAN_FIELDS = {
     "- Goal:",
     "- Automatic pause or shutdown conditions and logging:",
     "- Tests to run and expected results:",
+}
+REQUIRED_TARGET_PLAN_FIELDS = {
+    "- Target source:",
+    "- Owned-strategy discovery:",
+    "- Proposed strategy name:",
+    "- Owner starting balance:",
+    "- Access eligibility and mode:",
+    "- Paid cryptocurrency launch price:",
+    "- Core creation fields approval:",
+    "- Generated AlphaInsider description:",
+    "- Description synchronization:",
 }
 REMOVED_PLAN_FIELDS = {
     "- Why the strategy could work:",
@@ -97,6 +109,59 @@ REQUIRED_CREDENTIAL_GUIDANCE = {
     "Do not open `.env` before or after the update",
     "approval to update only those names",
     "use the sibling request helper",
+    "--remove ALPHAINSIDER_STRATEGY_ID",
+}
+REQUIRED_STRATEGY_API_PERMISSIONS = (
+    "getUserInfo",
+    "getStrategies",
+    "getStrategyValues",
+    "getUserStrategies",
+    "getStrategyPerformance",
+    "newStrategy",
+    "updateStrategy",
+    "deleteStrategy",
+    "getStrategySubscriptions",
+    "getAccountSubscription",
+    "getPositions",
+    "getOrders",
+    "getMaxOrderSize",
+    "newOrder",
+    "newOrderAllocations",
+    "deleteOrder",
+    "wsStockPrice",
+    "wsStrategyValue",
+    "wsOrders",
+    "wsPositions",
+)
+REQUIRED_PROVISIONING_GUIDANCE = {
+    "https://alphainsider.com/settings/developers",
+    "`verifyToken` has no selectable permission",
+    "stock REST lookup endpoints require no API-key permission",
+    "list only the missing permission names",
+    "pause all interview, remote creation, and implementation work",
+    "use the verified token's `user_id` with `getUserStrategies`",
+    "Never pick the first result or create a duplicate silently",
+    "Persist an approved selection",
+    "Compare the owned strategy count with `limits.max_strategies`",
+    "stop if either eligibility check fails",
+    "`getAccountSubscription.level > 0`",
+    "`getUserInfo.verified` is true",
+    "record public access without an extra access question",
+    "Never offer paid stock creation",
+    "$10 through $1000",
+    "public to `private: false, price: 0`",
+    "private to `private: true, price: 0`",
+    "Changing any core field invalidates that approval",
+    "Do not call `newStrategy` before complete plan confirmation",
+    "one to three plain-language sentences",
+    "write it only to `ALPHAINSIDER_STRATEGY_ID`",
+    "report it once",
+    "ask whether to delete this exact strategy",
+    "Never infer deletion approval",
+    "Only after deletion succeeds",
+    "Never remove a default that now refers to another strategy",
+    "send the current name and owner `input_value` unchanged",
+    "If synchronization fails, leave the plan `confirmed`",
 }
 REQUIRED_ALPHA_CREDENTIAL_GUIDANCE = {
     "never return the API key or arbitrary environment contents",
@@ -147,7 +212,9 @@ REQUIRED_VERSION_GUIDANCE = {
     "renewed approval before touching any newly discovered path",
     "Advance `contract_version` only after",
     "interrupted or failed upgrade",
-    "does not change runtime code, tests, dependencies, or the generated `README.md`",
+    "For a version-only upgrade, classify the configured target as an existing strategy",
+    "do not create a strategy or sync its description",
+    "The upgrade alone does not require runtime-code or dependency changes",
 }
 REQUIRED_UPDATE_CHECKER_SOURCE = {
     "https://raw.githubusercontent.com/AlphaInsider/skills/master/",
@@ -182,6 +249,9 @@ REQUIRED_README_OVERVIEW_GUIDANCE = {
     "`contract_version`",
     "npx skills@latest update alphainsider strategy-creator",
     "never installed automatically",
+    "verifies its required API-key permissions",
+    "discovers owned strategies",
+    "syncs the confirmed description",
 }
 
 
@@ -311,6 +381,12 @@ def validate() -> list[str]:
                 "strategy plan template is missing plain-language fields "
                 f"{sorted(missing_fields)}"
             )
+        missing_target_fields = REQUIRED_TARGET_PLAN_FIELDS - plan_lines
+        if missing_target_fields:
+            errors.append(
+                "strategy plan template is missing AlphaInsider target fields "
+                f"{sorted(missing_target_fields)}"
+            )
         obsolete_fields = {
             field for field in REMOVED_PLAN_FIELDS if field in plan_text
         }
@@ -321,6 +397,22 @@ def validate() -> list[str]:
             )
 
     strategy_text = (strategy / "SKILL.md").read_text(encoding="utf-8")
+    target_text = (
+        strategy / "references" / "alphainsider-target.md"
+    ).read_text(encoding="utf-8")
+    permission_block = re.search(
+        r"## API-key permission gate.*?```text\n(.*?)\n```",
+        target_text,
+        re.DOTALL,
+    )
+    documented_permissions = (
+        tuple(permission_block.group(1).splitlines()) if permission_block else ()
+    )
+    if documented_permissions != REQUIRED_STRATEGY_API_PERMISSIONS:
+        errors.append(
+            "strategy-creator API-key permission bundle must exactly match "
+            f"{list(REQUIRED_STRATEGY_API_PERMISSIONS)}"
+        )
     missing_states = {
         state for state in EXPECTED_PLAN_STATES if f"`{state}`" not in strategy_text
     }
@@ -348,7 +440,7 @@ def validate() -> list[str]:
         else ""
     )
     manual_text = " ".join(
-        f"{strategy_text}\n{interview_text}\n{version_text}".split()
+        f"{strategy_text}\n{target_text}\n{interview_text}\n{version_text}".split()
     )
     missing_replacement_guidance = {
         guidance
@@ -370,6 +462,17 @@ def validate() -> list[str]:
         errors.append(
             "strategy-creator is missing credential setup guidance "
             f"{sorted(missing_credential_guidance)}"
+        )
+
+    missing_provisioning_guidance = {
+        guidance
+        for guidance in REQUIRED_PROVISIONING_GUIDANCE
+        if guidance not in manual_text
+    }
+    if missing_provisioning_guidance:
+        errors.append(
+            "strategy-creator is missing AlphaInsider provisioning guidance "
+            f"{sorted(missing_provisioning_guidance)}"
         )
 
     missing_startup_guidance = {
@@ -428,6 +531,24 @@ def validate() -> list[str]:
             errors.append(
                 "strategy update checker is missing required safeguards "
                 f"{sorted(missing_checker_source)}"
+            )
+
+    env_helper = strategy / "scripts" / "set_env_value.py"
+    if env_helper.is_file():
+        helper_source = env_helper.read_text(encoding="utf-8")
+        required_helper_source = {
+            '"--remove",',
+            "def remove_env(",
+            "def removed_contents(",
+            'action = "Removed" if args.remove else "Updated"',
+        }
+        missing_helper_source = {
+            marker for marker in required_helper_source if marker not in helper_source
+        }
+        if missing_helper_source:
+            errors.append(
+                "strategy environment helper is missing safe removal support "
+                f"{sorted(missing_helper_source)}"
             )
 
     readme_text = (ROOT / "README.md").read_text(encoding="utf-8")

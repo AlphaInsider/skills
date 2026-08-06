@@ -27,6 +27,10 @@ questions and skip branches that cannot affect the project.
   workflow authorizes advancing it.
 - Allow conservative defaults for incidental mechanics. Label them as agent
   defaults so the user accepts them with the complete plan.
+- Treat API-key permissions, owned-strategy discovery, eligibility, account
+  limits, and endpoint fields as discoverable facts. Follow
+  `alphainsider-target.md` and the credential gate in `SKILL.md` rather than
+  asking the user to find IDs, scopes, or account details.
 
 ## Existing project branch
 
@@ -52,12 +56,36 @@ If a valid replacement plan is already `draft`, resume its next unresolved
 decision. If it is `confirmed`, proceed to the deletion inventory and approval
 instead of repeating the interview.
 
+## AlphaInsider target branch
+
+After the API-key permission gate in `alphainsider-target.md`, resolve the
+target before instrument selection:
+
+- If a configured strategy validates, record `selected existing` and its
+  strict asset class without recording the ID.
+- If no strategy ID is configured, discover the authenticated user's owned
+  strategies. Ask the user to select one or explicitly choose a new strategy;
+  never choose the first result or create a duplicate silently. Persist an
+  approved selection through the non-echoing helper and record `selected
+  existing` without its ID.
+- For a new target, first resolve the asset class. Propose a short name from the
+  goal, require the user to choose the owner starting balance, and use the
+  verified account checks in `alphainsider-target.md` to offer only eligible
+  access modes.
+  Present the exact type, name, starting balance, access, and launch price when
+  applicable, then obtain explicit core creation approval while the plan is
+  draft. If any core field later changes, invalidate and repeat that approval.
+- Do not call `newStrategy` while the plan is draft. Generate the exact remote
+  description after the behavior decisions are complete; its approval is part
+  of final plan confirmation.
+
 ## Decision tree
 
 1. **Intent** — Ask "What do you want this strategy to do?" and record the
    answer as the strategy goal.
-2. **AlphaInsider target** — Resolve the configured strategy's strict `stock`
-   or `cryptocurrency` type, then choose an instrument-selection mode:
+2. **AlphaInsider target** — Resolve or provision the plan's `stock` or
+   `cryptocurrency` target through the branch above, then choose an
+   instrument-selection mode:
    `fixed`, `dynamic`, or `constrained dynamic`. For fixed selection, record
    explicitly named instruments and their mappings. For dynamic selection,
    define the runtime selector without requiring an advance list. For
@@ -128,16 +156,23 @@ instead of repeating the interview.
    Treat the selected project root as `.` in every persisted path; never embed
    machine-specific absolute paths or write generated artifacts into an
    installed skill directory.
+10. **Remote description** — Draft one to three plain-language sentences from
+    the completed plan. Cover the traded universe, signal and entry/exit
+    behavior, cadence, and sizing or risk without performance claims,
+    credentials, implementation paths, or unsupported promises. Record the
+    exact text and require synchronization before the plan can become
+    `implemented`.
 
 ## Missing environment values
 
-A missing environment value is a setup gap, not a strategy decision. Pause the
-interview and follow **Environment setup** in `SKILL.md`. Name the missing
-variables and exact project `.env` path, then recommend that the user add the
-values there themselves and tell you when ready. If the user wants
-agent-assisted entry, they may paste values in chat so you can add them. Always
-warn first that pasting credentials is less secure because each value is visible
-to the agent.
+A missing API key or other required credential is a setup gap, not a strategy
+decision. Pause the interview and follow **Environment setup** in `SKILL.md`.
+Name the missing variables and exact project `.env` path, then recommend that
+the user add the values there themselves and tell you when ready. If the user
+wants agent-assisted entry, they may paste values in chat so you can add them.
+Always warn first that pasting credentials is less secure because each value is
+visible to the agent. A missing `ALPHAINSIDER_STRATEGY_ID` follows the target
+branch above instead of being treated as a credential gap.
 
 For pasted values, run `scripts/set_env_value.py` from the project root once per
 variable and provide each value only through its non-echoing prompt. Never pass
@@ -150,14 +185,19 @@ configuration.
 
 Before presenting the plan for confirmation:
 
-- Verify the `.env`-configured AlphaInsider strategy and its type through the
-  sibling request helper without reading or exposing `.env`.
+- Verify the documented API-permission bundle. For an existing target, verify
+  its ownership and type through the sibling request helper without reading or
+  exposing `.env`. For a new target, require approved core creation fields and
+  successful capacity and access checks, but do not create it yet.
 - If the user explicitly named instruments, verify their mappings through the
   read-only stock lookup workflow. Otherwise ensure the plan defines runtime
   lookup, asset-class validation, freshness, and failure behavior.
 - Ensure the selected data and library stack is available and obtain approval
   for any cost, credentials, scraping, or other material tradeoff.
 - Ensure no implementation-blocking placeholder or contradiction remains.
+- Include the exact generated AlphaInsider description. Plan confirmation
+  authorizes its initial creation value and later synchronization after
+  implementation verification.
 - For an upgrade, ensure the installed target contract and its applicable tests
   conform before advancing `contract_version`; never advance to a remote
   version that this installed skill does not contain.

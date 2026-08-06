@@ -1,5 +1,5 @@
 ---
-current_version: 1.0.0
+current_version: 1.1.0
 ---
 
 # Strategy Creator Versioning
@@ -65,9 +65,15 @@ installed version and leaves the outgoing project unchanged. For an update:
    behavior, and tests conform. Leave the previous version in place after an
    interrupted or failed upgrade.
 
-## Version 1.0.0 target
+## Version 1.1.0 target
 
-The `0.0.0` to `1.0.0` upgrade adds `contract_version: 1.0.0` to
-`docs/plan.md` and adds version-maintenance guidance to an attributable
-`AGENTS.md`. It does not change runtime code, tests, dependencies, or the
-generated `README.md`.
+The direct upgrade to `1.1.0` adds the AlphaInsider target-source, creation,
+access, description, and synchronization fields to `docs/plan.md`. It also
+adds the documented API-permission bundle and remote-description maintenance
+rules to attributable `README.md` and `AGENTS.md` files.
+
+For a version-only upgrade, classify the configured target as an existing
+strategy, preserve its remote metadata, and do not create a strategy or sync
+its description. Remote description synchronization begins only after the
+user confirms a behavior plan containing the exact description. The upgrade
+alone does not require runtime-code or dependency changes.
