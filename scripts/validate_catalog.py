@@ -32,17 +32,134 @@ EXPECTED_ALPHA_REFERENCES = {
     "websockets.md",
     "withdrawals.md",
 }
+EXPECTED_ALPHA_REST_SECTIONS = {
+    "authentication.md": (
+        ("verifyToken", "POST", "/verifyToken"),
+    ),
+    "users.md": (
+        ("getUsers", "GET", "/getUsers"),
+        ("getUserInfo", "GET", "/getUserInfo"),
+        ("updateUserInfo", "POST", "/updateUserInfo"),
+        ("updateUserNotifications", "POST", "/updateUserNotifications"),
+    ),
+    "strategies.md": (
+        ("getStrategies", "GET", "/getStrategies"),
+        ("getStrategyValues", "GET", "/getStrategyValues"),
+        ("getUserStrategies", "GET", "/getUserStrategies"),
+        ("getStrategyPerformance", "GET", "/getStrategyPerformance"),
+        ("getRecommendedStrategies", "GET", "/getRecommendedStrategies"),
+        ("searchStrategies", "POST", "/searchStrategies"),
+        ("newStrategy", "POST", "/newStrategy"),
+        ("updateStrategy", "POST", "/updateStrategy"),
+        ("updateStrategyPrice", "POST", "/updateStrategyPrice"),
+        ("deleteStrategy", "POST", "/deleteStrategy"),
+    ),
+    "subscriptions.md": (
+        ("getStrategySubscriptions", "GET", "/getStrategySubscriptions"),
+        ("newStrategySubscription", "POST", "/newStrategySubscription"),
+        ("deleteStrategySubscription", "POST", "/deleteStrategySubscription"),
+        (
+            "updateStrategySubscriptionNotifications",
+            "POST",
+            "/updateStrategySubscriptionNotifications",
+        ),
+        ("getStrategyCalculation", "GET", "/getStrategyCalculation"),
+        ("updateStrategyCalculation", "POST", "/updateStrategyCalculation"),
+        ("deleteStrategyCalculation", "POST", "/deleteStrategyCalculation"),
+        ("getAccountTiers", "GET", "/getAccountTiers"),
+        ("getAccountSubscription", "GET", "/getAccountSubscription"),
+        ("updateAccountSubscription", "POST", "/updateAccountSubscription"),
+    ),
+    "payments.md": (
+        ("getPaymentSources", "GET", "/getPaymentSources"),
+        ("getUpcomingInvoice", "GET", "/getUpcomingInvoice"),
+        ("getInvoices", "GET", "/getInvoices"),
+        ("getInvoicePdf", "GET", "/getInvoicePdf"),
+        ("retryInvoice", "POST", "/retryInvoice"),
+        ("getUpcomingInvoiceItems", "GET", "/getUpcomingInvoiceItems"),
+        ("getInvoiceItems", "GET", "/getInvoiceItems"),
+    ),
+    "withdrawals.md": (
+        ("getUserBalance", "GET", "/getUserBalance"),
+        ("getPayouts", "GET", "/getPayouts"),
+        ("newPayout", "POST", "/newPayout"),
+        ("getPayoutFees", "GET", "/getPayoutFees"),
+        ("getIncome", "GET", "/getIncome"),
+        ("getStripeAccountLink", "GET", "/getStripeAccountLink"),
+    ),
+    "timelines.md": (
+        ("getTimelines", "GET", "/getTimelines"),
+        ("getStrategyTimelines", "GET", "/getStrategyTimelines"),
+        ("newPost", "POST", "/newPost"),
+        ("previewPost", "POST", "/previewPost"),
+        ("deletePost", "POST", "/deletePost"),
+        ("like", "POST", "/like"),
+        ("unlike", "POST", "/unlike"),
+    ),
+    "stocks.md": (
+        ("getStocks", "GET", "/getStocks"),
+        ("getAllStocks", "GET", "/getAllStocks"),
+        ("getStockPriceHistory", "GET", "/getStockPriceHistory"),
+        ("searchStocks", "POST", "/searchStocks"),
+        ("getExchangeStatus", "GET", "/getExchangeStatus"),
+    ),
+    "trades.md": (
+        ("getPositions", "GET", "/getPositions"),
+        ("getOrders", "GET", "/getOrders"),
+        ("getMaxOrderSize", "GET", "/getMaxOrderSize"),
+        ("newOrder", "POST", "/newOrder"),
+        ("newOrderAllocations", "POST", "/newOrderAllocations"),
+        ("deleteOrder", "POST", "/deleteOrder"),
+    ),
+    "bots.md": (
+        ("getBots", "GET", "/getBots"),
+        ("getBotInfo", "GET", "/getBotInfo"),
+        ("newBot", "POST", "/newBot"),
+        ("updateBotSettings", "POST", "/updateBotSettings"),
+        ("updateBotBrokerKeys", "POST", "/updateBotBrokerKeys"),
+        ("updateBotNotifications", "POST", "/updateBotNotifications"),
+        ("deleteBot", "POST", "/deleteBot"),
+        ("startBot", "POST", "/startBot"),
+        ("stopBot", "POST", "/stopBot"),
+        ("resetBot", "POST", "/resetBot"),
+        ("getBotPerformance", "GET", "/getBotPerformance"),
+        ("resetBotPerformance", "POST", "/resetBotPerformance"),
+        ("getBotAllocations", "GET", "/getBotAllocations"),
+        ("updateBotAllocations", "POST", "/updateBotAllocations"),
+        ("getBotActivities", "GET", "/getBotActivities"),
+    ),
+    "webhooks.md": (
+        ("newOrderWebhook", "POST", "/newOrderWebhook"),
+    ),
+}
+EXPECTED_ALPHA_WEBSOCKET_SECTIONS = (
+    ("ping", "Ping"),
+    ("pingResponse", "Ping Response"),
+    ("subscribe", "Subscribe"),
+    ("subscribeResponse", "Subscribe Response"),
+    ("error", "Error Response"),
+    ("wsStockPrice", "Stock Price"),
+    ("wsStrategyValue", "Strategy Value"),
+    ("wsOrders", "Orders"),
+    ("wsPositions", "Positions"),
+    ("wsTimelines", "Timelines"),
+    ("wsBotStatus", "Bot Status"),
+    ("wsBotAllocations", "Bot Allocations"),
+    ("wsBotActivities", "Bot Activities"),
+)
 EXPECTED_STRATEGY_REFERENCES = {
     "alphainsider-target.md",
     "interview.md",
     "plan-template.md",
     "versioning.md",
 }
+REQUIRED_STRATEGY_RELEASES = {"1.0.0", "1.1.0", "1.2.0"}
 EXPECTED_STRATEGY_SCRIPTS = {"check_for_update.py", "set_env_value.py"}
 EXPECTED_PLAN_STATES = {"draft", "confirmed", "implemented"}
 STRICT_SEMVER_PATTERN = re.compile(
     r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$"
 )
+STRATEGY_VERSION_FILE_PATTERN = re.compile(r"^v([1-9][0-9]*)\.md$")
 REQUIRED_PLAN_SECTIONS = {
     "# Strategy Plan",
     "## Objective",
@@ -169,6 +286,23 @@ REQUIRED_ALPHA_CREDENTIAL_GUIDANCE = {
     "Never dump the process environment or complete `.env`",
     "prevents accidental output exposure, not hostile same-process inspection",
 }
+REQUIRED_ALPHA_ROUTING_GUIDANCE = {
+    "follow its link to the exact endpoint or WebSocket message section",
+    "Do not load unrelated endpoint sections from the same grouped reference",
+    "references/api-reference.md` for exact section links",
+}
+REQUIRED_ALPHA_STREAM_GUIDANCE = {
+    "pass `reconnect=True` to `stream_events(...)`",
+    "re-subscribes to the complete channel list",
+    "authentication failures remain terminal",
+}
+REQUIRED_ALPHA_DOC_AUDIT_GUIDANCE = {
+    "Before finalizing any change under `skills/alphainsider/`",
+    "https://api.alphainsider.com/llms.txt",
+    "https://api.alphainsider.com/openapi.yaml",
+    "https://api.alphainsider.com/asyncapi.yaml",
+    "Reconcile every discrepancy in the same change",
+}
 REQUIRED_STARTUP_GUIDANCE = {
     "a short `## Start` section",
     "ordered, copy-paste commands",
@@ -207,14 +341,27 @@ REQUIRED_VERSION_GUIDANCE = {
     "Compare the project with the installed version",
     "never a remote version",
     "npx skills@latest update alphainsider strategy-creator",
-    "Audit the project directly against the installed skill",
+    "one `vN.md` file per major version",
+    "Select every documented release greater than",
+    "less than or equal to the installed version",
+    "Process the selected release sections in ascending semantic-version order",
+    "Audit the project against the installed skill",
+    "Combine all selected increments into one target audit",
     "every exact create, modify, and delete path",
     "renewed approval before touching any newly discovered path",
     "Advance `contract_version` only after",
+    "do not write intermediate contract versions",
     "interrupted or failed upgrade",
     "For a version-only upgrade, classify the configured target as an existing strategy",
     "do not create a strategy or sync its description",
     "The upgrade alone does not require runtime-code or dependency changes",
+    "Pass `reconnect=True` to `stream_events` when the plan requires continuous reconnection and re-subscription",
+    "retain the default one-session behavior when the plan requires the strategy to stop on a stream error",
+}
+REQUIRED_STRATEGY_VERSION_LAYOUT_GUIDANCE = {
+    "sole nested exception",
+    "`references/versions/vN.md`",
+    "highest documented release",
 }
 REQUIRED_UPDATE_CHECKER_SOURCE = {
     "https://raw.githubusercontent.com/AlphaInsider/skills/master/",
@@ -252,6 +399,7 @@ REQUIRED_README_OVERVIEW_GUIDANCE = {
     "verifies its required API-key permissions",
     "discovers owned strategies",
     "syncs the confirmed description",
+    "`references/versions/vN.md`",
 }
 
 
@@ -270,8 +418,144 @@ def frontmatter(path: Path) -> dict[str, str]:
     return fields
 
 
+def markdown_anchor(heading: str) -> str:
+    """Return the anchor used by the grouped AlphaInsider references."""
+    return re.sub(r"[^a-z0-9 _-]", "", heading.lower()).replace(" ", "-")
+
+
+def section_link(label: str, reference: str, heading: str) -> str:
+    return f"[`{label}`]({reference}#{markdown_anchor(heading)})"
+
+
+def semver_tuple(value: str) -> tuple[int, int, int] | None:
+    match = STRICT_SEMVER_PATTERN.fullmatch(value)
+    if match is None:
+        return None
+    return tuple(int(part) for part in match.groups())
+
+
+def markdown_section_lines(text: str, heading: str) -> list[str] | None:
+    match = re.search(
+        rf"^## {re.escape(heading)}\n(?P<body>.*?)(?=^## |\Z)",
+        text,
+        re.MULTILINE | re.DOTALL,
+    )
+    if match is None:
+        return None
+    return [line.strip() for line in match.group("body").splitlines() if line.strip()]
+
+
+def validate_strategy_version_history(
+    version_text: str,
+    version_files: dict[str, str],
+    current_version: str | None,
+) -> tuple[list[str], list[str]]:
+    errors: list[str] = []
+    release_versions: list[str] = []
+    major_files: list[tuple[int, str, str]] = []
+
+    for relative_path, text in version_files.items():
+        match = STRATEGY_VERSION_FILE_PATTERN.fullmatch(relative_path)
+        if match is None:
+            errors.append(
+                "strategy version logs must use references/versions/vN.md: "
+                f"{relative_path}"
+            )
+            continue
+        major_files.append((int(match.group(1)), relative_path, text))
+
+    major_files.sort(key=lambda item: item[0])
+    expected_index = [
+        f"- [Version {major}](versions/{relative_path})"
+        for major, relative_path, _text in major_files
+    ]
+    actual_index = markdown_section_lines(version_text, "Version logs")
+    if actual_index != expected_index:
+        errors.append(
+            "strategy version index must link every major-version log exactly "
+            "once in ascending order"
+        )
+
+    for major, relative_path, text in major_files:
+        title = f"# Strategy Creator Version {major}"
+        if text.splitlines().count(title) != 1:
+            errors.append(
+                f"strategy version log {relative_path} must contain exactly "
+                f"one {title!r} heading"
+            )
+
+        headings = re.findall(r"^## (.+)$", text, re.MULTILINE)
+        if not headings or headings[0] != "Contents" or headings.count("Contents") != 1:
+            errors.append(
+                f"strategy version log {relative_path} must start with one "
+                "Contents section"
+            )
+        release_headings = [heading for heading in headings if heading != "Contents"]
+        parsed_releases: list[tuple[int, int, int]] = []
+        for release in release_headings:
+            parsed = semver_tuple(release)
+            if parsed is None:
+                errors.append(
+                    f"strategy version log {relative_path} has malformed "
+                    f"release heading {release!r}"
+                )
+                continue
+            if parsed[0] != major:
+                errors.append(
+                    f"strategy version log {relative_path} contains release "
+                    f"{release} from major version {parsed[0]}"
+                )
+            parsed_releases.append(parsed)
+            release_versions.append(release)
+
+        if parsed_releases != sorted(parsed_releases) or len(parsed_releases) != len(
+            set(parsed_releases)
+        ):
+            errors.append(
+                f"strategy version log {relative_path} releases must be unique "
+                "and in ascending order"
+            )
+
+        expected_contents = [
+            f"- [`{release}`](#{markdown_anchor(release)})"
+            for release in release_headings
+        ]
+        actual_contents = markdown_section_lines(text, "Contents")
+        if actual_contents != expected_contents:
+            errors.append(
+                f"strategy version log {relative_path} contents must link "
+                "every release exactly once in heading order"
+            )
+
+    if len(release_versions) != len(set(release_versions)):
+        errors.append("strategy release headings must be unique across version logs")
+
+    missing_releases = REQUIRED_STRATEGY_RELEASES - set(release_versions)
+    if missing_releases:
+        errors.append(
+            "strategy version history is missing releases "
+            f"{sorted(missing_releases)}"
+        )
+
+    current = semver_tuple(current_version) if current_version is not None else None
+    documented = [
+        parsed
+        for release in release_versions
+        if (parsed := semver_tuple(release)) is not None
+    ]
+    if current is not None and (not documented or max(documented) != current):
+        errors.append(
+            "strategy current_version must match the highest documented release"
+        )
+
+    return errors, release_versions
+
+
 def validate() -> list[str]:
     errors: list[str] = []
+    agent_guide_text = " ".join(
+        (ROOT / "AGENTS.md").read_text(encoding="utf-8").split()
+    )
     discovered = {path.parent.name for path in SKILLS_DIR.glob("*/SKILL.md")}
     if discovered != EXPECTED_SKILLS:
         errors.append(
@@ -301,13 +585,21 @@ def validate() -> list[str]:
             errors.append(f"{name}: description is too short")
 
     strategy = SKILLS_DIR / "strategy-creator"
+    strategy_references = strategy / "references"
     actual_strategy_refs = {
-        path.name for path in (strategy / "references").glob("*.md")
+        path.name for path in strategy_references.iterdir() if path.is_file()
     }
     if actual_strategy_refs != EXPECTED_STRATEGY_REFERENCES:
         errors.append(
             "strategy-creator references must be exactly "
             f"{sorted(EXPECTED_STRATEGY_REFERENCES)}"
+        )
+    strategy_reference_directories = {
+        path.name for path in strategy_references.iterdir() if path.is_dir()
+    }
+    if strategy_reference_directories != {"versions"}:
+        errors.append(
+            "strategy-creator reference directories must contain only versions"
         )
 
     strategy_scripts = {
@@ -323,6 +615,14 @@ def validate() -> list[str]:
 
     plan_template = strategy / "references" / "plan-template.md"
     version_reference = strategy / "references" / "versioning.md"
+    version_directory = strategy / "references" / "versions"
+    version_files = {
+        path.relative_to(version_directory).as_posix(): path.read_text(
+            encoding="utf-8"
+        )
+        for path in version_directory.rglob("*")
+        if path.is_file()
+    }
     current_version: str | None = None
     if version_reference.is_file():
         try:
@@ -341,6 +641,18 @@ def validate() -> list[str]:
                 errors.append(
                     "strategy version reference must use strict MAJOR.MINOR.PATCH"
                 )
+
+    version_text = (
+        version_reference.read_text(encoding="utf-8")
+        if version_reference.is_file()
+        else ""
+    )
+    version_errors, _release_versions = validate_strategy_version_history(
+        version_text,
+        version_files,
+        current_version,
+    )
+    errors.extend(version_errors)
 
     if plan_template.is_file():
         plan_text = plan_template.read_text(encoding="utf-8")
@@ -434,13 +746,12 @@ def validate() -> list[str]:
             "strategy interview contains removed evaluation questions "
             f"{sorted(obsolete_questions)}"
         )
-    version_text = (
-        version_reference.read_text(encoding="utf-8")
-        if version_reference.is_file()
-        else ""
-    )
+    version_history_text = "\n".join(version_files.values())
     manual_text = " ".join(
-        f"{strategy_text}\n{target_text}\n{interview_text}\n{version_text}".split()
+        (
+            f"{strategy_text}\n{target_text}\n{interview_text}\n"
+            f"{version_text}\n{version_history_text}"
+        ).split()
     )
     missing_replacement_guidance = {
         guidance
@@ -519,6 +830,17 @@ def validate() -> list[str]:
             f"{sorted(missing_version_guidance)}"
         )
 
+    missing_strategy_version_layout_guidance = {
+        guidance
+        for guidance in REQUIRED_STRATEGY_VERSION_LAYOUT_GUIDANCE
+        if guidance not in agent_guide_text
+    }
+    if missing_strategy_version_layout_guidance:
+        errors.append(
+            "AGENTS.md is missing Strategy Creator version-layout guidance "
+            f"{sorted(missing_strategy_version_layout_guidance)}"
+        )
+
     update_checker = strategy / "scripts" / "check_for_update.py"
     if update_checker.is_file():
         checker_source = update_checker.read_text(encoding="utf-8")
@@ -592,6 +914,49 @@ def validate() -> list[str]:
             f"{sorted(missing_alpha_credential_guidance)}"
         )
 
+    normalized_alphainsider_text = " ".join(alphainsider_text.split())
+    missing_alpha_routing_guidance = {
+        guidance
+        for guidance in REQUIRED_ALPHA_ROUTING_GUIDANCE
+        if guidance not in normalized_alphainsider_text
+    }
+    if missing_alpha_routing_guidance:
+        errors.append(
+            "alphainsider is missing focused section routing guidance "
+            f"{sorted(missing_alpha_routing_guidance)}"
+        )
+
+    websocket_guidance = " ".join(
+        (
+            alphainsider_text
+            + "\n"
+            + (alphainsider / "references" / "websockets.md").read_text(
+                encoding="utf-8"
+            )
+        ).split()
+    )
+    missing_alpha_stream_guidance = {
+        guidance
+        for guidance in REQUIRED_ALPHA_STREAM_GUIDANCE
+        if guidance not in websocket_guidance
+    }
+    if missing_alpha_stream_guidance:
+        errors.append(
+            "alphainsider is missing WebSocket recovery guidance "
+            f"{sorted(missing_alpha_stream_guidance)}"
+        )
+
+    missing_alpha_doc_audit_guidance = {
+        guidance
+        for guidance in REQUIRED_ALPHA_DOC_AUDIT_GUIDANCE
+        if guidance not in agent_guide_text
+    }
+    if missing_alpha_doc_audit_guidance:
+        errors.append(
+            "AGENTS.md is missing live AlphaInsider docs audit guidance "
+            f"{sorted(missing_alpha_doc_audit_guidance)}"
+        )
+
     alpha_scripts = {
         path.relative_to(alphainsider / "scripts").as_posix()
         for path in (alphainsider / "scripts").rglob("*")
@@ -611,6 +976,81 @@ def validate() -> list[str]:
             "alphainsider references must be exactly "
             f"{sorted(EXPECTED_ALPHA_REFERENCES)}"
         )
+
+    api_reference_text = (
+        alphainsider / "references" / "api-reference.md"
+    ).read_text(encoding="utf-8")
+    actual_rest_sections: list[tuple[str, str, str, str]] = []
+    expected_rest_sections: list[tuple[str, str, str, str]] = []
+    rest_heading_pattern = re.compile(
+        r"^## ([A-Za-z][A-Za-z0-9_]*) - "
+        r"(GET|POST|PUT|PATCH|DELETE) `(/[^`]+)`$",
+        re.MULTILINE,
+    )
+    for reference, sections in EXPECTED_ALPHA_REST_SECTIONS.items():
+        reference_text = (
+            alphainsider / "references" / reference
+        ).read_text(encoding="utf-8")
+        actual_rest_sections.extend(
+            (reference, operation_id, method, path)
+            for operation_id, method, path in rest_heading_pattern.findall(
+                reference_text
+            )
+        )
+        for operation_id, method, path in sections:
+            heading = f"{operation_id} - {method} `{path}`"
+            expected_rest_sections.append(
+                (reference, operation_id, method, path)
+            )
+            if reference_text.splitlines().count(f"## {heading}") != 1:
+                errors.append(
+                    "alphainsider REST section must appear exactly once: "
+                    f"{reference} {heading}"
+                )
+            link = section_link(operation_id, reference, heading)
+            if api_reference_text.count(link) != 1:
+                errors.append(
+                    "alphainsider API map must link exactly once to "
+                    f"{reference} section {operation_id}"
+                )
+            if reference == "bots.md":
+                local_link = section_link(operation_id, "", heading)
+                if local_link not in reference_text:
+                    errors.append(
+                        f"{reference} contents must link to {operation_id}"
+                    )
+
+    if sorted(actual_rest_sections) != sorted(expected_rest_sections):
+        errors.append(
+            "alphainsider grouped REST headings do not match the expected "
+            "operation inventory"
+        )
+
+    websocket_reference = alphainsider / "references" / "websockets.md"
+    websocket_text = websocket_reference.read_text(encoding="utf-8")
+    websocket_heading_pattern = re.compile(
+        r"^## ([A-Za-z][A-Za-z0-9_]*) - (.+)$", re.MULTILINE
+    )
+    actual_websocket_sections = websocket_heading_pattern.findall(websocket_text)
+    if actual_websocket_sections != list(EXPECTED_ALPHA_WEBSOCKET_SECTIONS):
+        errors.append(
+            "alphainsider WebSocket headings do not match the expected "
+            "message inventory"
+        )
+    for message_name, title in EXPECTED_ALPHA_WEBSOCKET_SECTIONS:
+        heading = f"{message_name} - {title}"
+        api_link = section_link(message_name, "websockets.md", heading)
+        if api_reference_text.count(api_link) != 1:
+            errors.append(
+                "alphainsider API map must link exactly once to WebSocket "
+                f"message {message_name}"
+            )
+        contents_link = section_link(message_name, "", heading)
+        if contents_link not in websocket_text:
+            errors.append(
+                "websockets.md message contents must link to "
+                f"{message_name}"
+            )
 
     helper_markers = {
         "scripts/alphainsider_request.py",

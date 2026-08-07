@@ -16,6 +16,24 @@ Workflow rules:
 - Use `updateBotBrokerKeys` to rotate credentials or switch paper/live mode, and confirm `getBotInfo.response.broker_status` before starting or restarting. To change broker type, create a new bot.
 - Bot statuses include `on`, `scheduled_rebalance`, `rebalancing`, `scheduled_close`, `closing`, `stopping`, and `off`. Confirm status before assuming a lifecycle action completed.
 
+## Endpoint Contents
+
+- [`getBots`](#getbots---get-getbots) — `GET /getBots`
+- [`getBotInfo`](#getbotinfo---get-getbotinfo) — `GET /getBotInfo`
+- [`newBot`](#newbot---post-newbot) — `POST /newBot`
+- [`updateBotSettings`](#updatebotsettings---post-updatebotsettings) — `POST /updateBotSettings`
+- [`updateBotBrokerKeys`](#updatebotbrokerkeys---post-updatebotbrokerkeys) — `POST /updateBotBrokerKeys`
+- [`updateBotNotifications`](#updatebotnotifications---post-updatebotnotifications) — `POST /updateBotNotifications`
+- [`deleteBot`](#deletebot---post-deletebot) — `POST /deleteBot`
+- [`startBot`](#startbot---post-startbot) — `POST /startBot`
+- [`stopBot`](#stopbot---post-stopbot) — `POST /stopBot`
+- [`resetBot`](#resetbot---post-resetbot) — `POST /resetBot`
+- [`getBotPerformance`](#getbotperformance---get-getbotperformance) — `GET /getBotPerformance`
+- [`resetBotPerformance`](#resetbotperformance---post-resetbotperformance) — `POST /resetBotPerformance`
+- [`getBotAllocations`](#getbotallocations---get-getbotallocations) — `GET /getBotAllocations`
+- [`updateBotAllocations`](#updatebotallocations---post-updatebotallocations) — `POST /updateBotAllocations`
+- [`getBotActivities`](#getbotactivities---get-getbotactivities) — `GET /getBotActivities`
+
 ## getBots - GET `/getBots`
 
 Get user bots.

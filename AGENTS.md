@@ -10,10 +10,20 @@ This repository publishes reusable AlphaInsider agent skills from `skills/`.
 - Keep public skills and documentation agent-vendor agnostic; do not require
   vendor-specific metadata or behavior.
 - Keep `SKILL.md` concise and route detailed material to one-level-deep
-  `references/` files.
+  `references/` files. The sole nested exception is Strategy Creator's
+  major-version history under `references/versions/vN.md`.
 - Keep `skills/alphainsider/SKILL.md` and its `references/` aligned with the
   AlphaInsider API docs at `https://api.alphainsider.com`, including the
   current OpenAPI and AsyncAPI contracts.
+- Before finalizing any change under `skills/alphainsider/`, read the live
+  `https://api.alphainsider.com/llms.txt` index and the relevant focused
+  Markdown pages, then verify REST operations against
+  `https://api.alphainsider.com/openapi.yaml` and WebSocket messages against
+  `https://api.alphainsider.com/asyncapi.yaml`. Compare operation and message
+  inventories, methods, paths, fields, requiredness, types, enums, defaults,
+  authentication placement, channel names, examples, and documented side
+  effects. Reconcile every discrepancy in the same change and report which
+  live sources were checked.
 - Put deterministic reusable code in `scripts/`; never place credentials,
   `.env`, user plans, or generated strategies in this repository.
 - When a design decision changes the strategy interview, plan schema, or
@@ -21,9 +31,10 @@ This repository publishes reusable AlphaInsider agent skills from `skills/`.
   validation, and repository documentation in the same change.
 - After the initial Strategy Creator `1.0.0` release, bump its shared SemVer
   for every subsequent change affecting `strategy-creator` before pushing to
-  `master`. Follow `skills/strategy-creator/references/versioning.md` and keep
-  its `current_version` aligned with the `contract_version` in
-  `skills/strategy-creator/references/plan-template.md`.
+  `master`. Follow `skills/strategy-creator/references/versioning.md`, append
+  each release to the matching `references/versions/vN.md` log, and keep its
+  `current_version`, highest documented release, and the `contract_version` in
+  `skills/strategy-creator/references/plan-template.md` aligned.
 - Preserve the AlphaInsider credential boundary: agents never inspect or print
   existing API keys or `.env` values. Strategy Creator may accept values the
   user deliberately pastes in chat and write them to the selected project's

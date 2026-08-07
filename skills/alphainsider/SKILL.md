@@ -16,11 +16,12 @@ Use this skill when working with AlphaInsider REST or WebSocket integrations.
 
 ## Core Workflow
 
-1. Start with `references/api-reference.md`, identify the API area, and read the matching focused reference.
-2. When current behavior or an unlisted detail matters, use `llms.txt` to find the focused Markdown page, then verify REST details in OpenAPI or WebSocket details in AsyncAPI. Use `llms-full.txt` only as a fallback.
-3. Construct endpoint paths, parameters, bodies, and channel names from the references; the Python scripts are generic transports, not an endpoint SDK.
-4. For REST calls, use `scripts/alphainsider_request.py`; for WebSocket connections, use `scripts/alphainsider_stream.py`. Do not manually read or inject credentials.
-5. Let the helpers own authentication and helper-managed default IDs. Use the deterministic calculation functions only for the normalized-value formulas they cover.
+1. Start with `references/api-reference.md`, identify the API area, and follow its link to the exact endpoint or WebSocket message section.
+2. Read the linked section and the domain guidance before the first endpoint section. Do not load unrelated endpoint sections from the same grouped reference.
+3. When current behavior or an unlisted detail matters, use `llms.txt` to find the focused Markdown page, then verify REST details in OpenAPI or WebSocket details in AsyncAPI. Use `llms-full.txt` only as a fallback.
+4. Construct endpoint paths, parameters, bodies, and channel names from the references; the Python scripts are generic transports, not an endpoint SDK.
+5. For REST calls, use `scripts/alphainsider_request.py`; for WebSocket connections, use `scripts/alphainsider_stream.py`. Do not manually read or inject credentials.
+6. Let the helpers own authentication and helper-managed default IDs. Use the deterministic calculation functions only for the normalized-value formulas they cover.
 
 For a standalone Python integration, copy and import the request helper. Copy
 the stream helper only when WebSocket events are required. Add small local
@@ -77,15 +78,22 @@ python scripts/alphainsider_stream.py \
   --channel "wsOrders:<STRATEGY_ID>"
 ```
 
+The stream CLI reconnects with capped exponential backoff and re-subscribes to
+the complete channel list. The importable interface defaults to one connection
+for backward compatibility; pass `reconnect=True` to `stream_events(...)` only
+when the integration's recovery policy calls for continuous reconnection.
+Missing credentials, invalid channel configuration, and server authentication
+failures remain terminal.
+
 The helpers own credential/default lookup. Do not read these values directly
 from the environment or `.env`. Their public Python interfaces expose only
 requests, streams, and deterministic calculations, not generic environment
 readers. They deliberately do not model individual endpoints, choose channels,
-retry requests, or implement trading policy.
+retry REST requests, or implement trading policy.
 
 ## References
 
-- Start with `references/api-reference.md` for the endpoint map.
+- Start with `references/api-reference.md` for exact section links into the grouped endpoint references.
 - Use `references/limits.md` for account tiers, endpoint caps, withdrawal minimums, and 429 handling.
 - Use `references/input-multiplier.md` for normalized strategy values, position/order display, performance display, and `newOrder` amount/total conversion.
 - Use `references/authentication.md` for token verification.
@@ -98,5 +106,5 @@ retry requests, or implement trading policy.
 - Use `references/stocks.md` for stock lookup, search, price history, and exchange status.
 - Use `references/trades.md` for positions, orders, user-facing max order size, fixed orders, allocation orders, and cancellations.
 - Use `references/webhooks.md` for TradingView-style webhook orders, stepped entries with `pyramiding`, and webhook slippage.
-- Use `references/bots.md` for bot lifecycle, private broker keys, full-replacement allocations, real broker values, performance, and activities.
-- Use `references/websockets.md` for real-time subscriptions and channel payloads.
+- Use the table of contents in `references/bots.md` for bot lifecycle, private broker keys, full-replacement allocations, real broker values, performance, and activities.
+- Use the table of contents in `references/websockets.md` for the connection protocol and exact real-time message section.

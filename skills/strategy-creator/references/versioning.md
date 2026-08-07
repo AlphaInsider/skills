@@ -1,5 +1,5 @@
 ---
-current_version: 1.1.0
+current_version: 1.2.0
 ---
 
 # Strategy Creator Versioning
@@ -15,8 +15,11 @@ values with no prerelease or build suffixes.
 - Increment minor for backward-compatible new requirements.
 - Increment patch for corrections or documentation-only changes that add no
   strategy decisions.
-- Increment the version for every published Strategy Creator change. Keep this
-  reference and `references/plan-template.md` on the same version.
+- Increment the version for every published Strategy Creator change. Record
+  each release under its major-version file in `references/versions/`, using
+  one `vN.md` file per major version.
+- Keep this reference, `references/plan-template.md`, and the highest
+  documented release on the same version.
 
 The canonical source is
 `https://github.com/AlphaInsider/skills/tree/master/skills/strategy-creator`.
@@ -25,6 +28,10 @@ compares this installed version with the canonical repository and reports only
 a newer valid version. The notice is advisory: never run its update command or
 ask for permission to run it. Continue with the installed version. If the
 check returns no output, continue silently.
+
+## Version logs
+
+- [Version 1](versions/v1.md)
 
 ## Project recognition
 
@@ -45,35 +52,32 @@ check returns no output, continue silently.
 
   Tell the user to invoke Strategy Creator again after updating.
 
-## Direct target audit
+## Upgrade selection and target audit
 
 For a project older than the installed version, first ask whether to update
 the existing plan or replace the strategy. A replacement starts on the
 installed version and leaves the outgoing project unchanged. For an update:
 
-1. Audit the project directly against the installed skill, current plan
-   template, and this reference. Do not replay historical migrations.
-2. Show the current and target versions and every exact create, modify, and
-   delete path. Explain required decisions and verification. Request one
-   explicit approval for that inventory. If declined, change nothing. Request
-   renewed approval before touching any newly discovered path.
-3. For behavior-affecting gaps, return the plan to `draft`, interview only the
+1. Follow the **Version logs** links for every major number from the project
+   version through the installed version, inclusive. For legacy `0.0.0`, start
+   with the first indexed major. Select every documented release greater than
+   the project version and less than or equal to the installed version. The
+   project version does not need its own release heading; the range alone
+   determines the selection.
+2. Read only the selected release sections and their verification guidance.
+   Process the selected release sections in ascending semantic-version order.
+   Audit the project against the installed skill, current plan template, this
+   reference, and every selected release increment.
+3. Combine all selected increments into one target audit. Show the current and
+   target versions and every exact create, modify, and delete path. Explain
+   required decisions and verification. Request one explicit approval for that
+   inventory. If declined, change nothing. Request renewed approval before
+   touching any newly discovered path.
+4. For behavior-affecting gaps, return the plan to `draft`, interview only the
    missing decisions, and obtain normal plan confirmation before code edits.
    Require the behavior to conform, but preserve the project's existing code
    structure where practical.
-4. Advance `contract_version` only after the applicable plan, documentation,
-   behavior, and tests conform. Leave the previous version in place after an
-   interrupted or failed upgrade.
-
-## Version 1.1.0 target
-
-The direct upgrade to `1.1.0` adds the AlphaInsider target-source, creation,
-access, description, and synchronization fields to `docs/plan.md`. It also
-adds the documented API-permission bundle and remote-description maintenance
-rules to attributable `README.md` and `AGENTS.md` files.
-
-For a version-only upgrade, classify the configured target as an existing
-strategy, preserve its remote metadata, and do not create a strategy or sync
-its description. Remote description synchronization begins only after the
-user confirms a behavior plan containing the exact description. The upgrade
-alone does not require runtime-code or dependency changes.
+5. Advance `contract_version` only after every selected increment's applicable
+   plan, documentation, behavior, and tests conform. Set it directly to the
+   installed version; do not write intermediate contract versions. Leave the
+   previous version in place after an interrupted or failed upgrade.

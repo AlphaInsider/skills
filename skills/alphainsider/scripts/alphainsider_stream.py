@@ -17,6 +17,12 @@ from alphainsider_request import _configured_value, _redact
 
 
 WEBSOCKET_URL = "wss://alphainsider.com/ws"
+_INITIAL_RECONNECT_DELAY = 1.0
+_MAX_RECONNECT_DELAY = 30.0
+_TERMINAL_ERROR_MESSAGES = {
+    "authentication failed.",
+    "failed to subscribe to channel.",
+}
 
 __all__ = ["AlphaInsiderStreamError", "stream_events"]
 
@@ -30,8 +36,9 @@ async def stream_events(
     *,
     websocket_url: str = WEBSOCKET_URL,
     ping_interval: float = 30.0,
+    reconnect: bool = False,
 ) -> AsyncIterator[dict[str, Any]]:
-    """Yield events for the complete caller-provided AlphaInsider channel list."""
+    """Yield events, optionally reconnecting with the complete channel list."""
     selected_channels = [channel for channel in channels if channel]
     if not selected_channels:
         raise AlphaInsiderStreamError("at least one channel is required")
@@ -46,39 +53,78 @@ async def stream_events(
         "event": "subscribe",
         "payload": {"channels": selected_channels, "token": api_key},
     }
-    try:
-        async with _websocket_connect(websocket_url) as socket:
-            await socket.send(json.dumps(subscription))
-            while True:
-                try:
-                    raw = await asyncio.wait_for(socket.recv(), timeout=ping_interval)
-                except TimeoutError:
-                    await socket.send("ping")
-                    continue
-                if raw == "pong":
-                    continue
-                try:
-                    payload = json.loads(raw)
-                except (TypeError, json.JSONDecodeError) as exc:
-                    raise AlphaInsiderStreamError(
-                        "invalid WebSocket JSON payload"
-                    ) from exc
-                for event in payload if isinstance(payload, list) else [payload]:
-                    if not isinstance(event, dict):
-                        raise AlphaInsiderStreamError(
-                            "invalid WebSocket event payload"
+    reconnect_delay = _INITIAL_RECONNECT_DELAY
+    while True:
+        try:
+            async with _websocket_connect(websocket_url) as socket:
+                await socket.send(json.dumps(subscription))
+                while True:
+                    try:
+                        raw = await asyncio.wait_for(
+                            socket.recv(), timeout=ping_interval
                         )
-                    event = _redact(event, (api_key,))
-                    if event.get("event") == "error":
+                    except TimeoutError:
+                        await socket.send("ping")
+                        continue
+                    if raw == "pong":
+                        continue
+                    try:
+                        payload = json.loads(raw)
+                    except (TypeError, json.JSONDecodeError) as exc:
                         raise AlphaInsiderStreamError(
-                            str(event.get("response", "stream error"))
-                        )
-                    yield event
-    except AlphaInsiderStreamError:
-        raise
-    except Exception as exc:
-        message = _redact(str(exc), (api_key,))
-        raise AlphaInsiderStreamError(f"WebSocket failed: {message}") from None
+                            "invalid WebSocket JSON payload"
+                        ) from exc
+                    events = payload if isinstance(payload, list) else [payload]
+                    redacted_events = []
+                    for event in events:
+                        if not isinstance(event, dict):
+                            raise AlphaInsiderStreamError(
+                                "invalid WebSocket event payload"
+                            )
+                        redacted_events.append(_redact(event, (api_key,)))
+
+                    errors = [
+                        str(event.get("response", "stream error"))
+                        for event in redacted_events
+                        if event.get("event") == "error"
+                    ]
+                    terminal_error = next(
+                        (
+                            message
+                            for message in errors
+                            if message.strip().lower()
+                            in _TERMINAL_ERROR_MESSAGES
+                        ),
+                        None,
+                    )
+                    if terminal_error is not None:
+                        raise AlphaInsiderStreamError(terminal_error)
+                    if errors:
+                        raise AlphaInsiderStreamError(errors[0])
+
+                    for event in redacted_events:
+                        if event.get("event") == "subscribe":
+                            reconnect_delay = _INITIAL_RECONNECT_DELAY
+                        yield event
+        except AlphaInsiderStreamError as exc:
+            if (
+                not reconnect
+                or str(exc).strip().lower()
+                in _TERMINAL_ERROR_MESSAGES
+            ):
+                raise
+        except Exception as exc:
+            if not reconnect:
+                message = _redact(str(exc), (api_key,))
+                raise AlphaInsiderStreamError(
+                    f"WebSocket failed: {message}"
+                ) from None
+
+        await asyncio.sleep(reconnect_delay)
+        reconnect_delay = min(
+            reconnect_delay * 2,
+            _MAX_RECONNECT_DELAY,
+        )
 
 
 async def _run(args: argparse.Namespace) -> None:
@@ -86,6 +132,7 @@ async def _run(args: argparse.Namespace) -> None:
         args.channel,
         websocket_url=args.websocket_url,
         ping_interval=args.ping_interval,
+        reconnect=True,
     ):
         print(json.dumps(event, separators=(",", ":")), flush=True)
 

@@ -2,7 +2,7 @@
 
 WebSocket URL: `wss://alphainsider.com/ws`.
 
-Send `ping` about every 30 seconds; the server responds with `pong`. Send one `subscribe` message with the full desired channel list because a new subscribe request overwrites previous subscriptions.
+Send `ping` about every 30 seconds; the server responds with `pong`. Send one `subscribe` message with the full desired channel list because a new subscribe request overwrites previous subscriptions. After a recoverable connection or server error, reconnect and re-subscribe with that complete list. Treat missing credentials, invalid channel configuration, and authentication failures as terminal.
 
 WebSocket strategy, position, order, and timeline payloads carry normalized strategy values. Read `input-multiplier.md` before displaying live strategy values, positions, orders, trades, or performance changes to users.
 
@@ -18,6 +18,22 @@ WebSocket strategy, position, order, and timeline payloads carry normalized stra
 | `wsBotStatus:<bot_id>` | Instant | Bot status changes. |
 | `wsBotAllocations:<bot_id>` | Instant | Bot allocation changes. |
 | `wsBotActivities:<bot_id>` | Instant | New bot activities. |
+
+## Message Contents
+
+- [`ping`](#ping---ping) — Ping
+- [`pingResponse`](#pingresponse---ping-response) — Ping Response
+- [`subscribe`](#subscribe---subscribe) — Subscribe
+- [`subscribeResponse`](#subscriberesponse---subscribe-response) — Subscribe Response
+- [`error`](#error---error-response) — Error Response
+- [`wsStockPrice`](#wsstockprice---stock-price) — Stock Price
+- [`wsStrategyValue`](#wsstrategyvalue---strategy-value) — Strategy Value
+- [`wsOrders`](#wsorders---orders) — Orders
+- [`wsPositions`](#wspositions---positions) — Positions
+- [`wsTimelines`](#wstimelines---timelines) — Timelines
+- [`wsBotStatus`](#wsbotstatus---bot-status) — Bot Status
+- [`wsBotAllocations`](#wsbotallocations---bot-allocations) — Bot Allocations
+- [`wsBotActivities`](#wsbotactivities---bot-activities) — Bot Activities
 
 ## ping - Ping
 
@@ -137,7 +153,7 @@ Example:
 
 ## error - Error Response
 
-Server error response, which may include a specific channel. We recommend reconnecting if an error occurs.
+Server error response, which may include a specific channel. Reconnect and re-subscribe with the complete channel list after recoverable errors. Do not retry an authentication failure without corrected credentials.
 
 Inputs:
 
