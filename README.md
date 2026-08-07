@@ -63,12 +63,12 @@ planned separately and requires explicit approval before attributable files are
 removed. Offline verification mocks external services and never submits
 AlphaInsider orders.
 
-Strategy Creator plans carry the skill's shared `contract_version`. On every
-invocation, a read-only check compares the installed version with the canonical
-repository. A newer release is reported with
-`npx skills@latest update alphainsider strategy-creator`, but is never installed
-automatically. Project upgrades use only the installed contract and remain
-approval-gated.
+Strategy Creator plans share `contract_version`. A read-only check reports a
+newer canonical release with
+`npx skills@latest update alphainsider strategy-creator`, but it is never
+installed automatically. The installed index routes older projects through
+applicable `references/versions/vN.md` increments and combines them into one
+approval-gated upgrade.
 
 Detailed lifecycle, safety, and implementation rules remain in each skill's
 `SKILL.md` and references.

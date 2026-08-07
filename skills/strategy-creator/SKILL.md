@@ -50,7 +50,9 @@ contains no provider or runtime code.
 3. Read [references/interview.md](references/interview.md),
    [references/alphainsider-target.md](references/alphainsider-target.md),
    [references/plan-template.md](references/plan-template.md), and
-   [references/versioning.md](references/versioning.md) in full.
+   [references/versioning.md](references/versioning.md) in full. Do not load a
+   major-version log until that reference selects release sections for an
+   older project that the user chose to update.
 4. Ask for the project root; recommend the invocation directory. Accept a
    normal user-controlled project location, including a suitable project
    directory beneath the user's home, when writable. Reject an installed skill
@@ -67,10 +69,11 @@ contains no provider or runtime code.
    whether to **update the existing plan** or **replace the trading strategy
    with a new one**. Recommend updating. For an update, preserve unaffected
    decisions, keep `draft` as-is, return later states to `draft`, and interview
-   only affected decisions. If its version is older, follow the direct target
-   audit and approval gate in `references/versioning.md` first. For replacement,
-   start on the installed version and follow that lifecycle without upgrading
-   or altering the current plan or implementation.
+   only affected decisions. If its version is older, follow the release-range
+   selection, combined target audit, and approval gate in
+   `references/versioning.md` first. For replacement, start on the installed
+   version and follow that lifecycle without upgrading or altering the current
+   plan or implementation.
 7. Without opening `.env`, list only existing paths this workflow would change.
    Treat other collisions as ordinary conflicts, obtain explicit overwrite
    approval, and preserve unrelated files.
@@ -200,10 +203,13 @@ Build the smallest standalone project that satisfies the plan:
 - For Python, read the sibling `scripts/alphainsider_request.py` as an immutable
   source and copy it to `strategy/alphainsider_request.py`. Copy
   `scripts/alphainsider_stream.py` to `strategy/alphainsider_stream.py` only
-  when the confirmed plan uses WebSockets. Import the generic request and
-  calculation helpers, and add project-local endpoint functions only for the
-  strategy's actual needs. Preserve credential and normalized-value behavior;
-  modify only project copies.
+  when the confirmed plan uses WebSockets. Pass `reconnect=True` to
+  `stream_events` only when the confirmed retry and recovery behavior requires
+  continuous reconnection; retain the default one-session behavior when the
+  plan requires the strategy to stop on a stream error. Import the generic
+  request and calculation helpers, and add project-local endpoint functions
+  only for the strategy's actual needs. Preserve credential and
+  normalized-value behavior; modify only project copies.
 - Put only names and safe examples in `.env.example`. Ignore `.env`, secrets,
   caches, and build outputs; keep plans, source, tests, and docs commit-ready.
   Use **Environment setup** for missing values.
