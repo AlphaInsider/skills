@@ -9,12 +9,10 @@ if __name__ != "__main__":
     )
 
 import argparse
-import getpass
 import json
 import os
 import re
 import stat
-import sys
 import tempfile
 from pathlib import Path
 from typing import Sequence
@@ -32,7 +30,7 @@ class _SafeArgumentParser(argparse.ArgumentParser):
     def error(self, _message: str) -> None:
         self.exit(
             2,
-            "error: invalid arguments; pass only [--remove] and the variable name\n",
+            "error: invalid arguments; pass NAME VALUE or --remove NAME\n",
         )
 
 
@@ -150,14 +148,15 @@ def _remove_env(env_path: Path, name: str) -> None:
 
 def _main(argv: Sequence[str] | None = None) -> int:
     parser = _SafeArgumentParser(
-        description="Create, update, or remove one value in the project's .env."
+        description="Agent-only update or removal of one project .env value."
     )
     parser.add_argument(
         "--remove",
         action="store_true",
-        help="Remove the named variable without prompting for a value.",
+        help="Remove the named variable without receiving a value.",
     )
     parser.add_argument("name", help="Environment variable name to create, update, or remove.")
+    parser.add_argument("value", nargs="?", help="Value to create or update.")
     args = parser.parse_args(argv)
 
     project_root = Path.cwd()
@@ -166,18 +165,15 @@ def _main(argv: Sequence[str] | None = None) -> int:
         _validate_project_root(project_root)
         _validate_name(args.name)
         if args.remove:
+            if args.value is not None:
+                parser.error("a removal does not accept a value")
             _remove_env(env_path, args.name)
         else:
-            if not sys.stdin.isatty():
-                raise _EnvUpdateError(
-                    "value entry requires an interactive terminal"
-                )
-            value = getpass.getpass(f"Value for {args.name}: ")
-            _update_env(env_path, args.name, value)
+            if args.value is None:
+                parser.error("an update requires a value")
+            _update_env(env_path, args.name, args.value)
     except (_EnvUpdateError, OSError, UnicodeError) as exc:
         parser.exit(1, f"error: {exc}\n")
-    except (EOFError, KeyboardInterrupt):
-        parser.exit(1, "error: no value received\n")
 
     action = "Removed" if args.remove else "Updated"
     print(f"{action} {args.name} in {env_path.resolve()}")

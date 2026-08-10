@@ -165,6 +165,7 @@ REQUIRED_STRATEGY_RELEASES = {
     "1.4.0",
     "1.4.1",
     "1.4.2",
+    "1.5.0",
 }
 STRATEGY_SKILL_MAX_WORDS = 900
 REQUIRED_PROGRESSIVE_DISCLOSURE_GUIDANCE = {
@@ -290,27 +291,43 @@ REQUIRED_CREDENTIAL_GUIDANCE = {
     "`scripts/alphainsider_stream.py`",
     "Recommend that the user add the values to `.env` themselves",
     "they may paste the values in chat",
+    "pasting credentials is less secure",
     "the value is visible to the agent",
-    "non-echoing prompt",
-    "Never pass a credential in a command argument",
+    "tool metadata",
+    "transient process listing",
+    "`set_env_value.py NAME VALUE`",
+    "pass the complete value as exactly one argument",
+    "structured argument-array",
+    "quote the value as one literal argument",
+    "Never show this command to the user",
     "Do not open `.env` before or after the update",
     "approval to update only those names",
     "use the sibling request helper",
     "--remove ALPHAINSIDER_STRATEGY_ID",
-    "CLI-only helper",
-    "interactive terminal",
-    "Wait until its non-echoing prompt appears",
+    "agent-only helper",
     "Never import the helper",
     "reproduce its write logic",
-    "command argument, pipe, redirect",
+    "shell pipeline, redirect",
     "environment or shell variable",
     "temporary file",
+    "direct `.env` edit",
     "without requesting another approval",
     "never recover it from `.env`",
-    "secure interactive terminal is unavailable",
+    "runtime cannot pass it as one safely quoted argument",
+    "return to the user-edit workflow",
     "Do not improvise another write path",
-    "`--remove NAME` may run without an interactive terminal",
-    "Generated `README.md` and `AGENTS.md` files must preserve",
+    "`--remove NAME` receives no value and is also agent-only",
+    "Generated `README.md` files must preserve user editing",
+    "never show the helper command",
+    "Generated `AGENTS.md` files must preserve the exact agent-only CLI",
+}
+REMOVED_LIVE_INPUT_CREDENTIAL_GUIDANCE = {
+    "interactive terminal",
+    "live process-input",
+    "live-input workflow",
+    "non-echoing prompt",
+    "process-input channel",
+    "readiness prompt",
 }
 REQUIRED_STRATEGY_API_PERMISSIONS = (
     "getUserInfo",
@@ -532,7 +549,7 @@ REQUIRED_README_OVERVIEW_GUIDANCE = {
     "`docs/plan.md`",
     "paper-trading",
     "Credentials remain",
-    "CLI-only",
+    "agent-only",
     "offline tests",
     "language-specific `Start` section",
     "sole approval for every exact planned implementation or update action",
@@ -1020,6 +1037,25 @@ def validate() -> list[str]:
             "strategy-creator is missing credential setup guidance "
             f"{sorted(missing_credential_guidance)}"
         )
+    current_credential_text = " ".join(
+        reference_texts[name]
+        for name in (
+            "alphainsider-target.md",
+            "credentials.md",
+            "implementation.md",
+            "interview.md",
+        )
+    )
+    stale_live_input_guidance = {
+        guidance
+        for guidance in REMOVED_LIVE_INPUT_CREDENTIAL_GUIDANCE
+        if guidance in current_credential_text
+    }
+    if stale_live_input_guidance:
+        errors.append(
+            "strategy-creator contains obsolete live-input credential guidance "
+            f"{sorted(stale_live_input_guidance)}"
+        )
 
     missing_provisioning_guidance = {
         guidance
@@ -1139,13 +1175,16 @@ def validate() -> list[str]:
         helper_source = env_helper.read_text(encoding="utf-8")
         required_helper_source = {
             '"--remove",',
+            'parser.add_argument("value", nargs="?"',
             'if __name__ != "__main__":',
             "set_env_value.py is CLI-only",
+            "Agent-only update or removal",
             "def _remove_env(",
             "def _removed_contents(",
             "def _update_env(",
-            "if not sys.stdin.isatty():",
-            "value entry requires an interactive terminal",
+            "if args.value is not None:",
+            "if args.value is None:",
+            "_update_env(env_path, args.name, args.value)",
             'action = "Removed" if args.remove else "Updated"',
         }
         missing_helper_source = {
@@ -1155,6 +1194,16 @@ def validate() -> list[str]:
             errors.append(
                 "strategy environment helper is missing CLI-only safeguards "
                 f"{sorted(missing_helper_source)}"
+            )
+        obsolete_helper_source = {
+            marker
+            for marker in ("getpass", "sys.stdin", "Ready for", "live process-input")
+            if marker in helper_source
+        }
+        if obsolete_helper_source:
+            errors.append(
+                "strategy environment helper contains obsolete live-input behavior "
+                f"{sorted(obsolete_helper_source)}"
             )
         public_helper_functions = re.findall(
             r"^def ([A-Za-z][A-Za-z0-9_]*)\(", helper_source, re.MULTILINE

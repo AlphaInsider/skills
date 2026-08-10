@@ -2,27 +2,27 @@
 
 ## Overview
 
-Reusable agent skills for AlphaInsider API integration and standalone,
-automated paper-trading strategy projects.
+Agent skills for AlphaInsider API integration and automated
+paper-trading strategy projects.
 
 ## Skills
 
-- `alphainsider` documents the AlphaInsider API and includes thin REST and
+- `alphainsider` documents the AlphaInsider API and includes REST and
   WebSocket helpers plus deterministic normalized-value calculations.
-- `strategy-creator` interviews the user, researches suitable data sources,
+- `strategy-creator` interviews the user, researches data sources,
   maintains a confirmed strategy plan, and generates or updates one automated
   stock or cryptocurrency strategy.
 
 ## Install
 
-Install only the AlphaInsider API skill:
+Install the AlphaInsider API skill:
 
 ```bash
 npx skills@latest add https://github.com/AlphaInsider/skills \
   --skill alphainsider
 ```
 
-Install Strategy Creator with its required AlphaInsider dependency:
+Install Strategy Creator with its AlphaInsider dependency:
 
 ```bash
 npx skills@latest add https://github.com/AlphaInsider/skills \
@@ -54,12 +54,12 @@ Background operation uses one user-level systemd, launchd, or tmux setup.
 Native definitions install inactive; generated instructions cover management
 and logs.
 
-Credentials remain in the generated project's `.env`. Strategy Creator
-verifies its required API-key permissions, discovers owned strategies, creates
-only plan-confirmed targets, and syncs the confirmed description.
-Agent-assisted entry warns that pasted values are visible and uses a CLI-only
-non-echoing helper. Each generated README includes a language-specific `Start`
-section.
+Credentials remain in project `.env` files. Users edit them by default. Chat
+entry is a less-secure agent-only fallback: values may appear in tool metadata
+or process listings but are never printed. Generated READMEs omit the helper
+and include a language-specific `Start` section.
+Strategy Creator verifies its required API-key permissions, discovers owned
+strategies, and syncs the confirmed description.
 
 Blocked AlphaInsider setup can be recorded as deferred without blocking
 backtest planning or a complete local build with mocked external interactions.

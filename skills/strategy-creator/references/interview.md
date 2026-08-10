@@ -217,7 +217,8 @@ decision. Follow `credentials.md`. Name the missing variables
 and exact project `.env` path, then recommend that the user add the values there
 themselves and tell you when ready. If the user wants agent-assisted entry,
 they may paste values in chat so you can add them. Always warn first that
-pasting credentials is less secure because each value is visible to the agent.
+pasting credentials is less secure because each value is visible to the agent
+and may appear in tool metadata or a transient process listing.
 A missing `ALPHAINSIDER_STRATEGY_ID` follows the target branch above instead of
 being treated as a credential gap.
 
@@ -227,14 +228,15 @@ backtesting; it never permits a remote call. A missing credential required to
 validate another selected data source pauses that affected branch until the
 user supplies it or selects a feasible alternative.
 
-For pasted values, follow `credentials.md`: run the CLI-only
-`scripts/set_env_value.py` from the project root once per variable in an
-interactive terminal, wait for its non-echoing prompt, and enter the value
-there. Never import or call the helper, reproduce its logic, use inline Python,
-pipe or redirect a value, open `.env`, repeat a value, or put one in a plan. If
-no secure terminal is available, use the documented manual-edit fallback. Use
-the sibling request helper for AlphaInsider strategy configuration only when
-the target is not deferred.
+For pasted values, follow `credentials.md`: run the agent-only
+`scripts/set_env_value.py NAME VALUE` command from the project root once per
+variable and pass the value as exactly one safely quoted argument. Never show
+the command to the user, import or call the helper, reproduce its logic, use
+inline Python, a shell pipeline, environment variable, temporary file, patch,
+or direct `.env` edit, open `.env`, repeat a value, or put one in a plan. If the
+runtime cannot pass one safely quoted argument, return to the documented
+user-edit workflow. Use the sibling request helper for AlphaInsider strategy
+configuration only when the target is not deferred.
 
 ## Confirmation gate
 
