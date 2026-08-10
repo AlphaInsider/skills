@@ -75,15 +75,16 @@ Run this flow only after the API key passes the permission gate.
    and identify which owned strategies match the planned asset class. Ask the
    user to select a compatible strategy or explicitly create a new one. Never
    pick the first result or create a duplicate silently. Persist the user's
-   selection by following the CLI-only interactive workflow in
+   selection by following the agent-only one-shot workflow in
    `credentials.md` with:
 
    ```bash
    python /absolute/path/to/strategy-creator/scripts/set_env_value.py \
-     ALPHAINSIDER_STRATEGY_ID
+     ALPHAINSIDER_STRATEGY_ID VALUE
    ```
 
-   Then validate it as in step 1.
+   Replace `VALUE` with the selected ID as one safely quoted argument, then
+   validate it as in step 1.
 3. Before planning a new target, call `getAccountSubscription` and
    `getUserInfo`; stop if either eligibility check fails. Compare the owned
    strategy count with `limits.max_strategies` and stop creation at capacity,
@@ -177,8 +178,7 @@ python /absolute/path/to/strategy-creator/scripts/set_env_value.py \
   --remove ALPHAINSIDER_STRATEGY_ID
 ```
 
-Run this as the CLI-only helper; removal receives no value and needs no
-interactive terminal.
+Run this as the agent-only helper; removal receives no value argument.
 
 Never remove a default that now refers to another strategy. If deletion fails,
 retain the ID and report the recoverable state. When the confirmed policy is

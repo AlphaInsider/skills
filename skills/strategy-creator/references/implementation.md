@@ -112,9 +112,10 @@ installed-version workflow before behavior changes. Preserve deferred-target
 restrictions, user invocation as execution consent, no second runtime prompt,
 no automatic start, the background host-write exception, collision checks,
 inactive installation, and stop-without-restart maintenance. Require agents to
-use only the installed CLI-only `set_env_value.py` in an interactive terminal
-for agent-assisted entry, never import or reproduce it, and fall back to user
-editing when a secure terminal is unavailable.
+use only the installed `set_env_value.py NAME VALUE` CLI with the value passed
+as one safely quoted argument for agent-assisted entry, never show that command
+to the user, import it, reproduce it, or edit `.env` directly, and fall back to
+user editing when that argument cannot be passed safely.
 
 ## Completion and maintenance
 
