@@ -3,12 +3,18 @@
 
 from __future__ import annotations
 
+if __name__ != "__main__":
+    raise RuntimeError(
+        "set_env_value.py is CLI-only; run it from the strategy project root"
+    )
+
 import argparse
 import getpass
 import json
 import os
 import re
 import stat
+import sys
 import tempfile
 from pathlib import Path
 from typing import Sequence
@@ -18,7 +24,7 @@ ENV_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 _UNQUOTED_VALUE = re.compile(r"^[A-Za-z0-9_./:@%+=,-]+$")
 
 
-class EnvUpdateError(ValueError):
+class _EnvUpdateError(ValueError):
     """The requested .env update is invalid or unsafe."""
 
 
@@ -30,29 +36,29 @@ class _SafeArgumentParser(argparse.ArgumentParser):
         )
 
 
-def validate_name(name: str) -> None:
+def _validate_name(name: str) -> None:
     if not ENV_NAME.fullmatch(name):
-        raise EnvUpdateError(
+        raise _EnvUpdateError(
             "variable name must start with a letter or underscore and contain "
             "only letters, numbers, and underscores"
         )
 
 
-def validate_value(value: str) -> None:
+def _validate_value(value: str) -> None:
     if not value:
-        raise EnvUpdateError("value must not be empty")
+        raise _EnvUpdateError("value must not be empty")
     if "\n" in value or "\r" in value:
-        raise EnvUpdateError("value must be a single line")
+        raise _EnvUpdateError("value must be a single line")
 
 
-def validate_project_root(project_root: Path) -> None:
+def _validate_project_root(project_root: Path) -> None:
     skills_root = Path(__file__).resolve().parents[2]
     resolved_root = project_root.resolve()
     if resolved_root == skills_root or skills_root in resolved_root.parents:
-        raise EnvUpdateError("refusing to write inside an installed skill directory")
+        raise _EnvUpdateError("refusing to write inside an installed skill directory")
 
 
-def render_assignment(name: str, value: str) -> str:
+def _render_assignment(name: str, value: str) -> str:
     rendered_value = (
         value
         if _UNQUOTED_VALUE.fullmatch(value)
@@ -61,8 +67,8 @@ def render_assignment(name: str, value: str) -> str:
     return f"{name}={rendered_value}\n"
 
 
-def updated_contents(contents: str, name: str, value: str) -> str:
-    assignment = render_assignment(name, value)
+def _updated_contents(contents: str, name: str, value: str) -> str:
+    assignment = _render_assignment(name, value)
     definition = re.compile(rf"^\s*(?:export\s+)?{re.escape(name)}\s*=")
     output: list[str] = []
     replaced = False
@@ -83,7 +89,7 @@ def updated_contents(contents: str, name: str, value: str) -> str:
     return "".join(output)
 
 
-def removed_contents(contents: str, name: str) -> str:
+def _removed_contents(contents: str, name: str) -> str:
     definition = re.compile(rf"^\s*(?:export\s+)?{re.escape(name)}\s*=")
     return "".join(
         line
@@ -107,17 +113,17 @@ def _replace_file(env_path: Path, replacement: str, mode: int) -> None:
             temporary_path.unlink()
 
 
-def update_env(env_path: Path, name: str, value: str) -> None:
-    validate_name(name)
-    validate_value(value)
+def _update_env(env_path: Path, name: str, value: str) -> None:
+    _validate_name(name)
+    _validate_value(value)
 
     if env_path.is_symlink():
-        raise EnvUpdateError("refusing to replace a symbolic-link .env")
+        raise _EnvUpdateError("refusing to replace a symbolic-link .env")
     if env_path.exists() and not env_path.is_file():
-        raise EnvUpdateError(".env exists but is not a regular file")
+        raise _EnvUpdateError(".env exists but is not a regular file")
 
     contents = env_path.read_text(encoding="utf-8") if env_path.exists() else ""
-    replacement = updated_contents(contents, name, value)
+    replacement = _updated_contents(contents, name, value)
     existing_mode = (
         stat.S_IMODE(env_path.stat().st_mode) if env_path.exists() else 0o600
     )
@@ -125,24 +131,24 @@ def update_env(env_path: Path, name: str, value: str) -> None:
     _replace_file(env_path, replacement, existing_mode)
 
 
-def remove_env(env_path: Path, name: str) -> None:
-    validate_name(name)
+def _remove_env(env_path: Path, name: str) -> None:
+    _validate_name(name)
 
     if env_path.is_symlink():
-        raise EnvUpdateError("refusing to replace a symbolic-link .env")
+        raise _EnvUpdateError("refusing to replace a symbolic-link .env")
     if not env_path.exists():
         return
     if not env_path.is_file():
-        raise EnvUpdateError(".env exists but is not a regular file")
+        raise _EnvUpdateError(".env exists but is not a regular file")
 
     contents = env_path.read_text(encoding="utf-8")
-    replacement = removed_contents(contents, name)
+    replacement = _removed_contents(contents, name)
     if replacement == contents:
         return
     _replace_file(env_path, replacement, stat.S_IMODE(env_path.stat().st_mode))
 
 
-def main(argv: Sequence[str] | None = None) -> int:
+def _main(argv: Sequence[str] | None = None) -> int:
     parser = _SafeArgumentParser(
         description="Create, update, or remove one value in the project's .env."
     )
@@ -157,14 +163,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     project_root = Path.cwd()
     env_path = project_root / ".env"
     try:
-        validate_project_root(project_root)
-        validate_name(args.name)
+        _validate_project_root(project_root)
+        _validate_name(args.name)
         if args.remove:
-            remove_env(env_path, args.name)
+            _remove_env(env_path, args.name)
         else:
+            if not sys.stdin.isatty():
+                raise _EnvUpdateError(
+                    "value entry requires an interactive terminal"
+                )
             value = getpass.getpass(f"Value for {args.name}: ")
-            update_env(env_path, args.name, value)
-    except (EnvUpdateError, OSError, UnicodeError) as exc:
+            _update_env(env_path, args.name, value)
+    except (_EnvUpdateError, OSError, UnicodeError) as exc:
         parser.exit(1, f"error: {exc}\n")
     except (EOFError, KeyboardInterrupt):
         parser.exit(1, "error: no value received\n")
@@ -175,4 +185,4 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(_main())
