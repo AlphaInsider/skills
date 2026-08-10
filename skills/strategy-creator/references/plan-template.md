@@ -1,6 +1,6 @@
 ---
 status: draft
-contract_version: 1.3.1
+contract_version: 1.4.2
 ---
 
 # Strategy Plan
@@ -43,6 +43,16 @@ keys, `.env` values, or the configured AlphaInsider strategy ID.
 - Open-order, duplicate-event, retry, and recovery behavior: _not yet decided_
 - Automatic pause or shutdown conditions and logging: _not yet decided_
 
+## Background operation
+
+- Continuous-command mode: _not yet decided_ <!-- foreground only | background -->
+- Manager, identifier, and capability check: _not applicable for foreground-only operation_
+- User-level host definition: _not applicable for foreground-only or tmux operation_
+- Login autostart: _not applicable for foreground-only or tmux operation_ <!-- disabled | enabled -->
+- Failure restart policy and bounded parameters: _not applicable for foreground-only operation_
+- Log exposure, paths, rotation, and retention: _not applicable for foreground-only operation_
+- Installation state: _not applicable until background operation is selected_
+
 ## AlphaInsider target
 
 - Target readiness: _not yet decided_ <!-- ready | deferred -->
@@ -53,6 +63,7 @@ keys, `.env` values, or the configured AlphaInsider strategy ID.
 - Owner starting balance: _not applicable unless creating_
 - Access eligibility and mode: _not applicable unless creating_ <!-- public | private | paid -->
 - Paid cryptocurrency launch price: _not applicable unless paid_
+- Failed-current-run target cleanup: _not applicable unless creating_ <!-- delete exact created target and matching saved ID | retain target and saved ID -->
 - Generated AlphaInsider description: _not yet decided_
 - Description synchronization: _pending_ <!-- required before implemented -->
 - Configured strategy validation: _pending_ <!-- result and UTC time; omit ID -->
@@ -66,10 +77,11 @@ keys, `.env` values, or the configured AlphaInsider strategy ID.
 ## Implementation
 
 - Project root: `.`
-- Path portability: project-relative paths only; installed skill directories are read-only
+- Path portability: project-relative paths except the confirmed user-level host definition; installed skill directories are read-only
 - Language, dependencies, and project structure: _not yet decided_
 - Data flow and persistent state: _not yet decided_
 - Environment variable names and operator commands: _not yet decided_
+- Exact create, modify, overwrite, delete, stop, disable, promotion, provisioning, synchronization, ID-persistence, and host-install actions: _not yet decided_
 - Tests to run and expected results: _not yet decided_
 
 ## Confirmation

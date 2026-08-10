@@ -1,5 +1,5 @@
 ---
-current_version: 1.3.1
+current_version: 1.4.2
 ---
 
 # Strategy Creator Versioning
@@ -70,14 +70,18 @@ installed version and leaves the outgoing project unchanged. For an update:
    reference, and every selected release increment.
 3. Combine all selected increments into one target audit. Show the current and
    target versions and every exact create, modify, and delete path. Explain
-   required decisions and verification. Request one explicit approval for that
-   inventory. If declined, change nothing. Request renewed approval before
-   touching any newly discovered path.
-4. For behavior-affecting gaps, return the plan to `draft`, interview only the
-   missing decisions, and obtain normal plan confirmation before code edits.
-   Require the behavior to conform, but preserve the project's existing code
-   structure where practical.
-5. Advance `contract_version` only after every selected increment's applicable
+   required decisions, warnings, and verification while the plan is `draft`.
+   Record the complete action inventory instead of requesting a separate audit
+   approval.
+4. Interview only behavior-affecting gaps; for documentation-only gaps, add no
+   unnecessary question. Resolve every collision, overwrite, deletion, and
+   other affected decision before presenting the complete updated plan once.
+   Preserve the project's existing code structure where practical.
+5. Final complete-plan confirmation is the sole authorization for the exact
+   recorded upgrade actions. If a new action or path appears afterward, return
+   the plan to `draft`, update the inventory, and require one new complete-plan
+   confirmation instead of requesting a one-off approval.
+6. Advance `contract_version` only after every selected increment's applicable
    plan, documentation, behavior, and tests conform. Set it directly to the
    installed version; do not write intermediate contract versions. Leave the
    previous version in place after an interrupted or failed upgrade.

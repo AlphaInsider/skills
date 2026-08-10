@@ -3,6 +3,15 @@
 Use this decision tree adaptively. Resolve dependencies before downstream
 questions and skip branches that cannot affect the project.
 
+## Contents
+
+- [Protocol](#protocol)
+- [Existing project branch](#existing-project-branch)
+- [AlphaInsider forward-test setup branch](#alphainsider-forward-test-setup-branch)
+- [Decision tree](#decision-tree)
+- [Missing environment values](#missing-environment-values)
+- [Confirmation gate](#confirmation-gate)
+
 ## Protocol
 
 - Ask exactly one decision question per turn and wait for the answer.
@@ -29,7 +38,7 @@ questions and skip branches that cannot affect the project.
   defaults so the user accepts them with the complete plan.
 - Treat API-key permissions, owned-strategy discovery, eligibility, account
   limits, and endpoint fields as discoverable facts. Follow
-  `alphainsider-target.md` and the credential gate in `SKILL.md` rather than
+  `alphainsider-target.md` and `credentials.md` rather than
   asking the user to find IDs, scopes, or account details.
 
 ## Existing project branch
@@ -41,25 +50,41 @@ with a new one?" Present those as two short choices and recommend updating
 because it preserves prior decisions.
 
 - For **update**, preserve unaffected decisions and interview only the choices
-  the requested change affects. For an older project, first complete the
-  direct target audit and exact-path approval in `versioning.md`. Return a
-  `confirmed` or `implemented` plan to `draft` before recording
-  behavior-affecting gaps; do not interview for a documentation-only gap.
+  the requested change affects. Return a `confirmed` or `implemented` plan to
+  `draft` before recording the exact action inventory. For an older project,
+  complete the combined target audit and exact-path decisions in
+  `versioning.md`. Do not ask a behavior question for a documentation-only gap.
 - For **replace**, leave the current plan and implementation untouched. Create
   or resume `docs/replacement-plan.md` on the installed version and run the
   complete decision tree for the new strategy. Do not upgrade the outgoing
-  strategy. A confirmed replacement plan proceeds only to the separate
-  deletion-approval gate in `SKILL.md`; it does not authorize deletion, plan
-  promotion, or implementation.
+  strategy. Inventory every exact replacement action while the plan is draft;
+  final confirmation sets it to `confirmed` and authorizes the exact recorded
+  deletion, promotion, and implementation actions without another approval.
 
-If a valid replacement plan is already `draft`, resume its next unresolved
-decision. If it is `confirmed`, proceed to the deletion inventory and approval
-instead of repeating the interview.
+Resume `docs/replacement-plan.md` when it is a recognized `draft` or
+`confirmed` plan. Treat any other existing file at that path as an ordinary
+collision. Otherwise create it from `plan-template.md` after the first
+interview answer and update it after every answer. Do not modify `docs/plan.md`
+or any current implementation artifact while drafting.
+
+Before confirmation, inventory attributable source, tests, copied
+AlphaInsider helpers, dependencies, `.env.example`, `.gitignore`, `README.md`,
+`AGENTS.md`, and any attributable background definition and running state.
+Show and record every exact deletion, overwrite, promotion, stop, disable, and
+background-definition action. Never recursively delete the project root.
+Never delete `.env`, credentials, caches, unrelated files, or files whose
+ownership is uncertain.
+
+If the user does not confirm, retain the replacement plan as `draft`. If a
+valid replacement plan is already `draft`, resume its next unresolved
+decision. If it is `confirmed`, use `implementation.md` to perform only the
+recorded actions without another interview or approval.
 
 ## AlphaInsider forward-test setup branch
 
-Enter this branch after the strategy's market, behavior, execution, risk, and
-resource decisions and before backtesting. Follow `alphainsider-target.md`:
+Enter this branch after the strategy's market, behavior, execution, risk,
+resource, and background-operation decisions and before backtesting. Follow
+`alphainsider-target.md`:
 
 - Run the API-key permission gate, then validate a configured target or
   discover owned strategies. Require the target to match the already planned
@@ -70,13 +95,14 @@ resource decisions and before backtesting. Follow `alphainsider-target.md`:
   the strategy or its configured target.
 - Ask the user to select an owned compatible strategy or explicitly choose a
   new strategy; never choose the first result or create a duplicate silently.
-  Persist an approved selection through the non-echoing helper and record
+  Persist the user's selection through the non-echoing helper and record
   `selected existing` without its ID.
 - For a new target, use the planned asset class, propose a short name from the
   goal, require the owner starting balance, and offer only access modes allowed
   by the verified account checks. Present the exact core fields and obtain
   each required decision while the plan is draft. Do not ask for separate
-  creation approval; complete plan confirmation covers the recorded fields.
+  creation approval; also resolve failed-current-run retain-or-delete behavior.
+  Complete plan confirmation covers the recorded fields and cleanup policy.
 - Validate mappings for explicitly named instruments. For dynamic selection,
   confirm that runtime lookup, asset-class checks, freshness, and invalid-
   candidate behavior are complete.
@@ -119,9 +145,9 @@ resource decisions and before backtesting. Follow `alphainsider-target.md`:
    constraints. Buying power, fees, and slippage may lower executable exposure.
    Use `getMaxOrderSize` as the fixed-order authority.
 6. **Risk and operations** — Resolve position/exposure limits, stops or exit
-   constraints, missing/stale data behavior, retries, duplicate events,
-   restart state, automatic pause or shutdown conditions, logging, and
-   recovery. For dynamic instruments, resolve validation freshness and whether
+   constraints, missing/stale data behavior, in-process retries, duplicate
+   events, automatic pause or shutdown conditions, logging, and recovery. For
+   dynamic instruments, resolve validation freshness and whether
    one invalid candidate causes the cycle to continue with valid candidates or
    abort. Propose safe, simple defaults when the strategy does not require a
    special choice.
@@ -131,21 +157,30 @@ resource decisions and before backtesting. Follow `alphainsider-target.md`:
    limits, licensing, reliability, and maintenance burden. Recommend the
    smallest stack and record routine selections as agent defaults. Ask the user
    only when cost, credentials, scraping, or another meaningful tradeoff needs
-   approval. Prefer AlphaInsider's applicable stock REST endpoints and
+   their decision. Prefer AlphaInsider's applicable stock REST endpoints and
    `wsStockPrice` for supported current instrument metadata, exchange status,
    and bid, ask, or last prices when their coverage, freshness, and cadence fit.
    Use an external provider when AlphaInsider does not supply the required live
    market, cadence, freshness, or signal-specific input. For historical inputs
    used by live operation, compare AlphaInsider and external sources case by
-   case under the same research criteria. Use scraping only with explicit
-   approval, permitted access, no suitable supported feed, and a documented
-   failure/maintenance plan.
-8. **AlphaInsider forward-test setup** — Run the branch above. Resolve a
+   case under the same research criteria. Offer scraping only with permitted
+   access, no suitable supported feed, a documented failure/maintenance plan,
+   and a recorded user decision before final confirmation.
+8. **Background operation** — Read and follow
+   `background-operation.md`. Always ask whether the continuous strategy should
+   run in the background. If declined, record foreground-only operation and
+   skip dependent questions. If accepted, discover usable user-level managers,
+   then resolve the selected manager and identifier, login autostart when
+   supported, failure restart behavior, bounded systemd retry parameters when
+   selected, log exposure and retention, collision state, and installation
+   readiness. Resolve missing manager support before confirmation. Never offer
+   background execution for the one-cycle command.
+9. **AlphaInsider forward-test setup** — Run the branch above. Resolve a
    compatible target and instrument validation when possible; otherwise record
    explicit deferral. Verify that the target's owner context and multiplier do
    not invalidate planned sizing or risk behavior. Reopen only affected
    strategy decisions when they do, then rerun their downstream branches.
-9. **Backtesting** — Determine whether every signal input and decision timestamp
+10. **Backtesting** — Determine whether every signal input and decision timestamp
    can be reconstructed without future information. For dynamic selection,
    require the historical candidate set and selection inputs as they existed at
    each decision time; reject current-universe substitution and survivorship
@@ -159,7 +194,7 @@ resource decisions and before backtesting. Follow `alphainsider-target.md`:
    accounting would be speculative. When production and replay use different
    providers, normalize them to the same decision-logic input contract and
    document timestamp, symbol, price-adjustment, and coverage differences.
-10. **Implementation contract** — Resolve language when Python is unsuitable,
+11. **Implementation contract** — Resolve language when Python is unsuitable,
    module responsibilities, data flow, persistent state, configuration names,
    one-cycle and continuous commands, tests to run, and expected results.
    Select routine implementation details as agent defaults; ask the user only
@@ -170,14 +205,15 @@ resource decisions and before backtesting. Follow `alphainsider-target.md`:
    Do not add an interactive confirmation to the one-cycle or continuous
    command. Running either command is the user's execution action. Never start
    either command automatically or during build and verification.
-   Treat the selected project root as `.` in every persisted path; never embed
-   machine-specific absolute paths or write generated artifacts into an
-   installed skill directory.
+   Treat the selected project root as `.` in every persisted project path;
+   never embed machine-specific absolute paths except in the confirmed native
+   host definition, or write generated artifacts into an installed skill
+   directory.
 
 ## Missing environment values
 
 A missing API key or other required credential is a setup gap, not a strategy
-decision. Follow **Environment setup** in `SKILL.md`. Name the missing variables
+decision. Follow `credentials.md`. Name the missing variables
 and exact project `.env` path, then recommend that the user add the values there
 themselves and tell you when ready. If the user wants agent-assisted entry,
 they may paste values in chat so you can add them. Always warn first that
@@ -191,11 +227,14 @@ backtesting; it never permits a remote call. A missing credential required to
 validate another selected data source pauses that affected branch until the
 user supplies it or selects a feasible alternative.
 
-For pasted values, run `scripts/set_env_value.py` from the project root once per
-variable and provide each value only through its non-echoing prompt. Never pass
-a credential in a command argument, open `.env`, repeat a value, or put one in a
-plan. Use the sibling request helper for AlphaInsider strategy configuration
-only when the target is not deferred.
+For pasted values, follow `credentials.md`: run the CLI-only
+`scripts/set_env_value.py` from the project root once per variable in an
+interactive terminal, wait for its non-echoing prompt, and enter the value
+there. Never import or call the helper, reproduce its logic, use inline Python,
+pipe or redirect a value, open `.env`, repeat a value, or put one in a plan. If
+no secure terminal is available, use the documented manual-edit fallback. Use
+the sibling request helper for AlphaInsider strategy configuration only when
+the target is not deferred.
 
 ## Confirmation gate
 
@@ -206,10 +245,18 @@ Before presenting the plan for confirmation:
   creation fields, and explicit mappings or runtime validation contract. For
   `deferred`, record a non-secret reason and normalize target-dependent fields;
   do not leave `_pending_` or `_not yet decided_` placeholders.
-- Ensure the selected data and library stack is available and obtain approval
-  for any cost, credentials, scraping, or other material tradeoff.
+- Ensure the selected data and library stack is available and resolve every
+  cost, credential, scraping, or other material tradeoff as a recorded
+  interview decision.
+- Require background operation to be normalized as foreground-only or as one
+  usable selected manager with every applicable dependent decision complete.
+  Include the exact inactive host definition path and any future-login
+  autostart effect in the complete plan.
 - Ensure no unresolved placeholder or contradiction remains outside the
   explicitly deferred target fields.
+- Include every exact create, modify, overwrite, delete, stop, disable,
+  promotion, provisioning, synchronization, ID-persistence, and host-install
+  action. Research collisions and present warnings while the plan is draft.
 - Include the exact generated AlphaInsider description. Plan confirmation
   authorizes its initial creation value and later synchronization only when
   target readiness is `ready`. For a ready new target, the same confirmation
@@ -219,16 +266,23 @@ Before presenting the plan for confirmation:
   conform before advancing `contract_version`; never advance to a remote
   version that this installed skill does not contain.
 - State backtesting as unavailable, declined, or accepted with its exact scope.
-- Present the complete normalized plan, including every agent default, and ask
-  for explicit confirmation.
+- Present the complete normalized plan, including every agent default and
+  exact action, and ask once for final confirmation. That confirmation is the
+  only skill-level execution approval; do not request another approval for any
+  confirmed implementation or update action.
 - Confirmation with a `deferred` target authorizes a complete local build,
   including AlphaInsider adapters, order mapping, documentation, backtests, and
   mocked tests, but no remote calls or order-submitting commands. Keep the plan
   `confirmed`, never `implemented`, and mark operational commands unavailable
-  until target readiness is resolved.
+  until target readiness is resolved. Retain background decisions but install
+  no host definition.
 - To resume a deferred target, return the plan to `draft`, preserve every
   unaffected decision, interview only target gaps, and reconfirm the complete
   plan before provisioning, synchronization, or any other remote work.
-- For a replacement, do not combine plan confirmation with deletion approval.
-  Leave the current plan and code unchanged until the user separately approves
-  the exact deletion list and replacement-plan promotion.
+- For a replacement, include the exact deletion list, stop/disable effects,
+  overwrites, and promotion in the draft. Final replacement-plan confirmation
+  authorizes all of them; do not use a separate deletion or promotion gate.
+- If any required action or path is discovered or changes after confirmation,
+  return the plan to `draft`, resolve only the affected decisions, and present
+  the complete plan for one new final confirmation. Never request a one-off
+  approval against a confirmed plan.

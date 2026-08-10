@@ -1,8 +1,18 @@
 # AlphaInsider Target Setup
 
-Use this reference after strategy design and before backtesting as the
-AlphaInsider forward-test setup phase.
+Use this reference after strategy design and background-operation planning and
+before backtesting as the AlphaInsider forward-test setup phase.
 Never record a strategy ID in a plan, source file, test, README, or `AGENTS.md`.
+
+## Contents
+
+- [API-key permission gate](#api-key-permission-gate)
+- [Resolve the target](#resolve-the-target)
+- [Target deferral](#target-deferral)
+- [Confirmed provisioning](#confirmed-provisioning)
+- [Failed-creation cleanup](#failed-creation-cleanup)
+- [Description synchronization](#description-synchronization)
+- [Generated project documentation](#generated-project-documentation)
 
 ## API-key permission gate
 
@@ -35,8 +45,9 @@ wsPositions
 
 Explain that `verifyToken` has no selectable permission and that AlphaInsider's
 stock REST lookup endpoints require no API-key permission. `deleteStrategy` is
-included only so a user may separately approve cleanup of a strategy created
-by a failed current run; it never authorizes routine or automatic deletion.
+included only for the confirmed cleanup policy of a strategy created by a
+failed current run; it never authorizes routine deletion or deletion of a
+selected existing strategy.
 
 After the key is available, use the sibling request helper to call
 `POST /verifyToken`. Read only the returned `user_id` and `scope`; never expose
@@ -63,8 +74,9 @@ Run this flow only after the API key passes the permission gate.
    `getUserStrategies`. Show safe distinguishing metadata without credentials
    and identify which owned strategies match the planned asset class. Ask the
    user to select a compatible strategy or explicitly create a new one. Never
-   pick the first result or create a duplicate silently. Persist an approved
-   selection with:
+   pick the first result or create a duplicate silently. Persist the user's
+   selection by following the CLI-only interactive workflow in
+   `credentials.md` with:
 
    ```bash
    python /absolute/path/to/strategy-creator/scripts/set_env_value.py \
@@ -95,15 +107,22 @@ Run this flow only after the API key passes the permission gate.
    updates the draft; changing one after confirmation returns the plan to
    `draft` and requires complete plan reconfirmation. Do not call `newStrategy`
    before complete plan confirmation.
-7. Generate the exact AlphaInsider description from the completed strategy
+7. Ask whether a strategy created by this run should be deleted or retained if
+   later work fails before `implemented`. Explain that deletion applies only to
+   that exact newly created strategy and removes the saved default only when it
+   still matches. Record the cleanup policy in the draft; final complete-plan
+   confirmation authorizes that conditional action without a failure-time
+   approval prompt.
+8. Generate the exact AlphaInsider description from the completed strategy
    design: one to three plain-language sentences covering the traded universe,
    signal and entry/exit behavior, cadence, and sizing or risk. Do not include
    performance claims, credentials, implementation paths, or unsupported
    promises. Normal confirmation of the active plan approves this exact
    description and the recorded core creation fields together. It is the sole
    authorization to call `newStrategy` and persist the returned strategy ID;
-   do not ask again. A replacement plan must first pass its separate promotion
-   gate in `SKILL.md`.
+   do not ask again. A replacement plan's final confirmation also authorizes
+   its exact recorded promotion actions under `interview.md` and
+   `implementation.md`.
 
 ## Target deferral
 
@@ -117,7 +136,8 @@ A confirmed deferred plan authorizes a complete local build, including copied
 AlphaInsider helpers, order mapping, documentation, backtests, and mocked
 tests. It does not authorize provisioning, remote target validation,
 synchronization, or an order-submitting command. Mark those operator commands
-unavailable, keep the plan `confirmed`, and never set it to `implemented`.
+unavailable, install no background definition, keep the plan `confirmed`, and
+never set it to `implemented`.
 
 When setup becomes possible, return the plan to `draft`, preserve unaffected
 decisions and local artifacts, resolve only the target gaps, and reconfirm the
@@ -140,25 +160,31 @@ mapping, price, and confirmed description. On success:
    sibling request helper. Do not continue if its type, ownership, starting
    value, or multiplier is unusable.
 3. If ID persistence, validation, or any later work fails before the plan is
-   `implemented`, report the failure and ask whether to delete this exact
-   strategy. Never infer deletion approval, never offer deletion for a selected
-   existing strategy, and never delete another strategy.
+   `implemented`, report the failure and immediately apply the confirmed
+   failed-current-run cleanup policy. Never delete a selected existing strategy
+   or another strategy.
 
 ## Failed-creation cleanup
 
-If the user approves cleanup, call `deleteStrategy` with the exact created ID.
-Before deletion, confirm through the sibling helper that the configured default
-still refers to that exact created ID. Only after deletion succeeds, and only
-when that comparison matched, remove the saved default with:
+When the confirmed policy is `delete`, call `deleteStrategy` with the exact
+created ID. Before deletion, confirm through the sibling helper that the
+configured default still refers to that exact created ID. If it does not,
+retain the strategy and report the mismatch. Only after deletion succeeds, and
+only when that comparison matched, remove the saved default with:
 
 ```bash
 python /absolute/path/to/strategy-creator/scripts/set_env_value.py \
   --remove ALPHAINSIDER_STRATEGY_ID
 ```
 
+Run this as the CLI-only helper; removal receives no value and needs no
+interactive terminal.
+
 Never remove a default that now refers to another strategy. If deletion fails,
-retain the ID and report the recoverable state. If the user declines, retain
-the created strategy and resume it on the next run.
+retain the ID and report the recoverable state. When the confirmed policy is
+`retain`, keep the created strategy and saved ID and report how to resume it on
+the next run. Never request another skill-level approval for either confirmed
+policy.
 
 ## Description synchronization
 
@@ -169,18 +195,20 @@ target metadata and owned subscription; send the current name and owner
 `input_value` unchanged because the endpoint requires them, plus only the
 confirmed description. Never use a stale plan value to overwrite either field.
 If synchronization fails, leave the plan `confirmed`. Set `implemented` only
-when code, tests, plan, docs, and remote description agree.
+when code, tests, plan, docs, remote description, and any required background
+installation agree.
 
 ## Generated project documentation
 
 The generated `README.md` API-key prerequisites must link to AlphaInsider
 developer settings, list the complete permission bundle above exactly, explain
 that `verifyToken` and stock REST lookups need no selectable permission, and
-identify `deleteStrategy` as approval-gated failed-creation cleanup only.
+identify `deleteStrategy` as final-plan-authorized failed-current-run cleanup
+only and state the confirmed retain-or-delete policy.
 
 The generated `AGENTS.md` must preserve these target rules. In particular,
 agents never change strategy price, never delete a remote strategy except
-through the exact failed-creation approval gate above, make no remote call for
+through the exact confirmed cleanup policy above, make no remote call for
 a deferred target, and return a deferred plan to `draft` for target completion
 and full reconfirmation. The one-cycle and continuous commands must not prompt
 for confirmation before submitting planned paper orders. Running either
