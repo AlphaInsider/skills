@@ -1,6 +1,6 @@
 ---
 status: draft
-contract_version: 1.2.0
+contract_version: 1.3.1
 ---
 
 # Strategy Plan
@@ -13,19 +13,9 @@ keys, `.env` values, or the configured AlphaInsider strategy ID.
 
 - Goal: _not yet decided_
 
-## AlphaInsider target
+## Market and instruments
 
-- Target source: _not yet decided_ <!-- selected existing | create after confirmation -->
-- Owned-strategy discovery: _pending_ <!-- result and UTC time; omit IDs -->
-- Proposed strategy name: _not applicable unless creating_
-- Owner starting balance: _not applicable unless creating_
-- Access eligibility and mode: _not applicable unless creating_ <!-- public | private | paid -->
-- Paid cryptocurrency launch price: _not applicable unless paid_
-- Core creation fields approval: _not applicable unless creating_
-- Generated AlphaInsider description: _not yet decided_
-- Description synchronization: _pending_ <!-- required before implemented -->
 - Strict asset class: _not yet decided_ <!-- stock | cryptocurrency -->
-- Configured strategy validation: _pending_ <!-- result and UTC time; omit ID -->
 - Instrument selection mode: _not yet decided_ <!-- fixed | dynamic | constrained dynamic -->
 - Selection rules or constraints: _not yet decided_
 - Explicit instruments and validated mappings: _not applicable unless specified_
@@ -52,6 +42,20 @@ keys, `.env` values, or the configured AlphaInsider strategy ID.
 - Position and exposure constraints: _not yet decided_
 - Open-order, duplicate-event, retry, and recovery behavior: _not yet decided_
 - Automatic pause or shutdown conditions and logging: _not yet decided_
+
+## AlphaInsider target
+
+- Target readiness: _not yet decided_ <!-- ready | deferred -->
+- Deferred reason: _not applicable unless deferred_ <!-- non-secret reason only -->
+- Target source: _not yet decided_ <!-- selected existing | create after confirmation | deferred -->
+- Owned-strategy discovery: _pending_ <!-- result and UTC time; omit IDs -->
+- Proposed strategy name: _not applicable unless creating_
+- Owner starting balance: _not applicable unless creating_
+- Access eligibility and mode: _not applicable unless creating_ <!-- public | private | paid -->
+- Paid cryptocurrency launch price: _not applicable unless paid_
+- Generated AlphaInsider description: _not yet decided_
+- Description synchronization: _pending_ <!-- required before implemented -->
+- Configured strategy validation: _pending_ <!-- result and UTC time; omit ID -->
 
 ## Backtesting
 

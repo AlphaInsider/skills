@@ -4,9 +4,8 @@
 
 AlphaInsider Skills provides reusable AI agent skills for integrating with
 AlphaInsider and building standalone automated paper-trading strategies. The
-skills are designed for developers who want API guidance, credential-safe
-tooling, or a structured workflow that turns a trading idea into a tested
-project.
+skills combine API guidance and credential-safe tooling with a workflow that
+turns a trading idea into a tested project.
 
 ## Skills
 
@@ -38,25 +37,32 @@ npx skills@latest add https://github.com/AlphaInsider/skills \
 Use `alphainsider` when you need endpoint behavior, request examples, market
 data guidance, or credential-safe generic API transports.
 
-Use `strategy-creator` when you want a complete strategy project. It asks one
-decision at a time and records the agreed design in `docs/plan.md`. After the
-plan is confirmed, it builds the smallest project that implements it, including
-strategy code, dependency configuration, documentation, and offline tests.
+Use `strategy-creator` to record decisions in `docs/plan.md`. It
+plans market, behavior, execution, risk, and resources before AlphaInsider
+forward-test setup and backtesting. A confirmed plan builds code,
+dependencies, documentation, and offline tests and is the sole approval for
+creating its planned remote target.
 
 Generated strategies use AlphaInsider as their only paper-trading order
 destination and prefer it for supported current market data. They validate
 instruments, reconcile positions and orders, and keep decision logic testable.
 Backtests require credible external history and are unavailable without it.
+User-run one-cycle and continuous commands may submit paper orders without a
+second prompt; Strategy Creator never starts them automatically.
 
-Credentials remain in the generated project's `.env`. Strategy Creator lists
-and verifies its required API-key permissions without exposing the key. If no
-strategy ID is configured, it discovers owned strategies or approval-gates a
-new remote strategy after plan confirmation, safely stores its ID, and syncs
-the confirmed description. Users are advised to add credentials directly;
-optional agent-assisted entry warns that pasted values are visible and uses a
-non-echoing helper. Generated artifacts contain only safe examples. Each
+Credentials remain in the generated project's `.env`. Strategy Creator
+verifies its required API-key permissions, discovers owned strategies when no
+ID is configured, creates only plan-confirmed remote strategies, and syncs the
+confirmed description. Users should add credentials directly; agent-assisted
+entry warns that pasted values are visible and uses a non-echoing helper. Each
 generated README includes a short, language-specific `Start` section with
-copy-paste setup, one-cycle, continuous, and test commands.
+setup, run, and test commands.
+
+Blocked AlphaInsider setup can be recorded as deferred without blocking
+backtest planning or a complete local build with mocked external interactions.
+Deferred plans make no remote calls, keep operational commands unavailable,
+and remain confirmed until target setup is completed and the full plan is
+reconfirmed.
 
 Existing Strategy Creator projects can be updated or replaced. Replacement is
 planned separately and requires explicit approval before attributable files are
@@ -69,9 +75,6 @@ newer canonical release with
 installed automatically. The installed index routes older projects through
 applicable `references/versions/vN.md` increments and combines them into one
 approval-gated upgrade.
-
-Detailed lifecycle, safety, and implementation rules remain in each skill's
-`SKILL.md` and references.
 
 ## Development
 

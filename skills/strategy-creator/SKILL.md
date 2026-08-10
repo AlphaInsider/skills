@@ -16,8 +16,9 @@ contains no provider or runtime code.
 - Use AlphaInsider as the only order destination; never create a live-broker
   client. Select an owned strategy or create one after plan confirmation, then
   persist it through `ALPHAINSIDER_STRATEGY_ID` in `.env`.
-- Keep the configured `stock` or `cryptocurrency` asset class. Signals may use
-  cross-asset or alternative data, but every traded instrument must match.
+- Plan a strict `stock` or `cryptocurrency` asset class before target setup.
+  Signals may use cross-asset or alternative data, but every traded instrument
+  and the eventual AlphaInsider target must match.
 - Support fixed, dynamic, and constrained-dynamic selection without requiring
   a predefined runtime candidate list.
 - Never inspect or print existing `.env` values or API keys. Use the credential
@@ -85,9 +86,11 @@ Do not create replacement backups or management metadata.
 Read and follow
 [references/alphainsider-target.md](references/alphainsider-target.md) for the
 complete API-key permission gate, existing-strategy discovery, new-strategy
-approval and creation, ID persistence, failure cleanup, and remote-description
-synchronization. Complete its permission gate before the interview and its
-target resolution before plan confirmation.
+planning and creation, ID persistence, failure cleanup, and remote-description
+synchronization. Run its forward-test setup after strategy design and before
+backtesting. A blocked setup may be explicitly deferred through confirmation
+and local offline implementation, but never through remote work or the
+`implemented` state.
 
 ## Environment setup
 
@@ -116,13 +119,17 @@ For each missing required credential or configuration value:
 6. Rerun the non-ordering check. For AlphaInsider configuration, use the sibling
    request helper and report only the result, never credentials. Strategy IDs
    and other non-secret values may be reported when the user supplied them,
-   explicitly asks for them, or approved their creation in this workflow.
+   explicitly asks for them, or confirmed the plan that created them.
 
-A missing `ALPHAINSIDER_API_KEY` must pass the target reference's permission
-gate before work continues. A missing `ALPHAINSIDER_STRATEGY_ID` is not a
-credential failure; follow the target reference. When that flow selects or
-creates a strategy, the user's selection or creation approval authorizes
-writing only `ALPHAINSIDER_STRATEGY_ID` through the non-echoing helper.
+A non-deferred `ALPHAINSIDER_API_KEY` must pass the target reference's
+permission gate before any remote work. If it cannot pass during forward-test
+setup, follow the target-deferral workflow and continue only with backtesting
+planning and local offline implementation. A missing
+`ALPHAINSIDER_STRATEGY_ID` is not a credential failure; follow the target
+reference. Selecting an existing strategy authorizes writing its ID through
+the non-echoing helper. For a new strategy, complete plan confirmation is the
+sole authorization for `newStrategy` and writing its returned ID; do not ask
+for another creation confirmation.
 
 ## Plan lifecycle
 
@@ -151,9 +158,10 @@ until the versioning workflow authorizes advancing it.
 5. If the user declines, change nothing and retain the confirmed replacement
    plan for later resumption.
 6. If approved, delete only the approved paths, replace `docs/plan.md` with
-   `docs/replacement-plan.md`, remove the temporary path, build through the
-   Confirmed workflow, verify offline, and set the promoted plan to
-   `implemented`.
+   `docs/replacement-plan.md`, remove the temporary path, and build through the
+   Confirmed workflow. Set the promoted plan to `implemented` only when target
+   readiness is `ready` and every remote gate passes; otherwise leave it
+   `confirmed` after the offline build.
 
 Plan confirmation and deletion approval are separate decisions. Never delete
 or reimplement from replacement confirmation alone.
@@ -165,18 +173,21 @@ or reimplement from replacement confirmation alone.
 2. Follow the interview reference: ask one decision per turn, record each
    normalized answer immediately, research discoverable facts and the smallest
    feasible stack, and obtain required confirmations. Do not keep a transcript.
-3. Before confirmation, complete the target reference's permission gate and
-   target resolution. Validate an existing target and its asset class, or record
-   approved core fields for a new target without creating it. Validate explicit
-   instrument mappings; for dynamic selection, record runtime resolution
-   instead. Follow **Environment setup** when needed, and record no credentials
-   or strategy IDs.
-4. Resolve contradictions and placeholders, then present the complete plan.
-   Include the exact generated AlphaInsider description. Explicit confirmation
-   of `docs/plan.md` sets `confirmed` and authorizes implementation immediately,
-   including creation of a new target with that description. It authorizes
-   synchronization of an existing target after offline verification.
-   Replacement confirmation stops at its deletion gate.
+3. Complete market, behavior, execution, risk, and resource decisions before
+   the target reference's forward-test setup. Then validate a compatible
+   existing target and explicit mappings, record exact core fields for a new
+   target without creating it, or record target readiness as `deferred` with a
+   non-secret reason. Follow **Environment setup** when needed, and record no
+   credentials or strategy IDs. Continue to backtesting after this phase.
+4. Resolve contradictions and all placeholders; explicit deferred target
+   fields are normalized decisions, not placeholders. Include the exact
+   generated AlphaInsider description, then present the complete plan.
+   Confirmation with a `ready` target authorizes normal implementation,
+   including target creation with the exact confirmed fields, ID persistence,
+   and later description synchronization without another creation prompt.
+   Confirmation with a `deferred` target authorizes only the complete local
+   offline build defined below. Replacement confirmation still stops at its
+   deletion gate.
 
 Do not code while the plan is `draft`. Label incidental conservative defaults
 for acceptance with the complete plan.
@@ -190,9 +201,10 @@ files, but an existing file still requires explicit overwrite approval. Keep
 every write inside the selected project root; use absolute paths only during
 the run and persist project-relative paths in the project.
 
-Before writing implementation files, complete **Confirmed provisioning** in
-the target reference. Its creation, validation, reporting, and approval-gated
-cleanup rules are part of this lifecycle.
+For a `ready` target, complete **Confirmed provisioning** in the target
+reference before writing implementation files. For a `deferred` target, skip
+all remote calls and provisioning, complete the local build with mocked
+external interactions, and leave the plan `confirmed`.
 
 Build the smallest standalone project that satisfies the plan:
 
@@ -215,6 +227,12 @@ Build the smallest standalone project that satisfies the plan:
   Use **Environment setup** for missing values.
 - Expose project-native commands for one decision cycle, continuous operation,
   tests, and an optional backtest when selected. Do not add a dry-run mode.
+  Do not add an interactive confirmation before either operational command
+  submits planned paper orders. Running the command is the user's execution
+  action; never start it automatically or during build and verification.
+  For a deferred target, keep the one-cycle and continuous commands documented
+  but mark them unavailable until target readiness is resolved; do not run
+  either command.
 - Implement `fixed`, `dynamic`, or `constrained dynamic` selection. For runtime
   candidates without exact IDs, use `search_stocks`; reject missing or ambiguous
   results and never guess a mapping. Validate resolved IDs with `get_stocks`,
@@ -243,18 +261,27 @@ one decision cycle and continuous operation equally. Match the selected
 language and keep explanations brief. For Python, place
 `source .venv/bin/activate` immediately before the execution commands. For any
 other language, use the project's exact package-manager and runtime commands;
-do not include Python steps.
+do not include Python steps. When target readiness is deferred, state that
+operational commands remain unavailable and must not be run until the plan is
+reconfirmed with a ready target. For a ready target, explain that invoking a
+one-cycle or continuous command can submit paper orders immediately without an
+additional prompt and that the user must start it deliberately.
 Write `AGENTS.md` to make `docs/plan.md` authoritative, preserve the credential
 boundary and missing-variable setup choices, identify code/test entry points,
 and require maintenance below. Require agents to preserve `contract_version`,
 follow Strategy Creator's installed-version workflow before behavior changes,
 never advance the version before applicable conformance and tests pass, and
-preserve the target reference's remote-management boundaries.
+preserve the target reference's remote-management boundaries. Require no
+remote calls for a deferred target and a return to `draft`, target-only gap
+resolution, and complete reconfirmation before remote work resumes. Require
+operational commands to treat user invocation as execution consent and never
+add a second confirmation prompt or automatic start.
 
-Run all offline tests and static checks, then complete **Description
-synchronization** in the target reference. Set `implemented` only after its
-remote gate passes. Exclude deployment unless separately requested. Before
-handoff, confirm every changed path is in the project and neither skill changed.
+Run all offline tests and static checks. For a ready target, complete
+**Description synchronization** in the target reference. Set `implemented`
+only after its remote gate passes; a deferred target remains `confirmed`.
+Exclude deployment unless separately requested. Before handoff, confirm every
+changed path is in the project and neither skill changed.
 
 ### Implemented
 
@@ -262,3 +289,8 @@ For behavior changes, return the plan to `draft`, interview affected decisions
 one at a time, and reconfirm before code edits. Update code, tests, `README.md`,
 and `AGENTS.md` together; regenerate the exact remote description and follow
 the target reference before restoring `implemented`.
+
+For a confirmed deferred target, also return the plan to `draft`, preserve the
+offline implementation and unaffected decisions, interview only target gaps,
+and reconfirm the complete plan before provisioning, synchronization, or any
+other remote work.

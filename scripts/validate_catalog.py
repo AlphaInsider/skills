@@ -153,37 +153,58 @@ EXPECTED_STRATEGY_REFERENCES = {
     "plan-template.md",
     "versioning.md",
 }
-REQUIRED_STRATEGY_RELEASES = {"1.0.0", "1.1.0", "1.2.0"}
+REQUIRED_STRATEGY_RELEASES = {
+    "1.0.0",
+    "1.1.0",
+    "1.2.0",
+    "1.3.0",
+    "1.3.1",
+}
 EXPECTED_STRATEGY_SCRIPTS = {"check_for_update.py", "set_env_value.py"}
 EXPECTED_PLAN_STATES = {"draft", "confirmed", "implemented"}
 STRICT_SEMVER_PATTERN = re.compile(
     r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$"
 )
 STRATEGY_VERSION_FILE_PATTERN = re.compile(r"^v([1-9][0-9]*)\.md$")
-REQUIRED_PLAN_SECTIONS = {
+REQUIRED_PLAN_SECTION_ORDER = (
     "# Strategy Plan",
     "## Objective",
-    "## AlphaInsider target",
+    "## Market and instruments",
     "## Strategy behavior",
     "## Data and resources",
     "## Execution and risk",
+    "## AlphaInsider target",
     "## Backtesting",
     "## Implementation",
     "## Confirmation",
-}
+)
+REQUIRED_PLAN_SECTIONS = set(REQUIRED_PLAN_SECTION_ORDER)
+REQUIRED_INTERVIEW_PHASE_ORDER = (
+    "1. **Intent**",
+    "2. **Market and instruments**",
+    "3. **Signals**",
+    "4. **Timing**",
+    "5. **Execution**",
+    "6. **Risk and operations**",
+    "7. **Resources**",
+    "8. **AlphaInsider forward-test setup**",
+    "9. **Backtesting**",
+    "10. **Implementation contract**",
+)
 REQUIRED_PLAIN_LANGUAGE_PLAN_FIELDS = {
     "- Goal:",
     "- Automatic pause or shutdown conditions and logging:",
     "- Tests to run and expected results:",
 }
 REQUIRED_TARGET_PLAN_FIELDS = {
+    "- Target readiness:",
+    "- Deferred reason:",
     "- Target source:",
     "- Owned-strategy discovery:",
     "- Proposed strategy name:",
     "- Owner starting balance:",
     "- Access eligibility and mode:",
     "- Paid cryptocurrency launch price:",
-    "- Core creation fields approval:",
     "- Generated AlphaInsider description:",
     "- Description synchronization:",
 }
@@ -194,12 +215,24 @@ REMOVED_PLAN_FIELDS = {
     "- What would show the strategy needs changes or should stop:",
     "- User confirmation:",
     "- Confirmation time:",
+    "- Core creation fields approval:",
 }
 REMOVED_INTERVIEW_QUESTIONS = {
     "Why do you think this trading idea could work?",
     "After how much time or how many trades should we review the results?",
     "What results would tell you the strategy is working?",
     "What loss or behavior would make you change or stop it?",
+}
+REMOVED_TARGET_ORDER_GUIDANCE = {
+    "Complete its permission gate before the interview",
+    "before the strategy interview",
+    "resolve the target before instrument selection",
+    "pause all interview, remote creation, and implementation work",
+}
+REMOVED_SEPARATE_CONFIRMATION_GUIDANCE = {
+    "Obtain explicit core creation approval",
+    "Changing any core field invalidates that approval",
+    "record approved core fields for a new target",
 }
 REQUIRED_REPLACEMENT_GUIDANCE = {
     "every section heading from the current plan template",
@@ -255,7 +288,7 @@ REQUIRED_PROVISIONING_GUIDANCE = {
     "`verifyToken` has no selectable permission",
     "stock REST lookup endpoints require no API-key permission",
     "list only the missing permission names",
-    "pause all interview, remote creation, and implementation work",
+    "pause AlphaInsider target setup and every remote action",
     "use the verified token's `user_id` with `getUserStrategies`",
     "Never pick the first result or create a duplicate silently",
     "Persist an approved selection",
@@ -268,7 +301,9 @@ REQUIRED_PROVISIONING_GUIDANCE = {
     "$10 through $1000",
     "public to `private: false, price: 0`",
     "private to `private: true, price: 0`",
-    "Changing any core field invalidates that approval",
+    "Do not ask for separate creation approval",
+    "Changing a core field before confirmation updates the draft",
+    "changing one after confirmation returns the plan to `draft`",
     "Do not call `newStrategy` before complete plan confirmation",
     "one to three plain-language sentences",
     "write it only to `ALPHAINSIDER_STRATEGY_ID`",
@@ -279,6 +314,28 @@ REQUIRED_PROVISIONING_GUIDANCE = {
     "Never remove a default that now refers to another strategy",
     "send the current name and owner `input_value` unchanged",
     "If synchronization fails, leave the plan `confirmed`",
+}
+REQUIRED_SINGLE_CONFIRMATION_GUIDANCE = {
+    "sole authorization for `newStrategy`",
+    "sole authorization to call `newStrategy` and persist the returned strategy ID",
+    "do not ask again",
+    "must not prompt for confirmation before submitting planned paper orders",
+    "Running either command is the user's execution action",
+    "never start either command automatically or during build and verification",
+}
+REQUIRED_DEFERRED_TARGET_GUIDANCE = {
+    "after strategy design and before backtesting",
+    "offer a compatible owned target or a new target",
+    "target readiness",
+    "`ready` or `deferred`",
+    "backtesting planning may continue",
+    "complete local build",
+    "Make no remote calls",
+    "mark them unavailable until target readiness is resolved",
+    "keep the plan `confirmed`",
+    "never `implemented`",
+    "return the plan to `draft`",
+    "reconfirm the complete plan",
 }
 REQUIRED_ALPHA_CREDENTIAL_GUIDANCE = {
     "never return the API key or arbitrary environment contents",
@@ -686,6 +743,16 @@ def validate() -> list[str]:
                 "strategy plan template is missing sections "
                 f"{sorted(missing_sections)}"
             )
+        actual_plan_section_order = tuple(
+            line
+            for line in plan_text.splitlines()
+            if line in REQUIRED_PLAN_SECTIONS
+        )
+        if actual_plan_section_order != REQUIRED_PLAN_SECTION_ORDER:
+            errors.append(
+                "strategy plan template sections must use order "
+                f"{list(REQUIRED_PLAN_SECTION_ORDER)}"
+            )
         plan_lines = {line.partition(" _")[0] for line in plan_text.splitlines()}
         missing_fields = REQUIRED_PLAIN_LANGUAGE_PLAN_FIELDS - plan_lines
         if missing_fields:
@@ -704,7 +771,7 @@ def validate() -> list[str]:
         }
         if obsolete_fields:
             errors.append(
-                "strategy plan template contains removed evaluation fields "
+                "strategy plan template contains removed fields "
                 f"{sorted(obsolete_fields)}"
             )
 
@@ -746,6 +813,16 @@ def validate() -> list[str]:
             "strategy interview contains removed evaluation questions "
             f"{sorted(obsolete_questions)}"
         )
+    interview_phase_positions = [
+        interview_text.find(phase) for phase in REQUIRED_INTERVIEW_PHASE_ORDER
+    ]
+    if -1 in interview_phase_positions or interview_phase_positions != sorted(
+        interview_phase_positions
+    ):
+        errors.append(
+            "strategy interview phases must use order "
+            f"{list(REQUIRED_INTERVIEW_PHASE_ORDER)}"
+        )
     version_history_text = "\n".join(version_files.values())
     manual_text = " ".join(
         (
@@ -753,6 +830,26 @@ def validate() -> list[str]:
             f"{version_text}\n{version_history_text}"
         ).split()
     )
+    stale_target_order_guidance = {
+        guidance
+        for guidance in REMOVED_TARGET_ORDER_GUIDANCE
+        if guidance in manual_text
+    }
+    if stale_target_order_guidance:
+        errors.append(
+            "strategy-creator contains obsolete target ordering guidance "
+            f"{sorted(stale_target_order_guidance)}"
+        )
+    stale_separate_confirmation_guidance = {
+        guidance
+        for guidance in REMOVED_SEPARATE_CONFIRMATION_GUIDANCE
+        if guidance in manual_text
+    }
+    if stale_separate_confirmation_guidance:
+        errors.append(
+            "strategy-creator contains obsolete creation-confirmation guidance "
+            f"{sorted(stale_separate_confirmation_guidance)}"
+        )
     missing_replacement_guidance = {
         guidance
         for guidance in REQUIRED_REPLACEMENT_GUIDANCE
@@ -784,6 +881,28 @@ def validate() -> list[str]:
         errors.append(
             "strategy-creator is missing AlphaInsider provisioning guidance "
             f"{sorted(missing_provisioning_guidance)}"
+        )
+
+    missing_single_confirmation_guidance = {
+        guidance
+        for guidance in REQUIRED_SINGLE_CONFIRMATION_GUIDANCE
+        if guidance not in manual_text
+    }
+    if missing_single_confirmation_guidance:
+        errors.append(
+            "strategy-creator is missing single-confirmation guidance "
+            f"{sorted(missing_single_confirmation_guidance)}"
+        )
+
+    missing_deferred_target_guidance = {
+        guidance
+        for guidance in REQUIRED_DEFERRED_TARGET_GUIDANCE
+        if guidance not in manual_text
+    }
+    if missing_deferred_target_guidance:
+        errors.append(
+            "strategy-creator is missing deferred-target guidance "
+            f"{sorted(missing_deferred_target_guidance)}"
         )
 
     missing_startup_guidance = {

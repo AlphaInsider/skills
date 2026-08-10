@@ -1,5 +1,5 @@
 ---
-current_version: 1.2.0
+current_version: 1.3.1
 ---
 
 # Strategy Creator Versioning
