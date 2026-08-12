@@ -1,13 +1,14 @@
 ---
 status: draft
-contract_version: 1.5.0
+contract_version: 1.6.0
 ---
 
 # Strategy Plan
 
 Keep this file as a normalized specification, not an interview transcript.
 Replace unresolved placeholders as answers are confirmed. Never record API
-keys, `.env` values, or the configured AlphaInsider strategy ID.
+keys, `.env` values, or the configured AlphaInsider strategy ID. Only the
+separate `docs/cleanup-plan.md` may record an exact non-secret strategy ID.
 
 ## Objective
 
@@ -43,15 +44,36 @@ keys, `.env` values, or the configured AlphaInsider strategy ID.
 - Open-order, duplicate-event, retry, and recovery behavior: _not yet decided_
 - Automatic pause or shutdown conditions and logging: _not yet decided_
 
-## Background operation
+## Backtesting
 
-- Continuous-command mode: _not yet decided_ <!-- foreground only | background -->
-- Manager, identifier, and capability check: _not applicable for foreground-only operation_
-- User-level host definition: _not applicable for foreground-only or tmux operation_
-- Login autostart: _not applicable for foreground-only or tmux operation_ <!-- disabled | enabled -->
-- Failure restart policy and bounded parameters: _not applicable for foreground-only operation_
-- Log exposure, paths, rotation, and retention: _not applicable for foreground-only operation_
-- Installation state: _not applicable until background operation is selected_
+- Historical reconstructibility: _not yet decided_
+- User choice: _not yet decided_ <!-- unavailable | declined | accepted -->
+- Window, scope, assumptions, and metrics: _not applicable until accepted_
+
+## Implementation
+
+- Project root: `.`
+- Path portability: project-relative paths except confirmed user-level native operation definitions; installed skill directories are read-only
+- Language, dependencies, and project structure: _not yet decided_
+- Data flow and persistent state: _not yet decided_
+- Environment variable names and operator commands: _not yet decided_
+- Exact create, modify, overwrite, delete, stop, pause, disable, activation, promotion, provisioning, synchronization, ID-persistence, native-operation, and agent-task actions: _not yet decided_
+- Managed artifact inventory and retirement state: _not initiated_
+- Tests to run and expected results: _not yet decided_
+
+## Operation and scheduling
+
+- Operation mode: _not yet decided_ <!-- foreground | native user-system | agent scheduled task -->
+- Invocation model: _not yet decided_ <!-- single run | persistent process | recurring schedule -->
+- Cadence, timezone, precision, and worst-case cycle duration: _not yet decided_
+- Capability check and selected runner or environment: _not yet decided_
+- Resource identifier and exact native definitions or agent task: _not applicable for unmanaged foreground operation_
+- Missed-run or catch-up behavior and acceptance: _not applicable unless recurring schedule_
+- Initial activation and autostart: _not applicable for unmanaged foreground operation_ <!-- inactive | active -->
+- Overlap, retry, and persistent-service restart policy: _not yet decided_
+- Logs, run history, notifications, rotation, and retention: _not yet decided_
+- Installation state and next scheduled run: _not applicable until managed operation is selected_
+- Operation cleanup state and removal verification: _not initiated_
 
 ## AlphaInsider target
 
@@ -67,22 +89,7 @@ keys, `.env` values, or the configured AlphaInsider strategy ID.
 - Generated AlphaInsider description: _not yet decided_
 - Description synchronization: _pending_ <!-- required before implemented -->
 - Configured strategy validation: _pending_ <!-- result and UTC time; omit ID -->
-
-## Backtesting
-
-- Historical reconstructibility: _not yet decided_
-- User choice: _not yet decided_ <!-- unavailable | declined | accepted -->
-- Window, scope, assumptions, and metrics: _not applicable until accepted_
-
-## Implementation
-
-- Project root: `.`
-- Path portability: project-relative paths except the confirmed user-level host definition; installed skill directories are read-only
-- Language, dependencies, and project structure: _not yet decided_
-- Data flow and persistent state: _not yet decided_
-- Environment variable names and operator commands: _not yet decided_
-- Exact create, modify, overwrite, delete, stop, disable, promotion, provisioning, synchronization, ID-persistence, and host-install actions: _not yet decided_
-- Tests to run and expected results: _not yet decided_
+- Target lifecycle disposition: _not initiated_ <!-- active | retained and detached | deleted | deletion pending -->
 
 ## Confirmation
 
