@@ -2,8 +2,7 @@
 
 ## Overview
 
-Agent skills for AlphaInsider API integration and automated
-paper-trading strategy projects.
+Skills for AlphaInsider API integration and paper-trading strategy projects.
 
 ## Skills
 
@@ -15,14 +14,14 @@ paper-trading strategy projects.
 
 ## Install
 
-Install the AlphaInsider API skill:
+Install AlphaInsider:
 
 ```bash
 npx skills@latest add https://github.com/AlphaInsider/skills \
   --skill alphainsider
 ```
 
-Install Strategy Creator with its AlphaInsider dependency:
+Install Strategy Creator and AlphaInsider:
 
 ```bash
 npx skills@latest add https://github.com/AlphaInsider/skills \
@@ -32,52 +31,51 @@ npx skills@latest add https://github.com/AlphaInsider/skills \
 
 ## How it works
 
-Use `alphainsider` when you need endpoint behavior, request examples, market
-data guidance, or credential-safe generic API transports.
+Use `strategy-creator` to maintain `docs/plan.md`. It plans Objective, Market
+and instruments, Strategy behavior, Data and resources, Execution and risk,
+Backtesting, and Implementation before Operation and scheduling and final
+AlphaInsider target setup. Confirmation builds offline tests and is the sole
+approval for every exact planned implementation or update action.
 
-Use `strategy-creator` to record decisions in `docs/plan.md`. It
-plans market, behavior, execution, risk, and resources, then optional
-background operation, before AlphaInsider forward-test setup and backtesting.
-A confirmed plan builds code, dependencies, documentation, and offline tests
-and is the sole approval for every exact planned implementation or update
-action, including target creation, overwrites, replacements, synchronization,
-and background installation.
+Strategies use AlphaInsider as their only paper-trading order
+destination and prefer it for supported current market data. Backtests require
+credible external history. User-run commands may submit orders without a
+second prompt; offline verification never submits AlphaInsider orders.
 
-Generated strategies use AlphaInsider as their only paper-trading order
-destination and prefer it for supported current market data. They validate
-instruments, reconcile positions and orders, and keep decision logic testable.
-Backtests require credible external history and are unavailable without it.
-User-run one-cycle and continuous commands may submit paper orders without a
-second prompt; Strategy Creator never starts them automatically.
+Operation and scheduling distinguishes a single run, a persistent process, and
+a recurring finite cycle across foreground, user-level systemd or launchd,
+Windows Task Scheduler, or a compatible local or remote agent scheduler.
+Managed resources default active on a first-session ready target and never
+start immediately.
 
-Background operation uses one user-level systemd, launchd, or tmux setup.
-Native definitions install inactive; generated instructions cover management
-and logs.
+Credentials remain in project `.env` files. Chat entry is a less-secure
+agent-only fallback whose values are never printed. Generated READMEs omit the
+helper and include a language-specific `Start` section. Strategy Creator
+verifies its required API-key permissions, discovers owned strategies, and
+syncs the confirmed description.
 
-Credentials remain in project `.env` files. Users edit them by default. Chat
-entry is a less-secure agent-only fallback: values may appear in tool metadata
-or process listings but are never printed. Generated READMEs omit the helper
-and include a language-specific `Start` section.
-Strategy Creator verifies its required API-key permissions, discovers owned
-strategies, and syncs the confirmed description.
-
-Blocked AlphaInsider setup can be recorded as deferred without blocking
-backtest planning or a complete local build with mocked external interactions.
-Deferred plans make no remote calls, keep operational commands unavailable,
-and remain confirmed until target setup is completed and the full plan is
-reconfirmed.
+Local-only plans allow a mocked local build but make no remote calls or
+operation resources and remain confirmed until target setup and
+reconfirmation.
 
 Existing Strategy Creator projects can be updated or replaced. Replacement is
-planned separately; its final confirmation authorizes exact attributable
-removal and promotion without another approval. Offline verification mocks
-external services and never submits AlphaInsider orders.
+planned separately and confirmed once for attributable cleanup, promotion, and
+implementation without another approval. A local-only replacement leaves the
+current strategy untouched.
+
+An implemented strategy can also be retired through one confirmed
+`docs/plan.md`. Strategy Creator first disables and removes only its
+attributable operation resources, then lets the user retain and detach or
+delete any exactly verified owned AlphaInsider target. It preserves `.env`,
+`.gitignore`, historical data, unrelated files, and a retired audit plan.
+Deletion warns about live state and undocumented cascades but never cancels
+orders, liquidates positions, or submits a trade.
 
 Strategy Creator plans share `contract_version`. A read-only check reports a
 newer canonical release with
 `npx skills@latest update alphainsider strategy-creator`, but it is never
 installed automatically. The installed index routes older projects through
-applicable `references/versions/vN.md` increments and combines them into one
-final-confirmation upgrade.
+`references/versions/vN.md` into one final-confirmation upgrade.
 
 ## Development
 

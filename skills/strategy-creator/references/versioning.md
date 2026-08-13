@@ -1,5 +1,5 @@
 ---
-current_version: 1.5.0
+current_version: 1.7.0
 ---
 
 # Strategy Creator Versioning
@@ -7,6 +7,13 @@ current_version: 1.5.0
 Use one shared version for the installed Strategy Creator skill and its
 generated-project contract. Versions are strict numeric `MAJOR.MINOR.PATCH`
 values with no prerelease or build suffixes.
+
+## Contents
+
+- [Release policy](#release-policy)
+- [Version logs](#version-logs)
+- [Project recognition](#project-recognition)
+- [Upgrade selection and target audit](#upgrade-selection-and-target-audit)
 
 ## Release policy
 
@@ -38,6 +45,11 @@ check returns no output, continue silently.
 - Recognize a versioned `docs/plan.md` from its valid lifecycle status,
   `# Strategy Plan` title, and strict `contract_version` value. Do not require
   an older version to have the latest template headings before auditing it.
+- Valid active lifecycle states are `draft`, `confirmed`, and `implemented`;
+  `retired` is a recognized non-operational audit state. Never run strategy
+  code or operation resources from a retired plan.
+- The active or replacement plan may contain the exact non-secret AlphaInsider
+  strategy ID.
 - If `contract_version` is absent, recognize only a plan with the current
   title, lifecycle status, and every section heading from the current plan
   template. Treat that exact legacy shape as `0.0.0`; do not infer versions
@@ -54,9 +66,11 @@ check returns no output, continue silently.
 
 ## Upgrade selection and target audit
 
-For a project older than the installed version, first ask whether to update
-the existing plan or replace the strategy. A replacement starts on the
-installed version and leaves the outgoing project unchanged. For an update:
+For a project older than the installed version, first ask whether to update,
+replace, or retire the strategy. A replacement starts on the installed version
+and leaves the outgoing project unchanged while drafting. Retirement interviews
+the remote-disposition decision on the active plan and combines applicable
+upgrade inventory into the same final confirmation. For an update:
 
 1. Follow the **Version logs** links for every major number from the project
    version through the installed version, inclusive. For legacy `0.0.0`, start
@@ -85,3 +99,8 @@ installed version and leaves the outgoing project unchanged. For an update:
    plan, documentation, behavior, and tests conform. Set it directly to the
    installed version; do not write intermediate contract versions. Leave the
    previous version in place after an interrupted or failed upgrade.
+
+Read increment-specific mappings only from the selected release sections in
+the version logs. A version-only upgrade performs no remote, scheduler,
+process, cleanup, or trading action unless a selected release section records
+that exact action.

@@ -1,8 +1,11 @@
 # AlphaInsider Target Setup
 
-Use this reference after strategy design and background-operation planning and
-before backtesting as the AlphaInsider forward-test setup phase.
-Never record a strategy ID in a plan, source file, test, README, or `AGENTS.md`.
+Use this reference after strategy, backtesting, implementation-contract, and
+operation-and-scheduling planning as the final AlphaInsider forward-test setup
+phase before confirmation. Record the non-secret strategy ID on the active or
+replacement plan after the user selects an existing target or confirmation
+creates one. Never record credentials. Follow `cleanup.md` for retirement or
+outgoing replacement.
 
 ## Contents
 
@@ -10,7 +13,7 @@ Never record a strategy ID in a plan, source file, test, README, or `AGENTS.md`.
 - [Resolve the target](#resolve-the-target)
 - [Target deferral](#target-deferral)
 - [Confirmed provisioning](#confirmed-provisioning)
-- [Failed-creation cleanup](#failed-creation-cleanup)
+- [Post-creation cleanup](#post-creation-cleanup)
 - [Description synchronization](#description-synchronization)
 - [Generated project documentation](#generated-project-documentation)
 
@@ -45,18 +48,19 @@ wsPositions
 
 Explain that `verifyToken` has no selectable permission and that AlphaInsider's
 stock REST lookup endpoints require no API-key permission. `deleteStrategy` is
-included only for the confirmed cleanup policy of a strategy created by a
-failed current run; it never authorizes routine deletion or deletion of a
-selected existing strategy.
+included for a separately confirmed retirement or outgoing replacement
+cleanup. Token scope alone never authorizes deletion; the cleanup workflow
+must verify exact identity and ownership and record the user's
+retain-or-delete decision.
 
 After the key is available, use the sibling request helper to call
 `POST /verifyToken`. Read only the returned `user_id` and `scope`; never expose
 the token. Compare `scope` with the complete bundle above. If any permission is
 missing, list only the missing permission names, instruct the user to create or
 replace the key, and pause AlphaInsider target setup and every remote action.
-Record the target as deferred if the key cannot be corrected in the current
-run; backtesting planning may continue. Accept extra permissions without
-treating them as Strategy Creator requirements.
+Record the target as local-only if the key cannot be corrected in the current
+run; preserve every completed earlier planning decision. Accept extra
+permissions without treating them as Strategy Creator requirements.
 
 ## Resolve the target
 
@@ -108,43 +112,40 @@ Run this flow only after the API key passes the permission gate.
    updates the draft; changing one after confirmation returns the plan to
    `draft` and requires complete plan reconfirmation. Do not call `newStrategy`
    before complete plan confirmation.
-7. Ask whether a strategy created by this run should be deleted or retained if
-   later work fails before `implemented`. Explain that deletion applies only to
-   that exact newly created strategy and removes the saved default only when it
-   still matches. Record the cleanup policy in the draft; final complete-plan
-   confirmation authorizes that conditional action without a failure-time
-   approval prompt.
-8. Generate the exact AlphaInsider description from the completed strategy
+7. Generate the exact AlphaInsider description from the completed strategy
    design: one to three plain-language sentences covering the traded universe,
    signal and entry/exit behavior, cadence, and sizing or risk. Do not include
    performance claims, credentials, implementation paths, or unsupported
    promises. Normal confirmation of the active plan approves this exact
    description and the recorded core creation fields together. It is the sole
    authorization to call `newStrategy` and persist the returned strategy ID;
-   do not ask again. A replacement plan's final confirmation also authorizes
-   its exact recorded promotion actions under `interview.md` and
-   `implementation.md`.
+   do not ask again. Record that ID on the plan. A replacement plan's final
+   confirmation also authorizes its exact recorded promotion actions under
+   `interview.md` and `implementation.md`. If later work fails before
+   `implemented`, retain the created target and saved ID and report how to
+   resume. Never request another skill-level approval for that retain default.
 
 ## Target deferral
 
 When permissions, eligibility, capacity, or compatible-target resolution
-cannot complete in the current run, record target readiness as `deferred` and
+cannot complete in the current run, record target readiness as `local-only` and
 record only a non-secret reason. Normalize every unavailable target field as
-deferred rather than leaving a placeholder. Make no remote calls after
-deferral, but continue through backtesting and plan confirmation.
+local-only rather than leaving a placeholder. Make no remote calls after
+local-only readiness, but continue to plan confirmation.
 
-A confirmed deferred plan authorizes a complete local build, including copied
+A confirmed local-only plan authorizes a complete local build, including copied
 AlphaInsider helpers, order mapping, documentation, backtests, and mocked
 tests. It does not authorize provisioning, remote target validation,
-synchronization, or an order-submitting command. Mark those operator commands
-unavailable, install no background definition, keep the plan `confirmed`, and
-never set it to `implemented`.
+synchronization, an order-submitting command, a native operation definition,
+or an agent scheduled task. Mark operator commands unavailable, keep the plan
+`confirmed`, and never set it to `implemented`.
 
 When setup becomes possible, return the plan to `draft`, preserve unaffected
 decisions and local artifacts, resolve only the target gaps, and reconfirm the
 complete plan before any remote work. If target facts invalidate market,
-execution, or risk decisions, reopen those affected branches and their
-downstream decisions as well.
+execution, risk, cadence, or runner decisions, reopen only those affected
+branches, rerun every dependent phase including Operation and scheduling when
+needed, and return to target setup before confirmation.
 
 ## Confirmed provisioning
 
@@ -155,36 +156,42 @@ For a new target, also recheck capacity and access eligibility, then call
 mapping, price, and confirmed description. On success:
 
 1. Capture the returned non-secret strategy ID, write it only to
-   `ALPHAINSIDER_STRATEGY_ID` through the non-echoing helper, and report it once
-   so the user can recover the target if later local work fails.
+   `ALPHAINSIDER_STRATEGY_ID` through the non-echoing helper, record it on the
+   plan, and report it once so the user can recover the target if later local
+   work fails.
 2. Validate the created strategy and owner subscription context through the
    sibling request helper. Do not continue if its type, ownership, starting
    value, or multiplier is unusable.
 3. If ID persistence, validation, or any later work fails before the plan is
-   `implemented`, report the failure and immediately apply the confirmed
-   failed-current-run cleanup policy. Never delete a selected existing strategy
-   or another strategy.
+   `implemented`, retain the created target and saved ID, report how to resume,
+   and leave later cleanup of any verified owned target to the separately
+   confirmed workflow in `cleanup.md`. Never request another skill-level
+   approval for that retain default. Never remove a default that now refers to
+   another strategy.
 
-## Failed-creation cleanup
+## Post-creation cleanup
 
-When the confirmed policy is `delete`, call `deleteStrategy` with the exact
-created ID. Before deletion, confirm through the sibling helper that the
-configured default still refers to that exact created ID. If it does not,
-retain the strategy and report the mismatch. Only after deletion succeeds, and
-only when that comparison matched, remove the saved default with:
+For an explicit retirement or the outgoing side of a replacement, read and
+follow `cleanup.md`. Stage the exact non-secret target ID and ownership
+evidence on the active or replacement plan, offer retain-and-detach or
+deletion for both Strategy Creator-created and selected existing owned
+targets, and obtain the workflow's one final confirmation.
 
-```bash
-python /absolute/path/to/strategy-creator/scripts/set_env_value.py \
-  --remove ALPHAINSIDER_STRATEGY_ID
-```
+Immediately before deletion, reverify the API-key permission, token user,
+exact target, and ownership. Use `getStrategies`, `getUserStrategies`,
+`getStrategySubscriptions`, `getOrders`, and `getPositions` for read-only
+metadata, owner-subscription context, subscriber, open-order, and nonzero-
+position findings. Warn that the documented `deleteStrategy` operation does
+not specify cascade behavior. The user may still confirm deletion; never cancel
+orders, liquidate positions, or submit any trading action as cleanup.
 
-Run this as the agent-only helper; removal receives no value argument.
-
-Never remove a default that now refers to another strategy. If deletion fails,
-retain the ID and report the recoverable state. When the confirmed policy is
-`retain`, keep the created strategy and saved ID and report how to resume it on
-the next run. Never request another skill-level approval for either confirmed
-policy.
+Call `deleteStrategy` only with the plan's exact confirmed ID. Verify that it
+no longer resolves before removing a matching configured default. Only after
+deletion succeeds, and only when that comparison matched, remove the saved
+default. For retention, make no deletion call and detach only an exact matching
+binding. A replacement keeps its ready target binding. On failure, preserve the
+confirmed plan and exact ID for an explicit retry; never retry during unrelated
+work.
 
 ## Description synchronization
 
@@ -195,22 +202,22 @@ target metadata and owned subscription; send the current name and owner
 `input_value` unchanged because the endpoint requires them, plus only the
 confirmed description. Never use a stale plan value to overwrite either field.
 If synchronization fails, leave the plan `confirmed`. Set `implemented` only
-when code, tests, plan, docs, remote description, and any required background
-installation agree.
+when code, tests, plan, docs, remote description, and every required operation
+resource agree.
 
 ## Generated project documentation
 
 The generated `README.md` API-key prerequisites must link to AlphaInsider
-developer settings, list the complete permission bundle above exactly, explain
-that `verifyToken` and stock REST lookups need no selectable permission, and
-identify `deleteStrategy` as final-plan-authorized failed-current-run cleanup
-only and state the confirmed retain-or-delete policy.
+developer settings, list the complete permission bundle above exactly, and
+explain that `verifyToken` and stock REST lookups need no selectable
+permission. Identify `deleteStrategy` as authorized only by a confirmed
+retirement or outgoing replacement on the plan. Copy the permission list from
+this file at generation time.
 
-The generated `AGENTS.md` must preserve these target rules. In particular,
-agents never change strategy price, never delete a remote strategy except
-through the exact confirmed cleanup policy above, make no remote call for
-a deferred target, and return a deferred plan to `draft` for target completion
-and full reconfirmation. The one-cycle and continuous commands must not prompt
-for confirmation before submitting planned paper orders. Running either
-command is the user's execution action; agents never start either command
-automatically or during build and verification.
+Generated `AGENTS.md` must point at the installed strategy-creator skill for
+target, cleanup, and local-only rules. Keep only project-specific commands,
+runner identity, and env names. Agents never change strategy price. Operational
+commands must not prompt for confirmation before submitting planned paper
+orders. A user-run command is the user's execution action; agents never
+manually run a cycle, start a persistent process, or trigger a scheduled task
+during build and verification.

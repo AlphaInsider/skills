@@ -218,7 +218,7 @@ Content-Type: application/json
 
 Create new orders based on percentage allocations.
 
-Note: Before submitting allocation-generated orders, this endpoint cancels any existing open orders for the strategy. It then creates market orders to move the strategy toward target percentage allocations. Do not send `order_dependencies` in this request. Allocation-generated increase orders may depend on reduce orders, so inspect each returned `order_dependencies` array before assuming the order can execute immediately.
+Note: Before submitting allocation-generated orders, this endpoint cancels any existing open orders for the strategy. It then creates market orders to move the strategy toward target percentage allocations. The `allocations` array represents the strategy's complete desired position set: any current position omitted from the array is closed, and an empty array closes every position.
 
 Inputs:
 
@@ -227,9 +227,9 @@ Inputs:
 | header | `Authorization` | Yes | string (JWT) | AlphaInsider API token sent exactly as the header value; do not prepend `Bearer`. |
 | body | `strategy_id` | Yes | string | Strategy ID. |
 | body | `allocations` | Yes | array of object | An array of positions the strategy should be allocated to. |
-| body | `allocations[].stock_id` | No | string | Stock ID. `"stock:exchange"` or `"stock_id"` |
-| body | `allocations[].action` | No | string: `buy`, `long`, `sell`, `short`, `close`, `flat` | Order actions. Action "buy" is the same as "long", "sell" is the same as "short", "close" is the same as "flat". When using "close" or "flat", the percent is set to 0—ignoring any percent passed. |
-| body | `allocations[].percent` | No | number (0..2; increments of `0.0001`) | The final position size, expressed as a positive decimal fraction of your equity (e.g., TSLA long 1.5 for a 150% long position in TSLA). Values must be positive decimals ranging from 0 to 2, with the sum of all allocations not exceeding the maximum leverage of 2 (or 200%). |
+| body | `allocations[].stock_id` | Yes | string | Stock ID. `"stock:exchange"` or `"stock_id"` |
+| body | `allocations[].action` | Yes | string: `buy`, `long`, `sell`, `short`, `close`, `flat` | Order actions. Action "buy" is the same as "long", "sell" is the same as "short", "close" is the same as "flat". When using "close" or "flat", the percent is set to 0—ignoring any percent passed. |
+| body | `allocations[].percent` | Yes | number (0..2; increments of `0.0001`) | The final position size, expressed as a positive decimal fraction of your equity (e.g., TSLA long 1.5 for a 150% long position in TSLA). Values must be positive decimals ranging from 0 to 2, with the sum of all allocations not exceeding the maximum leverage of 2 (or 200%). |
 | body | `slippage` | No | number (0..2; increments of `0.001`; default `0.002`) | Slippage represents the percentage offset from the current bid/ask price when placing a limit order. This adjustment helps ensure that orders are more likely to fill by accounting for potential price movements. **Please note that the allocations may not sum precisely to 100%.** The following calculation illustrates our approach to determining a conservative buffer for potential fees and slippage: * `MaxOrderTotal = BuyingPower * 2` This calculates the maximum possible order total, representing a full position reversal (e.g., from maximum long to maximum short, or vice versa). * `ConservativeFeeTotal = MaxOrderTotal * (fee * 2)` This accounts for the buying power reduction due to fees, as fees are deducted from collateral. (Stock Fees: 0%, Crypto Fees: 0.25%). * `ConservativeSlippageTotal = MaxOrderTotal * Slippage` This reserves funds for the worst-case scenario of order fills impacted by slippage. * `FinalBuyingPower = BuyingPower - ConservativeFeeTotal - ConservativeSlippageTotal` The adjusted buying power after these reductions. |
 
 Outputs:
