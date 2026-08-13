@@ -1,6 +1,6 @@
 ---
 name: strategy-creator
-description: Interview users one decision at a time, maintain a decision-complete plan, and build, test, backtest, document, change, replace, retire, or clean up one automated AlphaInsider paper-trading strategy. Use for stock or cryptocurrency strategies that may depend on market data, models, APIs, or authorized web data but send orders only to AlphaInsider.
+description: Interview users in frontier rounds, maintain a decision-complete plan, and build, test, backtest, document, change, replace, retire, or clean up one automated AlphaInsider paper-trading strategy. Use for stock or cryptocurrency strategies that may depend on market data, models, APIs, or authorized web data but send orders only to AlphaInsider.
 ---
 
 # AlphaInsider Strategy Creator
@@ -38,9 +38,7 @@ and the sibling `alphainsider` skill read-only.
    unusable path without elaborate denylist checks.
 4. Read `references/versioning.md` to recognize an existing project without
    opening `.env`. Stop on malformed or newer versions. For a recognized
-   project, ask once whether to update, replace, or retire the strategy;
-   recommend updating. Preserve unaffected decisions. Resume a cleanup only
-   for an explicit cleanup request.
+   project, follow `interview.md`.
 5. Before confirmation, inventory every changed project path, native
    definition, and agent task. Research collisions, explain consequences,
    resolve overwrite or alternate-identity choices, and record every action.
@@ -58,8 +56,6 @@ action begins:
 - [`references/interview.md`](references/interview.md) — draft through final
   confirmation.
 - [`references/credentials.md`](references/credentials.md) — missing values.
-- [`references/cleanup-plan-template.md`](references/cleanup-plan-template.md)
-  — staging one exact retirement or outgoing replacement cleanup.
 - [`references/cleanup.md`](references/cleanup.md) — explicit retirement,
   replacement cleanup, pending-cleanup recovery, or remote deletion.
 - [`references/operation-and-scheduling.md`](references/operation-and-scheduling.md)
@@ -74,18 +70,19 @@ Read the sibling `alphainsider` skill only for needed API behavior.
 
 ## Plan contract
 
-`docs/plan.md` is authoritative. Stage a replacement in
-`docs/replacement-plan.md` without altering the current strategy. Active plans
-use `draft`, `confirmed`, or `implemented`; completed retirement uses
-`retired`. Stage one explicit cleanup in `docs/cleanup-plan.md`, which uses
-only `draft` or `confirmed`. Retain `contract_version` until `versioning.md`
-permits advancement.
+`docs/plan.md` is authoritative and may record the non-secret AlphaInsider
+strategy ID. Stage a replacement in `docs/replacement-plan.md` without altering
+the current strategy. Active plans use `draft`, `confirmed`, or `implemented`;
+completed retirement uses `retired`. Retain `contract_version` until
+`versioning.md` permits advancement.
 
-Ask exactly one interview decision per turn, update the active plan after each
-answer, and do not code while it is `draft`. Follow this order: objective,
-market and instruments, strategy behavior, data and resources, execution and
-risk, backtesting, implementation contract, operation and scheduling,
-AlphaInsider forward-test setup, and final confirmation.
+Follow `interview.md`: ask every unblocked decision in one frontier round
+through the agent's interactive question prompt, not as ordinary chat text,
+update the active plan after each round, and do not code while it is `draft`.
+Follow this order: objective, market and instruments, strategy behavior, data
+and resources, execution and risk, backtesting, implementation contract,
+operation and scheduling, AlphaInsider forward-test setup, and final
+confirmation.
 
 Complete plan confirmation is the only skill-level execution approval. It
 authorizes every exact planned create, modify, overwrite, delete, stop, pause,
@@ -96,14 +93,13 @@ any required action, identity, or path was absent or changes afterward, return
 the plan to `draft`, resolve only affected decisions, and require one new
 complete-plan confirmation.
 
-Cleanup is a post-creation lifecycle, not an interview phase. Only its plan may
-contain the exact non-secret strategy ID. One final cleanup confirmation, or a
-replacement's joint confirmation, authorizes its attributable actions.
+Cleanup is a post-creation lifecycle, not an interview phase. Follow
+`cleanup.md`. One final confirmation authorizes its attributable actions.
 
-Target readiness must be `ready` or `deferred`. A confirmed ready plan may
+Target readiness must be `ready` or `local-only`. A confirmed ready plan may
 provision, build, synchronize, and install or schedule its exact operation
 resources in the confirmed active or inactive state without an immediate run.
-A confirmed deferred plan permits a complete mocked local build but no remote
+A confirmed local-only plan permits a complete mocked local build but no remote
 calls, operational commands, managed resources, or `implemented` state.
 
 ## Execute the lifecycle
@@ -111,15 +107,12 @@ calls, operational commands, managed resources, or `implemented` state.
 - **Draft:** Follow `interview.md` and present one normalized complete plan.
 - **Confirmed:** For a ready target, follow target provisioning, then
   `implementation.md`, description synchronization, and operation-resource
-  installation or scheduling. For a deferred target, follow only the offline path in
-  `implementation.md` and leave the plan `confirmed`.
+  installation or scheduling. For a local-only target, follow only the offline
+  path in `implementation.md` and leave the plan `confirmed`.
 - **Replacement:** Keep the current strategy untouched while drafting. After
-  joint final confirmation, wait for a ready replacement target, then follow
-  `cleanup.md` and `implementation.md` for only the recorded cleanup,
-  promotion, and build actions.
-- **Cleanup:** Only for an explicit request, follow `cleanup.md`, disable and
-  remove exact operation resources, optionally retain or delete the verified
-  owned AlphaInsider target, and preserve the retired record.
+  ready-target confirmation, follow `cleanup.md` and `implementation.md` for
+  only the recorded cleanup, promotion, and build actions.
+- **Cleanup:** Only for an explicit request, follow `cleanup.md`.
 - **Implemented:** Return changes to `draft`, preserve unaffected decisions,
   interview affected choices, and fully reconfirm.
 - **Retired:** Preserve the plan as a non-operational audit record. Resume only

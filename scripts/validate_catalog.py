@@ -149,7 +149,6 @@ EXPECTED_ALPHA_WEBSOCKET_SECTIONS = (
 )
 EXPECTED_STRATEGY_REFERENCES = {
     "alphainsider-target.md",
-    "cleanup-plan-template.md",
     "cleanup.md",
     "credentials.md",
     "implementation.md",
@@ -170,6 +169,7 @@ REQUIRED_STRATEGY_RELEASES = {
     "1.5.0",
     "1.5.1",
     "1.6.0",
+    "1.7.0",
 }
 STRATEGY_SKILL_MAX_WORDS = 950
 REQUIRED_PROGRESSIVE_DISCLOSURE_GUIDANCE = {
@@ -178,7 +178,6 @@ REQUIRED_PROGRESSIVE_DISCLOSURE_GUIDANCE = {
 }
 EXPECTED_STRATEGY_SCRIPTS = {"check_for_update.py", "set_env_value.py"}
 EXPECTED_PLAN_STATES = {"draft", "confirmed", "implemented", "retired"}
-EXPECTED_CLEANUP_PLAN_STATES = {"draft", "confirmed"}
 STRICT_SEMVER_PATTERN = re.compile(
     r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$"
 )
@@ -217,14 +216,16 @@ REQUIRED_PLAIN_LANGUAGE_PLAN_FIELDS = {
 }
 REQUIRED_TARGET_PLAN_FIELDS = {
     "- Target readiness:",
-    "- Deferred reason:",
+    "- Local-only reason:",
     "- Target source:",
     "- Owned-strategy discovery:",
     "- Proposed strategy name:",
     "- Owner starting balance:",
     "- Access eligibility and mode:",
     "- Paid cryptocurrency launch price:",
-    "- Failed-current-run target cleanup:",
+    "- AlphaInsider strategy ID:",
+    "- Remote disposition:",
+    "- Pending outgoing strategy ID and result:",
     "- Generated AlphaInsider description:",
     "- Description synchronization:",
     "- Target lifecycle disposition:",
@@ -242,31 +243,14 @@ REQUIRED_OPERATION_PLAN_FIELDS = {
     "- Installation state and next scheduled run:",
     "- Operation cleanup state and removal verification:",
 }
-REQUIRED_CLEANUP_PLAN_SECTIONS = {
-    "# Strategy Cleanup Plan",
-    "## Identity and intent",
-    "## Operation shutdown",
-    "## Local retirement",
-    "## AlphaInsider preflight",
-    "## Execution and result",
-}
-REQUIRED_CLEANUP_PLAN_FIELDS = {
-    "- Cleanup reason:",
-    "- AlphaInsider strategy ID:",
-    "- Target source and ownership:",
-    "- Remote disposition:",
-    "- Exact native definitions or agent task:",
-    "- Disable, wait, graceful-stop, removal, and verification actions:",
-    "- Exact attributable paths to remove or replace:",
-    "- Preserved paths and data:",
-    "- Environment binding action:",
-    "- Retired-plan destination:",
-    "- Subscriber count and subscription findings:",
-    "- Open-order findings:",
-    "- Nonzero-position findings:",
-    "- Undocumented-cascade warning and acceptance:",
-    "- Exact ordered actions:",
-    "- Final confirmation:",
+REQUIRED_GRILL_PROTOCOL_GUIDANCE = {
+    "Ask every currently unblocked user decision in one turn",
+    "interactive question prompt",
+    "not ordinary chat text",
+    "recommended option first",
+    "Research repository, API, host, and provider facts",
+    "A question that depends on an answer still open in this round",
+    "Do not depend on any other skill for this pacing",
 }
 REMOVED_PLAN_FIELDS = {
     "- Why the strategy could work:",
@@ -283,6 +267,8 @@ REMOVED_PLAN_FIELDS = {
     "- Failure restart policy and bounded parameters:",
     "- Log exposure, paths, rotation, and retention:",
     "- Installation state:",
+    "- Deferred reason:",
+    "- Failed-current-run target cleanup:",
 }
 REMOVED_PLAN_SECTIONS = {"## Background operation"}
 REMOVED_INTERVIEW_PHASES = {"8. **Background operation**"}
@@ -372,7 +358,7 @@ REQUIRED_CREDENTIAL_GUIDANCE = {
     "`--remove NAME` receives no value and is also agent-only",
     "Generated `README.md` files must preserve user editing",
     "never show the helper command",
-    "Generated `AGENTS.md` files must preserve the exact agent-only CLI",
+    "Generated `AGENTS.md` files must point at the installed skill",
 }
 REMOVED_LIVE_INPUT_CREDENTIAL_GUIDANCE = {
     "interactive terminal",
@@ -429,10 +415,7 @@ REQUIRED_PROVISIONING_GUIDANCE = {
     "one to three plain-language sentences",
     "write it only to `ALPHAINSIDER_STRATEGY_ID`",
     "report it once",
-    "failed-current-run cleanup policy",
-    "immediately apply the confirmed",
-    "When the confirmed policy is `delete`",
-    "When the confirmed policy is `retain`",
+    "retain the created target and saved ID",
     "Never request another skill-level approval",
     "Only after deletion succeeds",
     "Never remove a default that now refers to another strategy",
@@ -440,16 +423,11 @@ REQUIRED_PROVISIONING_GUIDANCE = {
     "If synchronization fails, leave the plan `confirmed`",
 }
 REQUIRED_CLEANUP_GUIDANCE = {
-    "`docs/cleanup-plan.md`",
-    "`cleanup-plan-template.md`",
-    "sole plan allowed to record the exact non-secret AlphaInsider strategy ID",
-    "Permit only one unresolved cleanup plan",
+    "The active or replacement plan is the sole place",
     "Before setting `implemented`",
     "exact project-relative managed-artifact inventory",
-    "Ask exactly one decision per turn",
     "retain and detach",
     "selected existing owned targets",
-    "one final cleanup-plan confirmation",
     "Disable future cycles",
     "safe cycle boundary",
     "preventing another internal cycle",
@@ -465,10 +443,10 @@ REQUIRED_CLEANUP_GUIDANCE = {
     "Never recursively delete the project root",
     "`.env`, `.gitignore`",
     "`status: retired`",
-    "docs/retired/YYYYMMDDTHHMMSSZ-<slug>.md",
-    "replacement target is deferred",
+    "If the replacement target is local-only",
     "allow its confirmed future activation with a prominent pending-cleanup warning",
     "never retry it during unrelated work",
+    "pending outgoing strategy ID",
 }
 REQUIRED_SINGLE_CONFIRMATION_GUIDANCE = {
     "Complete plan confirmation is the only skill-level execution approval",
@@ -484,11 +462,11 @@ REQUIRED_SINGLE_CONFIRMATION_GUIDANCE = {
     "Running either command is the user's execution action",
     "Never manually run a one-cycle command, start a persistent process, or trigger a scheduled task during build or verification",
 }
-REQUIRED_DEFERRED_TARGET_GUIDANCE = {
+REQUIRED_LOCAL_ONLY_TARGET_GUIDANCE = {
     "after strategy, backtesting, implementation-contract, and operation-and-scheduling planning as the final AlphaInsider forward-test setup phase before confirmation",
     "offer a compatible owned target or a new target",
     "target readiness",
-    "`ready` or `deferred`",
+    "`ready` or `local-only`",
     "preserve every completed earlier planning decision",
     "continue to plan confirmation",
     "complete local build",
@@ -530,7 +508,7 @@ REQUIRED_OPERATION_GUIDANCE = {
     "Do not provision cloud infrastructure",
     "run the exact confirmed one-cycle invocation once",
     "Never manually trigger a run during creation or validation",
-    "recommend inactive",
+    "recommend active",
     "create no native definition or agent task",
     "not an immediate test run",
 }
@@ -675,8 +653,7 @@ REQUIRED_README_OVERVIEW_GUIDANCE = {
     "user-level systemd or launchd",
     "Windows Task Scheduler",
     "local or remote agent scheduler",
-    "default inactive",
-    "`docs/cleanup-plan.md`",
+    "default active",
     "retain and detach",
     "retired audit plan",
     "never cancels orders, liquidates positions",
@@ -894,7 +871,6 @@ def validate() -> list[str]:
         )
 
     plan_template = strategy / "references" / "plan-template.md"
-    cleanup_plan_template = strategy / "references" / "cleanup-plan-template.md"
     version_reference = strategy / "references" / "versioning.md"
     version_directory = strategy / "references" / "versions"
     version_files = {
@@ -1011,78 +987,19 @@ def validate() -> list[str]:
                 f"{sorted(obsolete_sections)}"
             )
 
-    if cleanup_plan_template.is_file():
-        cleanup_plan_text = cleanup_plan_template.read_text(encoding="utf-8")
-        try:
-            cleanup_fields = frontmatter(cleanup_plan_template)
-        except ValueError as exc:
-            errors.append(str(exc))
-        else:
-            if cleanup_fields.get("status") != "draft":
-                errors.append("strategy cleanup plan template must start in draft status")
-            if set(cleanup_fields) != {"status", "contract_version"}:
-                errors.append(
-                    "strategy cleanup plan template must declare status and contract_version"
-                )
-            cleanup_version = cleanup_fields.get("contract_version")
-            if cleanup_version is None or STRICT_SEMVER_PATTERN.fullmatch(
-                cleanup_version
-            ) is None:
-                errors.append(
-                    "strategy cleanup plan template contract_version must use strict "
-                    "MAJOR.MINOR.PATCH"
-                )
-            elif current_version is not None and cleanup_version != current_version:
-                errors.append(
-                    "strategy cleanup plan template contract_version must match the "
-                    "strategy version reference"
-                )
-        cleanup_lines = set(cleanup_plan_text.splitlines())
-        missing_cleanup_sections = REQUIRED_CLEANUP_PLAN_SECTIONS - cleanup_lines
-        if missing_cleanup_sections:
-            errors.append(
-                "strategy cleanup plan template is missing sections "
-                f"{sorted(missing_cleanup_sections)}"
-            )
-        normalized_cleanup_lines = {
-            f"{line.split(':', 1)[0]}:"
-            for line in cleanup_plan_text.splitlines()
-            if line.startswith("- ") and ":" in line
-        }
-        missing_cleanup_fields = (
-            REQUIRED_CLEANUP_PLAN_FIELDS - normalized_cleanup_lines
-        )
-        if missing_cleanup_fields:
-            errors.append(
-                "strategy cleanup plan template is missing fields "
-                f"{sorted(missing_cleanup_fields)}"
-            )
-        missing_cleanup_states = {
-            state
-            for state in EXPECTED_CLEANUP_PLAN_STATES
-            if f"`{state}`" not in (
-                strategy / "references" / "cleanup.md"
-            ).read_text(encoding="utf-8")
-        }
-        if missing_cleanup_states:
-            errors.append(
-                "strategy cleanup workflow is missing cleanup plan states "
-                f"{sorted(missing_cleanup_states)}"
-            )
-
     strategy_text = (strategy / "SKILL.md").read_text(encoding="utf-8")
     reference_texts = {
         name: (strategy_references / name).read_text(encoding="utf-8")
         for name in EXPECTED_STRATEGY_REFERENCES
     }
-    cleanup_id_field_references = {
+    strategy_id_field_references = {
         name
         for name, text in reference_texts.items()
         if "\n- AlphaInsider strategy ID:" in text
     }
-    if cleanup_id_field_references != {"cleanup-plan-template.md"}:
+    if strategy_id_field_references != {"plan-template.md"}:
         errors.append(
-            "only the cleanup plan template may define an AlphaInsider strategy ID field"
+            "only the strategy plan template may define an AlphaInsider strategy ID field"
         )
     long_references_without_contents = {
         name
@@ -1319,15 +1236,26 @@ def validate() -> list[str]:
             f"{sorted(missing_single_confirmation_guidance)}"
         )
 
-    missing_deferred_target_guidance = {
+    missing_local_only_target_guidance = {
         guidance
-        for guidance in REQUIRED_DEFERRED_TARGET_GUIDANCE
+        for guidance in REQUIRED_LOCAL_ONLY_TARGET_GUIDANCE
         if guidance not in manual_text
     }
-    if missing_deferred_target_guidance:
+    if missing_local_only_target_guidance:
         errors.append(
-            "strategy-creator is missing deferred-target guidance "
-            f"{sorted(missing_deferred_target_guidance)}"
+            "strategy-creator is missing local-only-target guidance "
+            f"{sorted(missing_local_only_target_guidance)}"
+        )
+
+    missing_grill_protocol_guidance = {
+        guidance
+        for guidance in REQUIRED_GRILL_PROTOCOL_GUIDANCE
+        if guidance not in manual_text
+    }
+    if missing_grill_protocol_guidance:
+        errors.append(
+            "strategy-creator is missing grill-interview protocol guidance "
+            f"{sorted(missing_grill_protocol_guidance)}"
         )
 
     missing_operation_guidance = {

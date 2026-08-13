@@ -43,14 +43,15 @@ For each missing value:
    and other non-secret values may be reported when the user supplied them,
    explicitly asks for them, or confirmed the plan that created them.
 
-A missing API key is a setup gap, not a strategy decision. A non-deferred
+A missing API key is a setup gap, not a strategy decision. A non-local-only
 `ALPHAINSIDER_API_KEY` must pass the target reference's permission gate before
-remote work. If it cannot pass during forward-test setup, defer the target and
-continue only with backtesting planning and local offline implementation. A
-missing `ALPHAINSIDER_STRATEGY_ID` is not a credential failure; follow
-`alphainsider-target.md`. Selecting an existing strategy authorizes writing its
-ID through the non-echoing helper. Complete plan confirmation is the sole
-authorization to write an ID returned by `newStrategy`.
+remote work. If it cannot pass during forward-test setup, record the target as
+local-only and continue only with backtesting planning and local offline
+implementation. A missing `ALPHAINSIDER_STRATEGY_ID` is not a credential
+failure; follow `alphainsider-target.md`. Selecting an existing strategy
+authorizes writing its ID through the non-echoing helper. Complete plan
+confirmation is the sole authorization to write an ID returned by
+`newStrategy`.
 
 A missing credential required by another selected data source pauses that
 affected branch until the user supplies it or selects a feasible alternative.
@@ -58,6 +59,6 @@ affected branch until the user supplies it or selects a feasible alternative.
 Generated `README.md` files must preserve user editing as the preferred setup
 and identify chat entry and command transport as the less-secure agent-assisted
 fallback, but never show the helper command. Generated `AGENTS.md` files must
-preserve the exact agent-only CLI, single-argument and quoting procedure,
-exposure warning, prohibited bypasses, no-repeat-approval rule, and user-edit
-fallback above. `--remove NAME` receives no value and is also agent-only.
+point at the installed skill for the write path and never show the helper.
+`--remove NAME` receives no value and is also agent-only. Removing a saved
+strategy binding uses `--remove ALPHAINSIDER_STRATEGY_ID`.

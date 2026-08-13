@@ -21,9 +21,9 @@ long one process lives:
 
 ## Interview branch
 
-Ask exactly one decision per turn. First derive the compatible invocation
-models from the confirmed cadence, data dependencies, and worst-case cycle
-duration. Then perform read-only discovery and offer only usable runners:
+First derive the compatible invocation models from the confirmed cadence, data
+dependencies, and worst-case cycle duration. Then perform read-only discovery
+and offer only usable runners:
 
 1. Always offer `foreground`. It supports a user-run single cycle or a visible
    persistent process that performs repeated cycles. A foreground process
@@ -46,18 +46,19 @@ meets the strategy cadence and let the user choose.
 For managed operation, derive a stable lowercase ASCII slug from the project
 directory, collapse other runs to one hyphen, and prefix it with
 `alphainsider-`. Ask for an identifier only when normalization is empty or an
-unrelated collision requires a different value. Resolve, one decision at a
-time, the runner, exact recurrence and timezone when scheduled, missed-run
-behavior, initial activation, logs or run history, and notifications. Record
-the manager or provider, execution environment, resource identity, exact
-native paths or task name, and capability result without recording secrets.
+unrelated collision requires a different value. Resolve the runner first.
+Then resolve exact recurrence and timezone when scheduled, missed-run
+behavior, initial activation, logs or run history, and notifications.
+Record the manager or provider, execution environment, resource identity,
+exact native paths or task name, and capability result without recording
+secrets.
 
 Ask whether each managed resource should initially be `inactive` or `active`
-and recommend inactive. Active means eligible for future planned occurrences
-or next-login startup after installation; it never authorizes a manual or
-immediate strategy run. State the next scheduled occurrence when known and
-warn that a future active occurrence can submit AlphaInsider paper orders
-without another prompt.
+and recommend active for a first-session ready target. Active means eligible
+for future planned occurrences or next-login startup after installation; it
+never authorizes a manual or immediate strategy run. State the next scheduled
+occurrence when known and warn that a future active occurrence can submit
+AlphaInsider paper orders without another prompt.
 
 ## Capability and safety gates
 
@@ -214,7 +215,7 @@ local build and offline checks pass, and the remote description is synchronized.
 Never manually run a one-cycle command, start a persistent process, or trigger
 a scheduled task during build or verification.
 
-For a deferred target, retain normalized operation decisions but create no
+For a local-only target, retain normalized operation decisions but create no
 native definition or agent task and keep all operational commands unavailable.
 If required installation or activation fails, leave the plan `confirmed` and
 the runner stopped or paused. Set the plan to `implemented` only when every
@@ -245,12 +246,8 @@ pause, resume, status, log or history, update, and uninstall or delete actions.
 Warn immediately before every manual activation or start action that it may
 submit paper orders without another prompt.
 
-The generated `AGENTS.md` must preserve the plan fields, credential boundary,
-native host-write and external-task exceptions, collision rules, installation
-ordering, no-immediate-run rule, and single-final-confirmation boundary. It must
-require runtime-affecting updates to pause future cycles, wait for safe cycle
-completion, leave the runner inactive afterward, and report the exact user-run
-resume action. It must also route explicit retirement or replacement cleanup
-through the installed `cleanup.md`, require exact resource attribution and
-safe-cycle completion, and forbid automatic resumption or cleanup retries
-during unrelated work.
+Generated `AGENTS.md` must point at the installed strategy-creator skill for
+operation, collision, and cleanup rules. Keep only this project's commands,
+runner identity, and env names. Runtime-affecting updates must pause future
+cycles, wait for safe cycle completion, leave the runner inactive afterward,
+and report the exact user-run resume action.

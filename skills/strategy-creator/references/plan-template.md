@@ -1,14 +1,14 @@
 ---
 status: draft
-contract_version: 1.6.0
+contract_version: 1.7.0
 ---
 
 # Strategy Plan
 
 Keep this file as a normalized specification, not an interview transcript.
 Replace unresolved placeholders as answers are confirmed. Never record API
-keys, `.env` values, or the configured AlphaInsider strategy ID. Only the
-separate `docs/cleanup-plan.md` may record an exact non-secret strategy ID.
+keys or `.env` values. This plan may record the non-secret AlphaInsider
+strategy ID after the user selects or confirmation creates a target.
 
 ## Objective
 
@@ -77,18 +77,20 @@ separate `docs/cleanup-plan.md` may record an exact non-secret strategy ID.
 
 ## AlphaInsider target
 
-- Target readiness: _not yet decided_ <!-- ready | deferred -->
-- Deferred reason: _not applicable unless deferred_ <!-- non-secret reason only -->
-- Target source: _not yet decided_ <!-- selected existing | create after confirmation | deferred -->
-- Owned-strategy discovery: _pending_ <!-- result and UTC time; omit IDs -->
+- Target readiness: _not yet decided_ <!-- ready | local-only -->
+- Local-only reason: _not applicable unless local-only_ <!-- non-secret reason only -->
+- Target source: _not yet decided_ <!-- selected existing | create after confirmation | local-only -->
+- Owned-strategy discovery: _pending_ <!-- result and UTC time; omit IDs until selected -->
 - Proposed strategy name: _not applicable unless creating_
 - Owner starting balance: _not applicable unless creating_
 - Access eligibility and mode: _not applicable unless creating_ <!-- public | private | paid -->
 - Paid cryptocurrency launch price: _not applicable unless paid_
-- Failed-current-run target cleanup: _not applicable unless creating_ <!-- delete exact created target and matching saved ID | retain target and saved ID -->
+- AlphaInsider strategy ID: _not applicable until selected or created_
+- Remote disposition: _not initiated_ <!-- retain and detach | delete | not applicable -->
+- Pending outgoing strategy ID and result: _not applicable unless a confirmed replacement delete is unfinished_
 - Generated AlphaInsider description: _not yet decided_
 - Description synchronization: _pending_ <!-- required before implemented -->
-- Configured strategy validation: _pending_ <!-- result and UTC time; omit ID -->
+- Configured strategy validation: _pending_ <!-- result and UTC time -->
 - Target lifecycle disposition: _not initiated_ <!-- active | retained and detached | deleted | deletion pending -->
 
 ## Confirmation

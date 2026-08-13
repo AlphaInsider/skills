@@ -45,30 +45,31 @@ second prompt; offline verification never submits AlphaInsider orders.
 Operation and scheduling distinguishes a single run, a persistent process, and
 a recurring finite cycle across foreground, user-level systemd or launchd,
 Windows Task Scheduler, or a compatible local or remote agent scheduler.
-Managed resources default inactive and never start immediately.
+Managed resources default active on a first-session ready target and never
+start immediately.
 
 Credentials remain in project `.env` files. Chat entry is a less-secure
 agent-only fallback whose values are never printed. Generated READMEs omit the
 helper and include a language-specific `Start` section. Strategy Creator
-verifies its required API-key permissions, discovers owned strategies, and syncs the
-confirmed description.
+verifies its required API-key permissions, discovers owned strategies, and
+syncs the confirmed description.
 
-Deferred plans allow a mocked local build but make no remote calls or operation
-resources and remain confirmed until target setup and reconfirmation.
+Local-only plans allow a mocked local build but make no remote calls or
+operation resources and remain confirmed until target setup and
+reconfirmation.
 
 Existing Strategy Creator projects can be updated or replaced. Replacement is
-planned separately and confirmed once for attributable cleanup, archived
-retirement, promotion, and implementation without another approval. A deferred
-replacement leaves the current strategy untouched.
+planned separately and confirmed once for attributable cleanup, promotion, and
+implementation without another approval. A local-only replacement leaves the
+current strategy untouched.
 
 An implemented strategy can also be retired through one confirmed
-`docs/cleanup-plan.md`. Strategy Creator first disables and removes only its
+`docs/plan.md`. Strategy Creator first disables and removes only its
 attributable operation resources, then lets the user retain and detach or
 delete any exactly verified owned AlphaInsider target. It preserves `.env`,
 `.gitignore`, historical data, unrelated files, and a retired audit plan.
 Deletion warns about live state and undocumented cascades but never cancels
-orders, liquidates positions, or submits a trade. Offline verification never
-submits AlphaInsider orders.
+orders, liquidates positions, or submits a trade.
 
 Strategy Creator plans share `contract_version`. A read-only check reports a
 newer canonical release with

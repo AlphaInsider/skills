@@ -1,5 +1,5 @@
 ---
-current_version: 1.6.0
+current_version: 1.7.0
 ---
 
 # Strategy Creator Versioning
@@ -48,11 +48,8 @@ check returns no output, continue silently.
 - Valid active lifecycle states are `draft`, `confirmed`, and `implemented`;
   `retired` is a recognized non-operational audit state. Never run strategy
   code or operation resources from a retired plan.
-- Recognize `docs/cleanup-plan.md` only with the `# Strategy Cleanup Plan`
-  title, `draft` or `confirmed` status, strict installed `contract_version`,
-  and every field in `cleanup-plan-template.md`. It is the sole plan allowed to
-  contain an exact non-secret AlphaInsider strategy ID. Never overwrite a
-  malformed or colliding cleanup plan.
+- The active or replacement plan may contain the exact non-secret AlphaInsider
+  strategy ID.
 - If `contract_version` is absent, recognize only a plan with the current
   title, lifecycle status, and every section heading from the current plan
   template. Treat that exact legacy shape as `0.0.0`; do not infer versions
@@ -71,9 +68,9 @@ check returns no output, continue silently.
 
 For a project older than the installed version, first ask whether to update,
 replace, or retire the strategy. A replacement starts on the installed version
-and leaves the outgoing project unchanged while drafting. Retirement stages an
-installed-version cleanup plan and combines applicable upgrade inventory into
-the same final cleanup confirmation. For an update:
+and leaves the outgoing project unchanged while drafting. Retirement interviews
+the remote-disposition decision on the active plan and combines applicable
+upgrade inventory into the same final confirmation. For an update:
 
 1. Follow the **Version logs** links for every major number from the project
    version through the installed version, inclusive. For legacy `0.0.0`, start
@@ -103,8 +100,7 @@ the same final cleanup confirmation. For an update:
    installed version; do not write intermediate contract versions. Leave the
    previous version in place after an interrupted or failed upgrade.
 
-For the `1.6.0` increment, add the managed-artifact retirement, operation
-cleanup, and target lifecycle fields with `not initiated` values. They are
-derived lifecycle state, not new strategy interview decisions. A version-only
-upgrade creates no cleanup plan and performs no remote, scheduler, process,
-cleanup, or trading action.
+Read increment-specific mappings only from the selected release sections in
+the version logs. A version-only upgrade performs no remote, scheduler,
+process, cleanup, or trading action unless a selected release section records
+that exact action.
