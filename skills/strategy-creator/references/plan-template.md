@@ -1,6 +1,6 @@
 ---
 status: draft
-contract_version: 1.8.0
+contract_version: 2.0.0
 ---
 
 # Strategy Plan
@@ -63,7 +63,7 @@ strategy ID after the user selects or confirmation creates a target.
 
 ## Operation and scheduling
 
-- Operation mode: _not yet decided_ <!-- foreground | native user-system | agent scheduled task -->
+- Operation mode: _not yet decided_ <!-- foreground | background process | agent scheduler -->
 - Invocation model: _not yet decided_ <!-- single run | persistent process | recurring schedule -->
 - Cadence, timezone, precision, and worst-case cycle duration: _not yet decided_
 - Capability check and selected runner or environment: _not yet decided_

@@ -18,7 +18,7 @@ and the sibling `alphainsider` skill read-only.
 - Never inspect or print existing `.env` values or API keys.
 - Keep generated artifacts in the selected project root. Exact confirmed
   user-level native operation definitions are the only host-write exception;
-  confirmed agent scheduled tasks are external managed resources.
+  confirmed agent schedulers are external managed resources.
 
 ## Start
 

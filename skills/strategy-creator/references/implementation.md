@@ -24,7 +24,7 @@ instead of requesting a one-off approval.
 Keep project writes inside the selected project root; use absolute paths only
 during the run and persist project-relative paths. Exact confirmed user-level
 native operation definitions are the sole host-write exception and confirmed
-agent scheduled tasks are external managed resources. Create either only under
+agent schedulers are external managed resources. Create either only under
 `operation-and-scheduling.md` after all preceding gates pass.
 
 For a `ready` target, complete **Confirmed provisioning** in
@@ -169,10 +169,12 @@ values later from names alone.
 
 For a ready target, complete
 **Description synchronization**, then install and verify every confirmed
-native definition or agent task in its confirmed active or inactive state.
-Never manually trigger it; report the next occurrence for an active schedule.
-Set `implemented` only after the remote and applicable operation gates pass; a
-local-only target or failed required installation remains `confirmed`. Exclude
+native definition or agent scheduler in its confirmed active or inactive
+state. Never manually trigger it; report the next occurrence for an active
+schedule when known. A created agent-scheduler task object counts as
+installed even when recorded limitations remain. Set `implemented` only after
+the remote and applicable operation gates pass; a local-only target or failed
+required background-process installation remains `confirmed`. Exclude
 other deployment unless separately requested. Before handoff, verify every
 changed path or external task is exact, attributable, and confirmed, and
 neither skill changed.

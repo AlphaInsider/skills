@@ -43,8 +43,9 @@ credible external history. User-run commands may submit orders without a
 second prompt; offline verification never submits AlphaInsider orders.
 
 Operation and scheduling distinguishes a single run, a persistent process, and
-a recurring finite cycle across foreground, user-level systemd or launchd,
-Windows Task Scheduler, or a compatible local or remote agent scheduler.
+a recurring finite cycle across foreground, a background process using
+user-level systemd or launchd or Windows Task Scheduler, or an agent
+scheduler.
 Managed resources default active on a first-session ready target and never
 start immediately.
 

@@ -1,5 +1,5 @@
 ---
-current_version: 1.8.0
+current_version: 2.0.0
 ---
 
 # Strategy Creator Versioning
@@ -39,6 +39,7 @@ check returns no output, continue silently.
 ## Version logs
 
 - [Version 1](versions/v1.md)
+- [Version 2](versions/v2.md)
 
 ## Project recognition
 

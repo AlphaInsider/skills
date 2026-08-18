@@ -153,7 +153,7 @@ A confirmed local-only plan authorizes a complete local build, including copied
 AlphaInsider helpers, order mapping, documentation, backtests, and mocked
 tests. It does not authorize provisioning, remote target validation,
 synchronization, an order-submitting command, a native operation definition,
-or an agent scheduled task. Mark operator commands unavailable, keep the plan
+or an agent scheduler. Mark operator commands unavailable, keep the plan
 `confirmed`, and never set it to `implemented`.
 
 When setup becomes possible, return the plan to `draft`, preserve unaffected

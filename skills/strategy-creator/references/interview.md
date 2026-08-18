@@ -196,17 +196,23 @@ up or continue that cleanup.
    operation definitions, or write generated artifacts into an installed skill
    directory.
 8. **Operation and scheduling** — After cadence, worst-case cycle duration, and
-   host discovery, follow `operation-and-scheduling.md`. Distinguish a single
-   run, persistent process, and recurring schedule. Foreground supports a
-   single run or visible persistent process. Native user-system operation may
-   use a Linux systemd or macOS launchd persistent service, or recurring finite
-   cycles through systemd timers, launchd calendar intervals, or Windows Task
-   Scheduler. An available agent scheduler may run a recurring standalone task
-   locally or in an already prepared remote or web runtime; each occurrence
-   runs exactly one finite cycle. Resolve capability, collision, schedule,
-   missed-run, non-overlap, retry, activation, log or history, notification,
-   and installation decisions without creating or starting a resource.
-   Recommend active for a first-session ready target.
+   host and agent-tool discovery, follow `operation-and-scheduling.md`.
+   Distinguish a single run, persistent process, and recurring schedule.
+   Present `foreground`, `background process`, and `agent scheduler` with a
+   usable or not-usable result; never omit a family. Foreground supports a
+   single run or visible persistent process and is always selectable. A
+   background process may use a Linux systemd or macOS launchd persistent
+   service, or recurring finite cycles through systemd timers, launchd
+   calendar intervals, or Windows Task Scheduler, and is selectable only when
+   those native gates pass. An agent scheduler is listed whenever any
+   future-invocation tool exists and is selectable for recurring operation
+   when that tool can repeat, including session-scoped or conversation-
+   attached automations; each occurrence runs exactly one finite cycle.
+   Resolve capability, collision, schedule, missed-run, non-overlap, retry,
+   activation, log or history, notification, recorded limitations, and
+   installation decisions without creating or starting a resource.
+   Recommend a background process before an agent scheduler, keep foreground
+   available, and recommend active for a first-session ready target.
 9. **AlphaInsider target** — After class and execution, follow
    `alphainsider-target.md`. Resolve a compatible target and instrument
    validation when possible; otherwise record explicit local-only readiness.
@@ -217,7 +223,7 @@ up or continue that cleanup.
 Objective unblocks market. Market unblocks behavior. Behavior cadence unblocks
 data, execution, and backtesting as one frontier. Implementation defaults may
 join that frontier when no material language tradeoff exists. Operation waits
-for cadence, worst-case duration, and host facts. Target waits for class and
+for cadence, worst-case duration, and host and agent-tool facts. Target waits for class and
 execution. Confirmation waits for a complete tree.
 
 ## Missing environment values
