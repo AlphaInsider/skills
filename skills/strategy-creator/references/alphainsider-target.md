@@ -21,7 +21,9 @@ outgoing replacement.
 
 Before asking the user to set `ALPHAINSIDER_API_KEY`, link to
 [AlphaInsider developer settings](https://alphainsider.com/settings/developers)
-and instruct them to create one key with every permission below:
+and instruct them to create one key by selecting the **AI Agent** preset. The
+preset selects every required permission below; the user may alternatively
+select the complete list individually:
 
 ```text
 getUserInfo
@@ -29,11 +31,19 @@ getStrategies
 getStrategyValues
 getUserStrategies
 getStrategyPerformance
+getRecommendedStrategies
+searchStrategies
 newStrategy
 updateStrategy
 deleteStrategy
 getStrategySubscriptions
+getStrategyCalculation
 getAccountSubscription
+getTimelines
+getStrategyTimelines
+newPost
+previewPost
+deletePost
 getPositions
 getOrders
 getMaxOrderSize
@@ -44,6 +54,7 @@ wsStockPrice
 wsStrategyValue
 wsOrders
 wsPositions
+wsTimelines
 ```
 
 Explain that `verifyToken` has no selectable permission and that AlphaInsider's
@@ -53,11 +64,16 @@ cleanup. Token scope alone never authorizes deletion; the cleanup workflow
 must verify exact identity and ownership and record the user's
 retain-or-delete decision.
 
+Timeline permissions allow reading, creating, previewing, and deleting posts;
+`like` and `unlike` are not required. The subscription permissions are
+read-only and never authorize starting, changing, or cancelling a subscription.
+
 After the key is available, use the sibling request helper to call
 `POST /verifyToken`. Read only the returned `user_id` and `scope`; never expose
 the token. Compare `scope` with the complete bundle above. If any permission is
 missing, list only the missing permission names, instruct the user to create or
-replace the key, and pause AlphaInsider target setup and every remote action.
+replace the key with the **AI Agent** preset, and pause AlphaInsider target
+setup and every remote action.
 Record the target as local-only if the key cannot be corrected in the current
 run; preserve every completed earlier planning decision. Accept extra
 permissions without treating them as Strategy Creator requirements.
@@ -208,11 +224,12 @@ resource agree.
 ## Generated project documentation
 
 The generated `README.md` API-key prerequisites must link to AlphaInsider
-developer settings, list the complete permission bundle above exactly, and
-explain that `verifyToken` and stock REST lookups need no selectable
-permission. Identify `deleteStrategy` as authorized only by a confirmed
-retirement or outgoing replacement on the plan. Copy the permission list from
-this file at generation time.
+developer settings, tell the user they can select the **AI Agent** preset, list
+the complete permission bundle above exactly, and explain that `verifyToken`
+and stock REST lookups need no selectable permission. Identify
+`deleteStrategy` as authorized only by a confirmed retirement or outgoing
+replacement on the plan. Copy the permission list from this file at generation
+time.
 
 Generated `AGENTS.md` must point at the installed strategy-creator skill for
 target, cleanup, and local-only rules. Keep only project-specific commands,

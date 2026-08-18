@@ -48,11 +48,11 @@ Windows Task Scheduler, or a compatible local or remote agent scheduler.
 Managed resources default active on a first-session ready target and never
 start immediately.
 
-Credentials remain in project `.env` files. Chat entry is a less-secure
-agent-only fallback whose values are never printed. Generated READMEs omit the
-helper and include a language-specific `Start` section. Strategy Creator
-verifies its required API-key permissions, discovers owned strategies, and
-syncs the confirmed description.
+Credentials remain in project `.env` files; less-secure agent-only chat entry
+is never printed. Generated READMEs omit the helper and include a
+language-specific `Start` section. Strategy Creator verifies its required
+API-key permissions, discovers owned strategies, and syncs the confirmed
+description. AlphaInsider's **AI Agent** preset selects the full bundle.
 
 Local-only plans allow a mocked local build but make no remote calls or
 operation resources and remain confirmed until target setup and
