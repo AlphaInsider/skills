@@ -6,6 +6,8 @@ Skills for AlphaInsider API integration and paper-trading strategy projects.
 
 ## Skills
 
+- `alphainsider` routes an explicit request to a published specialist.
+  Specialists stay independently installable.
 - `alphainsider-api` documents the AlphaInsider API and includes REST and
   WebSocket helpers plus normalized-value calculations.
 - `alphainsider-strategy-creator` interviews the user, researches data sources,
@@ -14,14 +16,24 @@ Skills for AlphaInsider API integration and paper-trading strategy projects.
 
 ## Install
 
-Install AlphaInsider:
+Install the optional router:
+
+```bash
+npx skills@latest add https://github.com/AlphaInsider/skills \
+  --skill alphainsider
+```
+
+Invoke with `/alphainsider`, "use the alphainsider skill", "route this with
+alphainsider", or "which AlphaInsider skill".
+
+Install AlphaInsider API:
 
 ```bash
 npx skills@latest add https://github.com/AlphaInsider/skills \
   --skill alphainsider-api
 ```
 
-Install Strategy Creator and AlphaInsider:
+Install Strategy Creator and AlphaInsider API:
 
 ```bash
 npx skills@latest add https://github.com/AlphaInsider/skills \
@@ -76,8 +88,9 @@ orders, liquidates positions, or submits a trade.
 Strategy Creator plans share `contract_version`. A read-only check reports a
 newer canonical release with
 `npx skills@latest update alphainsider-api alphainsider-strategy-creator`, but it is never
-installed automatically. The installed index routes older projects through
-`references/versions/vN.md` into one final-confirmation upgrade.
+installed automatically. Update the router with
+`npx skills@latest update alphainsider`. The installed index routes older
+projects through `references/versions/vN.md` into one final-confirmation upgrade.
 
 ## Development
 

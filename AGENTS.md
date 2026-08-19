@@ -4,8 +4,10 @@ This repository publishes reusable AlphaInsider agent skills from `skills/`.
 
 ## Rules
 
-- Keep each public skill self-contained. When both are installed, Strategy
-  Creator should read `alphainsider-api` for API behavior.
+- Keep each public skill self-contained. `alphainsider` is the optional
+  explicit router to published specialists; specialists stay self-contained.
+  When `alphainsider-api` and `alphainsider-strategy-creator` are both
+  installed, Strategy Creator should read `alphainsider-api` for API behavior.
 - Expose public skills only as `skills/<name>/SKILL.md`.
 - Keep public skills and documentation agent-vendor agnostic; do not require
   vendor-specific metadata or behavior.

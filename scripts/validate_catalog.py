@@ -10,7 +10,55 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = ROOT / "skills"
-EXPECTED_SKILLS = {"alphainsider-api", "alphainsider-strategy-creator"}
+EXPECTED_SKILLS = {
+    "alphainsider",
+    "alphainsider-api",
+    "alphainsider-strategy-creator",
+}
+WRAPPER_NAME = "alphainsider"
+EXPECTED_WRAPPER_REFERENCES = {
+    "catalog.md",
+    "versioning.md",
+}
+EXPECTED_WRAPPER_SCRIPTS = {
+    "check_for_update.py",
+}
+REQUIRED_WRAPPER_TRIGGERS = {
+    "/alphainsider",
+    "use the alphainsider skill",
+    "route this with alphainsider",
+    "which AlphaInsider skill",
+}
+REQUIRED_WRAPPER_GUIDANCE = {
+    "scripts/check_for_update.py",
+    "never run or offer its update command",
+    "references/catalog.md",
+    "always ask",
+    "npx skills list",
+    "npx skills@latest use",
+    "Never pass `--agent`",
+    "only when the user asks",
+    "recommend global",
+    "--skill <name> -g -y",
+    "Do not require any specialist",
+}
+REQUIRED_WRAPPER_VERSION_GUIDANCE = {
+    "`MAJOR.MINOR.PATCH`",
+    "Do not keep version logs",
+    "npx skills@latest update alphainsider",
+    "never run its update command",
+}
+REQUIRED_WRAPPER_UPDATE_CHECKER_SOURCE = {
+    "https://raw.githubusercontent.com/AlphaInsider/skills/master/",
+    "skills/alphainsider/references/versioning.md",
+    'UPDATE_COMMAND = "npx skills@latest update alphainsider"',
+    "TIMEOUT_SECONDS = 3",
+    "MAX_RESPONSE_BYTES = 64 * 1024",
+    "response.geturl() != REMOTE_VERSION_URL",
+}
+CATALOG_HEADING_PATTERN = re.compile(
+    r"^## ([a-z0-9]+(?:-[a-z0-9]+)*)$", re.MULTILINE
+)
 EXPECTED_ALPHA_SCRIPTS = {
     "alphainsider_request.py",
     "alphainsider_stream.py",
@@ -657,7 +705,7 @@ REQUIRED_UPDATE_CHECKER_SOURCE = {
     "MAX_RESPONSE_BYTES = 64 * 1024",
     "response.geturl() != REMOTE_VERSION_URL",
 }
-README_MAX_WORDS = 450
+README_MAX_WORDS = 550
 REQUIRED_README_SECTIONS = {
     "# AlphaInsider Skills",
     "## Overview",
@@ -667,9 +715,13 @@ REQUIRED_README_SECTIONS = {
     "## Development",
 }
 REQUIRED_README_OVERVIEW_GUIDANCE = {
+    "`alphainsider`",
     "`alphainsider-api`",
     "`alphainsider-strategy-creator`",
+    "/alphainsider",
+    "use the alphainsider skill",
     "npx skills@latest add",
+    "npx skills@latest update alphainsider",
     "`docs/plan.md`",
     "paper-trading",
     "Credentials remain",
@@ -730,6 +782,11 @@ def semver_tuple(value: str) -> tuple[int, int, int] | None:
     if match is None:
         return None
     return tuple(int(part) for part in match.groups())
+
+
+def catalog_specialists(text: str) -> list[str]:
+    """Return routable specialist names from catalog headings."""
+    return CATALOG_HEADING_PATTERN.findall(text)
 
 
 def markdown_section_lines(text: str, heading: str) -> list[str] | None:
@@ -862,7 +919,10 @@ def validate() -> list[str]:
 
     all_skill_files = list(ROOT.rglob("SKILL.md"))
     if len(all_skill_files) != len(EXPECTED_SKILLS):
-        errors.append(f"expected exactly two SKILL.md files, found {len(all_skill_files)}")
+        errors.append(
+            f"expected exactly {len(EXPECTED_SKILLS)} SKILL.md files, "
+            f"found {len(all_skill_files)}"
+        )
 
     for name in sorted(EXPECTED_SKILLS):
         skill_dir = SKILLS_DIR / name
@@ -881,6 +941,139 @@ def validate() -> list[str]:
             errors.append(f"{name}: frontmatter name does not match directory")
         if len(fields.get("description", "")) < 40:
             errors.append(f"{name}: description is too short")
+
+    wrapper = SKILLS_DIR / WRAPPER_NAME
+    wrapper_skill = wrapper / "SKILL.md"
+    wrapper_references = wrapper / "references"
+    wrapper_scripts = wrapper / "scripts"
+    if wrapper_skill.is_file():
+        wrapper_text = wrapper_skill.read_text(encoding="utf-8")
+        wrapper_fields = frontmatter(wrapper_skill)
+        missing_wrapper_triggers = {
+            trigger
+            for trigger in REQUIRED_WRAPPER_TRIGGERS
+            if trigger not in wrapper_fields.get("description", "")
+        }
+        if missing_wrapper_triggers:
+            errors.append(
+                "alphainsider description is missing explicit invoke triggers "
+                f"{sorted(missing_wrapper_triggers)}"
+            )
+        missing_wrapper_guidance = {
+            guidance
+            for guidance in REQUIRED_WRAPPER_GUIDANCE
+            if guidance not in wrapper_text
+        }
+        if missing_wrapper_guidance:
+            errors.append(
+                "alphainsider is missing facade guidance "
+                f"{sorted(missing_wrapper_guidance)}"
+            )
+
+    actual_wrapper_refs = {
+        path.name
+        for path in wrapper_references.iterdir()
+        if path.is_file()
+    } if wrapper_references.is_dir() else set()
+    if actual_wrapper_refs != EXPECTED_WRAPPER_REFERENCES:
+        errors.append(
+            "alphainsider references must be exactly "
+            f"{sorted(EXPECTED_WRAPPER_REFERENCES)}"
+        )
+    if wrapper_references.is_dir():
+        extra_wrapper_dirs = {
+            path.name for path in wrapper_references.iterdir() if path.is_dir()
+        }
+        if extra_wrapper_dirs:
+            errors.append(
+                "alphainsider references must not contain nested directories "
+                f"{sorted(extra_wrapper_dirs)}"
+            )
+
+    actual_wrapper_scripts = {
+        path.relative_to(wrapper_scripts).as_posix()
+        for path in wrapper_scripts.rglob("*")
+        if path.is_file() and "__pycache__" not in path.parts
+    } if wrapper_scripts.is_dir() else set()
+    if actual_wrapper_scripts != EXPECTED_WRAPPER_SCRIPTS:
+        errors.append(
+            "alphainsider scripts must be exactly "
+            f"{sorted(EXPECTED_WRAPPER_SCRIPTS)}"
+        )
+
+    catalog_path = wrapper_references / "catalog.md"
+    catalog_names: list[str] = []
+    if catalog_path.is_file():
+        catalog_text = catalog_path.read_text(encoding="utf-8")
+        catalog_names = catalog_specialists(catalog_text)
+        catalog_set = set(catalog_names)
+        if WRAPPER_NAME in catalog_set:
+            errors.append("alphainsider catalog must not list itself")
+        if len(catalog_names) != len(catalog_set):
+            errors.append("alphainsider catalog headings must be unique")
+        if catalog_set | {WRAPPER_NAME} != EXPECTED_SKILLS:
+            errors.append(
+                "alphainsider catalog must list every specialist skill exactly "
+                f"once: expected {sorted(EXPECTED_SKILLS - {WRAPPER_NAME})}, "
+                f"found {sorted(catalog_set)}"
+            )
+        for name in catalog_names:
+            if not (SKILLS_DIR / name / "SKILL.md").is_file():
+                errors.append(
+                    f"alphainsider catalog lists {name} without skills/{name}/SKILL.md"
+                )
+            if f"--skill {name}" not in catalog_text:
+                errors.append(
+                    f"alphainsider catalog must include the {name} install command"
+                )
+        if catalog_names != sorted(catalog_names):
+            errors.append(
+                "alphainsider catalog headings must be in ascending name order"
+            )
+
+    version_path = wrapper_references / "versioning.md"
+    if version_path.is_file():
+        try:
+            wrapper_version_fields = frontmatter(version_path)
+        except ValueError as exc:
+            errors.append(str(exc))
+        else:
+            if set(wrapper_version_fields) != {"current_version"}:
+                errors.append(
+                    "alphainsider version reference must declare only current_version"
+                )
+            wrapper_version = wrapper_version_fields.get("current_version")
+            if wrapper_version is None or STRICT_SEMVER_PATTERN.fullmatch(
+                wrapper_version
+            ) is None:
+                errors.append(
+                    "alphainsider version reference must use strict MAJOR.MINOR.PATCH"
+                )
+        wrapper_version_text = version_path.read_text(encoding="utf-8")
+        missing_wrapper_version_guidance = {
+            guidance
+            for guidance in REQUIRED_WRAPPER_VERSION_GUIDANCE
+            if guidance not in wrapper_version_text
+        }
+        if missing_wrapper_version_guidance:
+            errors.append(
+                "alphainsider version reference is missing guidance "
+                f"{sorted(missing_wrapper_version_guidance)}"
+            )
+
+    wrapper_checker = wrapper_scripts / "check_for_update.py"
+    if wrapper_checker.is_file():
+        wrapper_checker_source = wrapper_checker.read_text(encoding="utf-8")
+        missing_wrapper_checker_source = {
+            marker
+            for marker in REQUIRED_WRAPPER_UPDATE_CHECKER_SOURCE
+            if marker not in wrapper_checker_source
+        }
+        if missing_wrapper_checker_source:
+            errors.append(
+                "alphainsider update checker is missing required safeguards "
+                f"{sorted(missing_wrapper_checker_source)}"
+            )
 
     strategy = SKILLS_DIR / "alphainsider-strategy-creator"
     strategy_references = strategy / "references"
@@ -1524,6 +1717,9 @@ def validate() -> list[str]:
             "README is missing high-level guidance "
             f"{sorted(missing_readme_overview_guidance)}"
         )
+    readme_install_skills = re.findall(r"--skill ([a-z0-9-]+)", readme_text)
+    if not readme_install_skills or readme_install_skills[0] != WRAPPER_NAME:
+        errors.append("README must lead with the alphainsider install")
 
     alphainsider = SKILLS_DIR / "alphainsider-api"
     alphainsider_text = (alphainsider / "SKILL.md").read_text(encoding="utf-8")
@@ -1702,7 +1898,7 @@ def main() -> int:
         for error in errors:
             print(f"error: {error}", file=sys.stderr)
         return 1
-    print("validated skills: alphainsider-api, alphainsider-strategy-creator")
+    print("validated skills: " + ", ".join(sorted(EXPECTED_SKILLS)))
     return 0
 
 
