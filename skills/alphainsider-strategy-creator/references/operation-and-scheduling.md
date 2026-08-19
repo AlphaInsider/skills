@@ -63,12 +63,13 @@ Record the manager or provider, execution environment, resource identity,
 exact native paths or task name, capability result, and every agent-scheduler
 limitation without recording secrets.
 
-Ask whether each managed resource should initially be `inactive` or `active`
-and recommend active for a first-session ready target. Active means eligible
-for future planned occurrences or next-login startup after installation; it
-never authorizes a manual or immediate strategy run. State the next scheduled
-occurrence when known and warn that a future active occurrence can submit
-AlphaInsider paper orders without another prompt.
+Ask Initial activation and autostart as `inactive` or `active` for every
+invocation model, including unmanaged foreground. Recommend `active` and
+recommend active for a first-session ready target. After the plan is `implemented`, `active` means
+start the matching planned command: one finite cycle, start the persistent
+process, or enable the recurring schedule. Warn once that paper orders can
+submit. `inactive` installs or leaves the runner stopped. State the next
+scheduled occurrence when known.
 
 ## Capability and safety gates
 
@@ -231,7 +232,8 @@ definition and external task create, update, pause, disable, activation, or
 deletion. Apply those actions only after a ready target is provisioned, the
 local build and offline checks pass, and the remote description is synchronized.
 Never manually run a one-cycle command, start a persistent process, or trigger
-a scheduled task during build or verification.
+a scheduled task during build or verification. After `implemented`, follow
+this skill's run rule.
 
 For a local-only target, retain normalized operation decisions but create no
 native definition or agent task and keep all operational commands unavailable.
@@ -250,9 +252,9 @@ untouched, preserve it in the pending cleanup plan, and report the exact
 provider-neutral lifecycle information. Never treat lack of task visibility as
 proof that a local, remote, or web task no longer exists.
 
-An active resource may run at a later confirmed occurrence or login. The final
-plan confirmation authorizes those future executions, not an immediate test
-run. If a path, identity, capability, status, or required action differs from
+An `active` resource starts only after `implemented`, not an immediate test
+run during build or verification. A later explicit chat request may also run
+the matching planned command. If a path, identity, capability, status, or required action differs from
 the confirmed inventory, return the plan to `draft`, resolve only affected
 decisions, and require one new complete-plan confirmation.
 
@@ -267,8 +269,10 @@ pause, resume, status, log or history, update, and uninstall or delete actions.
 Warn immediately before every manual activation or start action that it may
 submit paper orders without another prompt.
 
-Generated `AGENTS.md` must point at the installed strategy-creator skill for
+Generated `AGENTS.md` must point at the installed alphainsider-strategy-creator skill for
 operation, collision, and cleanup rules. Keep only this project's commands,
-runner identity, and env names. Runtime-affecting updates must pause future
-cycles, wait for safe cycle completion, leave the runner inactive afterward,
-and report the exact user-run resume action.
+runner identity, and env names. Agents must not run operational commands
+during build or verification. After `implemented`, they honor `active`
+autostart and an explicit later chat request. Runtime-affecting updates must
+pause future cycles, wait for safe cycle completion, leave the runner
+inactive afterward, and report the exact resume command.

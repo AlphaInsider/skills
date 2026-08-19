@@ -152,7 +152,10 @@ up or continue that cleanup.
    and a recorded user decision before final confirmation.
 5. **Execution and risk** — Resolve fixed versus allocation orders, types,
    sizing, entries, reductions, exits, and position/open-order reconciliation;
-   apply the sibling AlphaInsider skill's normalized sizing/order rules. For
+   apply installed `alphainsider-api` normalized sizing/order rules when that
+   skill is present; otherwise read the live AlphaInsider docs and keep these
+   fail-closed rules: never default a missing `input_multiplier` to `1`, and
+   use `getMaxOrderSize` as the fixed-order authority. For
    allocations or webhook leverage, ask a separate maximum-exposure question:
    100% is 1× portfolio value, while AlphaInsider permits up to 200% (2×).
    Treat 200% as the platform ceiling, not a default; do not assume 100% is the
@@ -184,13 +187,15 @@ up or continue that cleanup.
    finite one-cycle command, persistent command when applicable, tests to run,
    and expected results.
    Select routine implementation details as agent defaults; ask the user only
-   when a material tradeoff requires their decision. Require the generated
-   README's short startup sequence to use those exact language-specific setup
-   and run commands; for Python, include `source .venv/bin/activate` before the
-   run choices. Do not add an interactive confirmation to an operational
-   command. A user-run command is the user's execution action. Never manually
-   run a cycle, start a persistent process, or trigger a schedule during build
-   and verification.
+   when a material tradeoff requires their decision. Ask about the AlphaInsider
+   client only when the user already named a library or request style;
+   otherwise pick an idiomatic library and record it as an agent default.
+   Require the generated README's short startup sequence to use those exact
+   language-specific setup and run commands; for Python, include
+   `source .venv/bin/activate` before the run choices. Do not add an
+   interactive confirmation to an operational command. Never manually run a
+   cycle, start a persistent process, or trigger a schedule during build and
+   verification. After implementation, follow this skill's run rule.
    Treat the selected project root as `.` in every persisted project path;
    never embed machine-specific absolute paths except in confirmed native
    operation definitions, or write generated artifacts into an installed skill
@@ -212,7 +217,8 @@ up or continue that cleanup.
    activation, log or history, notification, recorded limitations, and
    installation decisions without creating or starting a resource.
    Recommend a background process before an agent scheduler, keep foreground
-   available, and recommend active for a first-session ready target.
+   available, and ask Initial activation and autostart for every invocation
+   model. Recommend active for a first-session ready target.
 9. **AlphaInsider target** — After class and execution, follow
    `alphainsider-target.md`. Resolve a compatible target and instrument
    validation when possible; otherwise record explicit local-only readiness.
@@ -244,7 +250,7 @@ continuation to plan confirmation; it never permits a remote call. A missing
 credential required to validate another selected data source pauses that
 affected branch until the user supplies it or selects a feasible alternative.
 
-For pasted values, follow `credentials.md`. Use the sibling request helper for
+For pasted values, follow `credentials.md`. Use the setup request wrapper for
 AlphaInsider strategy configuration only when the target is not local-only.
 
 ## Confirmation gate

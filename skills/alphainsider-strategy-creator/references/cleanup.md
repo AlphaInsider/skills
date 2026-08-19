@@ -92,7 +92,7 @@ local deletion. Never resume or reactivate an outgoing runner automatically.
 
 ## AlphaInsider disposition
 
-Use the sibling request helper and never open `.env`. Reverify `deleteStrategy`
+Use the setup request wrapper and never open `.env`. Reverify `deleteStrategy`
 permission, the token's user ID, the exact target through `getStrategies`, and
 ownership through `getUserStrategies` and owner-subscription context. Selected
 existing and Strategy Creator-created targets are both eligible when ownership
@@ -189,6 +189,6 @@ retain-or-delete choice, live-state warning, and recovery path. Do not include
 credentials.
 
 Generated `AGENTS.md` files must tell future agents to read the installed
-strategy-creator skill before retiring or replacing this project. Keep only
+alphainsider-strategy-creator skill before retiring or replacing this project. Keep only
 project-specific commands, runner identity, and env names. Do not copy this
 workflow.

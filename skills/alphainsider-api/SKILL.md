@@ -1,5 +1,5 @@
 ---
-name: alphainsider
+name: alphainsider-api
 description: Navigate, use, debug, or document the AlphaInsider trading API, including strategies, subscriptions, normalized trading calculations, orders, positions, allocation rebalancing, bots, broker keys, webhooks, market data, timelines, billing, withdrawals, and WebSocket streams. Use for endpoint behavior, request examples, authentication rules, helper-managed defaults, thin REST requests, or WebSocket connections.
 ---
 
@@ -35,8 +35,8 @@ endpoint functions only for the integration's actual needs.
 - Use `scripts/alphainsider_request.py` for REST calls. The helper reads only `ALPHAINSIDER_API_KEY`, `ALPHAINSIDER_STRATEGY_ID`, and `ALPHAINSIDER_BOT_ID` from the process environment or `.env` in the invoking directory, injects auth safely, and redacts credentials from dry runs, responses, and errors.
 - Use `scripts/alphainsider_stream.py` for authenticated WebSocket subscriptions. It reads `ALPHAINSIDER_API_KEY` privately, never accepts it as a command-line argument, and redacts credentials from events and errors.
 - The documented importable interfaces never return the API key or arbitrary environment contents. They still transmit the key to AlphaInsider as required; this boundary prevents accidental output exposure, not hostile same-process inspection.
-- `ALPHAINSIDER_STRATEGY_ID` and `ALPHAINSIDER_BOT_ID` are helper-managed defaults, not secrets like the API key. A user may provide, request, and display explicit `strategy_id`, `bot_id`, or other non-secret configuration values.
-- Never dump the process environment or complete `.env`. Use non-secret values only when the user provides them or explicitly asks for them.
+- `ALPHAINSIDER_STRATEGY_ID` and `ALPHAINSIDER_BOT_ID` are helper-managed defaults, not secrets like the API key. Agents may display these and other public IDs even when a helper resolved them. Still hide `ALPHAINSIDER_API_KEY`, broker secrets, and webhook `api_token`.
+- Never dump the process environment or complete `.env`.
 - Broker keys and secrets passed to `newBot` or `updateBotBrokerKeys` are private credentials. Never print, log, commit, quote, or summarize them; send only the fields required by the selected broker.
 
 If a required `strategy_id` or `bot_id` is not supplied by the user and the helper/API cannot resolve it from defaults, ask the user for that ID. Do not inspect `.env` to find it.

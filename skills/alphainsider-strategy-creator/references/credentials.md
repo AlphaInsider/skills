@@ -20,7 +20,7 @@ For each missing value:
 5. From the project root, launch this exact agent-only CLI, once per name:
 
    ```bash
-   python /absolute/path/to/strategy-creator/scripts/set_env_value.py NAME VALUE
+   python /absolute/path/to/alphainsider-strategy-creator/scripts/set_env_value.py NAME VALUE
    ```
 
    Replace `NAME` and `VALUE`; pass the complete value as exactly one argument.
@@ -38,10 +38,20 @@ For each missing value:
    runtime cannot pass it as one safely quoted argument, return to the user-edit
    workflow. Do not improvise another write path. Defer the affected setup only
    when the user declines or cannot complete that workflow.
-7. Rerun the non-ordering check. For AlphaInsider configuration, use the sibling
-   request helper and report only the result, never credentials. Strategy IDs
-   and other non-secret values may be reported when the user supplied them,
-   explicitly asks for them, or confirmed the plan that created them.
+7. Rerun the non-ordering check. For AlphaInsider configuration, use
+   `scripts/alphainsider_setup_request.py` from the project root and report
+   only the result, never credentials. Public strategy IDs and other
+   non-secret values may be shown, including a value returned by
+   `--print-config ALPHAINSIDER_STRATEGY_ID`. Launch this exact agent-only
+   CLI and never import the setup wrapper or show it to the user:
+
+   ```bash
+   python /absolute/path/to/alphainsider-strategy-creator/scripts/alphainsider_setup_request.py \
+     METHOD PATH
+
+   python /absolute/path/to/alphainsider-strategy-creator/scripts/alphainsider_setup_request.py \
+     --print-config ALPHAINSIDER_STRATEGY_ID
+   ```
 
 A missing API key is a setup gap, not a strategy decision. A non-local-only
 `ALPHAINSIDER_API_KEY` must pass the target reference's permission gate before

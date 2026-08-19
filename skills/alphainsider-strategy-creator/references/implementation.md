@@ -14,8 +14,10 @@ confirmed replacement or cleanup, or when maintaining an implemented strategy.
 
 ## Execution gates
 
-Read the sibling `alphainsider` skill and only the API references needed for
-authentication, instruments, orders, sizing, and selected WebSockets. Before
+If `alphainsider-api` is installed, read it and only the API references needed
+for authentication, instruments, orders, sizing, and selected WebSockets. If
+it is not, read `https://api.alphainsider.com` (`llms.txt`, then OpenAPI or
+AsyncAPI) for those details. Do not embed a second API catalog. Before
 writing, inventory every path again. Confirmation authorizes new files and
 every exact overwrite recorded in the plan. If an unplanned path or collision
 appears, return the plan to `draft` and reconfirm the complete updated plan
@@ -85,13 +87,15 @@ Build the smallest standalone project that satisfies the plan:
   with equivalent AlphaInsider integration. Create `strategy/`, `tests/`,
   `.env.example`, dependency configuration, `.gitignore`, `README.md`, and
   `AGENTS.md` without a generic framework.
-- For Python, read the sibling `scripts/alphainsider_request.py` as an immutable
-  source and copy it to `strategy/alphainsider_request.py`. Copy
-  `scripts/alphainsider_stream.py` only when the plan uses WebSockets. Pass
-  `reconnect=True` to `stream_events` only for confirmed continuous recovery;
-  retain one-session behavior when the plan stops on a stream error. Import
-  generic request and calculation helpers, add only needed project-local
-  endpoint functions, and modify only project copies.
+- Write a small project-local AlphaInsider client in the selected language.
+  Record the HTTP library as an agent default under Implementation unless the
+  user already named a preference. Never copy this skill's setup wrapper or
+  `alphainsider-api` scripts into the project. Leave an existing copied helper
+  in place unless this change already inventories that path. The running app
+  may load project `.env`; agents still never open `.env`. Pass
+  `reconnect=True` to `stream_events` when the plan requires continuous
+  reconnection and re-subscription; retain the default one-session behavior
+  when the plan requires the strategy to stop on a stream error.
 - Put only names and safe examples in `.env.example`. Ignore `.env`, secrets,
   caches, and build outputs; keep plans, source, tests, and docs commit-ready.
   Follow `credentials.md` for missing values.
@@ -99,9 +103,10 @@ Build the smallest standalone project that satisfies the plan:
   process when planned, tests, and a selected backtest. A recurring schedule
   must invoke the same finite one-cycle entry point once per occurrence. Do not
   add dry-run mode or an interactive confirmation before planned paper orders.
-  A user-run command is the user's execution action; never manually run a
-  cycle, start a persistent process, or trigger a schedule during build and
-  verification. For a local-only target, document operational commands but mark
+  Never manually run a cycle, start a persistent process, or trigger a
+  schedule during build and verification. After the plan is `implemented`,
+  follow this skill's run rule: honor `active` autostart, and honor an
+  explicit later chat request. For a local-only target, document operational commands but mark
   them unavailable until target readiness is resolved.
 - For every finite-cycle and persistent entry point, acquire a fail-closed
   process-lifetime lock before external data or order work and release it
@@ -153,10 +158,13 @@ schedule, management, logging or history, notification, limitation, and
 activation warnings from `operation-and-scheduling.md`.
 
 Write `AGENTS.md` to make `docs/plan.md` authoritative and require the
-installed strategy-creator skill before changing, scheduling, or retiring the
+installed alphainsider-strategy-creator skill before changing, scheduling, or retiring the
 strategy. List only this project's commands, runner identity, and env names.
 Do not copy interview, cleanup, or credential procedures. Never show
-`set_env_value.py` to the user.
+`set_env_value.py` to the user. State that agents must not run operational
+commands during build or verification, may start the matching planned command
+after `implemented` when autostart is `active`, and may run on an explicit
+later chat request.
 
 ## Completion and maintenance
 
@@ -170,14 +178,16 @@ values later from names alone.
 For a ready target, complete
 **Description synchronization**, then install and verify every confirmed
 native definition or agent scheduler in its confirmed active or inactive
-state. Never manually trigger it; report the next occurrence for an active
+state. Do not trigger it as a build or verification test. If autostart is
+`active`, start the matching planned command after `implemented` and warn
+once that paper orders can submit. Report the next occurrence for an active
 schedule when known. A created agent-scheduler task object counts as
 installed even when recorded limitations remain. Set `implemented` only after
 the remote and applicable operation gates pass; a local-only target or failed
 required background-process installation remains `confirmed`. Exclude
 other deployment unless separately requested. Before handoff, verify every
 changed path or external task is exact, attributable, and confirmed, and
-neither skill changed.
+this skill was not changed.
 
 For behavior changes to an `implemented` plan, return it to `draft`, interview
 only affected decisions, and reconfirm before code edits. Update code, tests,
@@ -185,13 +195,14 @@ only affected decisions, and reconfirm before code edits. Update code, tests,
 restore `implemented` only after every gate passes. For a runtime-affecting
 change, follow `operation-and-scheduling.md`: pause or disable future cycles,
 allow an active cycle to finish, stop a persistent process at a safe boundary,
-and never resume automatically. Report the final state and exact user-run
-resume command.
+and never resume automatically. Report the final state and the exact resume
+command. An explicit later chat request may run that command.
 
 To resume a confirmed local-only target, return the plan to `draft`, preserve
 the offline implementation and unaffected decisions, resolve only target gaps,
 and reconfirm before provisioning, synchronization, or other remote work.
 
-For a `retired` plan or a pending outgoing deletion, never run strategy code or
-resume a runner. Follow `cleanup.md` only when the user explicitly requests
-cleanup or recovery, and otherwise preserve the audit record unchanged.
+For a `retired` plan or a pending outgoing deletion, follow `cleanup.md` only
+when the user explicitly requests cleanup or recovery. Do not run the
+strategy unless the user explicitly asks. Otherwise preserve the audit record
+unchanged.

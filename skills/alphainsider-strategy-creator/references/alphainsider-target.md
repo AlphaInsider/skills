@@ -68,7 +68,7 @@ Timeline permissions allow reading, creating, previewing, and deleting posts;
 `like` and `unlike` are not required. The subscription permissions are
 read-only and never authorize starting, changing, or cancelling a subscription.
 
-After the key is available, use the sibling request helper to call
+After the key is available, use the setup request wrapper to call
 `POST /verifyToken`. Read only the returned `user_id` and `scope`; never expose
 the token. Compare `scope` with the complete bundle above. If any permission is
 missing, list only the missing permission names, instruct the user to create or
@@ -82,8 +82,9 @@ permissions without treating them as Strategy Creator requirements.
 
 Run this flow only after the API key passes the permission gate.
 
-1. If the helper resolves a configured strategy ID, validate it with
-   `getStrategies` and `getStrategySubscriptions`. Require an owned strategy,
+1. If `--print-config ALPHAINSIDER_STRATEGY_ID` resolves a configured strategy
+   ID, validate it with `getStrategies` and `getStrategySubscriptions`. Require
+   an owned strategy,
    its owner `input_value` and `input_multiplier`, and a strict `stock` or
    `cryptocurrency` type matching the planned asset class. Record the target
    source as `selected existing` only when it is compatible.
@@ -99,7 +100,7 @@ Run this flow only after the API key passes the permission gate.
    `credentials.md` with:
 
    ```bash
-   python /absolute/path/to/strategy-creator/scripts/set_env_value.py \
+   python /absolute/path/to/alphainsider-strategy-creator/scripts/set_env_value.py \
      ALPHAINSIDER_STRATEGY_ID VALUE
    ```
 
@@ -149,12 +150,13 @@ record only a non-secret reason. Normalize every unavailable target field as
 local-only rather than leaving a placeholder. Make no remote calls after
 local-only readiness, but continue to plan confirmation.
 
-A confirmed local-only plan authorizes a complete local build, including copied
-AlphaInsider helpers, order mapping, documentation, backtests, and mocked
-tests. It does not authorize provisioning, remote target validation,
-synchronization, an order-submitting command, a native operation definition,
-or an agent scheduler. Mark operator commands unavailable, keep the plan
-`confirmed`, and never set it to `implemented`.
+A confirmed local-only plan authorizes a complete local build, including
+project-local AlphaInsider adapters, order mapping, documentation, backtests,
+and mocked tests. It does not authorize provisioning, remote target validation,
+synchronization, a native operation definition, or an agent scheduler. Keep
+the plan `confirmed` and never set it to `implemented`. An explicit later
+chat request may still run the planned command; warn that there may be no
+ready remote target. After local-only confirmation, keep the plan `confirmed`.
 
 When setup becomes possible, return the plan to `draft`, preserve unaffected
 decisions and local artifacts, resolve only the target gaps, and reconfirm the
@@ -176,7 +178,7 @@ mapping, price, and confirmed description. On success:
    plan, and report it once so the user can recover the target if later local
    work fails.
 2. Validate the created strategy and owner subscription context through the
-   sibling request helper. Do not continue if its type, ownership, starting
+   setup request wrapper. Do not continue if its type, ownership, starting
    value, or multiplier is unusable.
 3. If ID persistence, validation, or any later work fails before the plan is
    `implemented`, retain the created target and saved ID, report how to resume,
@@ -231,10 +233,10 @@ and stock REST lookups need no selectable permission. Identify
 replacement on the plan. Copy the permission list from this file at generation
 time.
 
-Generated `AGENTS.md` must point at the installed strategy-creator skill for
+Generated `AGENTS.md` must point at the installed alphainsider-strategy-creator skill for
 target, cleanup, and local-only rules. Keep only project-specific commands,
 runner identity, and env names. Agents never change strategy price. Operational
 commands must not prompt for confirmation before submitting planned paper
-orders. A user-run command is the user's execution action; agents never
-manually run a cycle, start a persistent process, or trigger a scheduled task
-during build and verification.
+orders. Never manually run a cycle, start a persistent process, or trigger a
+scheduled task during build and verification. After `implemented`, follow
+this skill's run rule.

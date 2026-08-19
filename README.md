@@ -6,9 +6,9 @@ Skills for AlphaInsider API integration and paper-trading strategy projects.
 
 ## Skills
 
-- `alphainsider` documents the AlphaInsider API and includes REST and
-  WebSocket helpers plus deterministic normalized-value calculations.
-- `strategy-creator` interviews the user, researches data sources,
+- `alphainsider-api` documents the AlphaInsider API and includes REST and
+  WebSocket helpers plus normalized-value calculations.
+- `alphainsider-strategy-creator` interviews the user, researches data sources,
   maintains a confirmed strategy plan, and generates or updates one automated
   stock or cryptocurrency strategy.
 
@@ -18,20 +18,22 @@ Install AlphaInsider:
 
 ```bash
 npx skills@latest add https://github.com/AlphaInsider/skills \
-  --skill alphainsider
+  --skill alphainsider-api
 ```
 
 Install Strategy Creator and AlphaInsider:
 
 ```bash
 npx skills@latest add https://github.com/AlphaInsider/skills \
-  --skill alphainsider \
-  --skill strategy-creator
+  --skill alphainsider-api \
+  --skill alphainsider-strategy-creator
 ```
+
+Strategy Creator does not require `alphainsider-api`.
 
 ## How it works
 
-Use `strategy-creator` to maintain `docs/plan.md`. It plans Objective, Market
+Use `alphainsider-strategy-creator` to maintain `docs/plan.md`. It plans Objective, Market
 and instruments, Strategy behavior, Data and resources, Execution and risk,
 Backtesting, and Implementation before Operation and scheduling and final
 AlphaInsider target setup. Confirmation builds offline tests and is the sole
@@ -46,11 +48,10 @@ Operation and scheduling distinguishes a single run, a persistent process, and
 a recurring finite cycle across foreground, a background process using
 user-level systemd or launchd or Windows Task Scheduler, or an agent
 scheduler.
-Managed resources default active on a first-session ready target and never
-start immediately.
+Managed resources default active on a first-session ready target.
 
-Credentials remain in project `.env` files; less-secure agent-only chat entry
-is never printed. Generated READMEs omit the helper and include a
+Credentials remain in project `.env` files; agent-only chat entry is never
+printed. Generated READMEs omit the helper and include a
 language-specific `Start` section. Strategy Creator verifies its required
 API-key permissions, discovers owned strategies, and syncs the confirmed
 description. AlphaInsider's **AI Agent** preset selects the full bundle.
@@ -74,7 +75,7 @@ orders, liquidates positions, or submits a trade.
 
 Strategy Creator plans share `contract_version`. A read-only check reports a
 newer canonical release with
-`npx skills@latest update alphainsider strategy-creator`, but it is never
+`npx skills@latest update alphainsider-api alphainsider-strategy-creator`, but it is never
 installed automatically. The installed index routes older projects through
 `references/versions/vN.md` into one final-confirmation upgrade.
 

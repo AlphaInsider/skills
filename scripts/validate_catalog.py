@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = ROOT / "skills"
-EXPECTED_SKILLS = {"alphainsider", "strategy-creator"}
+EXPECTED_SKILLS = {"alphainsider-api", "alphainsider-strategy-creator"}
 EXPECTED_ALPHA_SCRIPTS = {
     "alphainsider_request.py",
     "alphainsider_stream.py",
@@ -178,7 +178,22 @@ REQUIRED_PROGRESSIVE_DISCLOSURE_GUIDANCE = {
     "Do not preload every reference",
     "Read each file in full only when its phase or action begins",
 }
-EXPECTED_STRATEGY_SCRIPTS = {"check_for_update.py", "set_env_value.py"}
+REQUIRED_INDEPENDENCE_GUIDANCE = {
+    "Require this skill's three scripts",
+    "Do not require the `alphainsider-api` skill to continue",
+    "If `alphainsider-api` is installed, read it only for needed API behavior",
+    "Never copy this skill's setup wrapper",
+}
+REMOVED_SIBLING_DEPENDENCY_GUIDANCE = {
+    "Require this skill's two scripts and the sibling",
+    "use the sibling request helper",
+    "read the sibling `scripts/alphainsider_request.py`",
+}
+EXPECTED_STRATEGY_SCRIPTS = {
+    "alphainsider_setup_request.py",
+    "check_for_update.py",
+    "set_env_value.py",
+}
 EXPECTED_PLAN_STATES = {"draft", "confirmed", "implemented", "retired"}
 STRICT_SEMVER_PATTERN = re.compile(
     r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$"
@@ -328,8 +343,7 @@ REQUIRED_REPLACEMENT_GUIDANCE = {
 }
 REQUIRED_CREDENTIAL_GUIDANCE = {
     "`scripts/set_env_value.py`",
-    "`scripts/alphainsider_request.py`",
-    "`scripts/alphainsider_stream.py`",
+    "`scripts/alphainsider_setup_request.py`",
     "Recommend that the user add the values to `.env` themselves",
     "they may paste the values in chat",
     "pasting credentials is less secure",
@@ -343,7 +357,8 @@ REQUIRED_CREDENTIAL_GUIDANCE = {
     "Never show this command to the user",
     "Do not open `.env` before or after the update",
     "approval to update only those names",
-    "use the sibling request helper",
+    "use the setup request wrapper",
+    "--print-config ALPHAINSIDER_STRATEGY_ID",
     "--remove ALPHAINSIDER_STRATEGY_ID",
     "agent-only helper",
     "Never import the helper",
@@ -475,6 +490,7 @@ REQUIRED_SINGLE_CONFIRMATION_GUIDANCE = {
     "must not prompt for confirmation before submitting planned paper orders",
     "Running either command is the user's execution action",
     "Never manually run a one-cycle command, start a persistent process, or trigger a scheduled task during build or verification",
+    "An explicit later chat request may run",
 }
 REQUIRED_LOCAL_ONLY_TARGET_GUIDANCE = {
     "after strategy, backtesting, implementation-contract, and operation-and-scheduling planning as the final AlphaInsider forward-test setup phase before confirmation",
@@ -527,8 +543,10 @@ REQUIRED_OPERATION_GUIDANCE = {
     "run the exact confirmed one-cycle invocation once",
     "Never manually trigger a run during creation or validation",
     "recommend active",
+    "Ask Initial activation and autostart",
     "create no native definition or agent task",
     "not an immediate test run",
+    "explicit later chat request",
 }
 REMOVED_CURRENT_OPERATION_GUIDANCE = {
     "Offer tmux only when it is installed",
@@ -564,7 +582,7 @@ REQUIRED_ALPHA_STREAM_GUIDANCE = {
     "authentication failures remain terminal",
 }
 REQUIRED_ALPHA_DOC_AUDIT_GUIDANCE = {
-    "Before finalizing any change under `skills/alphainsider/`",
+    "Before finalizing any change under `skills/alphainsider-api/`",
     "https://api.alphainsider.com/llms.txt",
     "https://api.alphainsider.com/openapi.yaml",
     "https://api.alphainsider.com/asyncapi.yaml",
@@ -607,7 +625,7 @@ REQUIRED_VERSION_GUIDANCE = {
     "Treat that exact legacy shape as `0.0.0`",
     "Compare the project with the installed version",
     "never a remote version",
-    "npx skills@latest update alphainsider strategy-creator",
+    "npx skills@latest update alphainsider-api alphainsider-strategy-creator",
     "one `vN.md` file per major version",
     "Select every documented release greater than",
     "less than or equal to the installed version",
@@ -633,8 +651,8 @@ REQUIRED_STRATEGY_VERSION_LAYOUT_GUIDANCE = {
 }
 REQUIRED_UPDATE_CHECKER_SOURCE = {
     "https://raw.githubusercontent.com/AlphaInsider/skills/master/",
-    "skills/strategy-creator/references/versioning.md",
-    'UPDATE_COMMAND = "npx skills@latest update alphainsider strategy-creator"',
+    "skills/alphainsider-strategy-creator/references/versioning.md",
+    'UPDATE_COMMAND = "npx skills@latest update alphainsider-api alphainsider-strategy-creator"',
     "TIMEOUT_SECONDS = 3",
     "MAX_RESPONSE_BYTES = 64 * 1024",
     "response.geturl() != REMOTE_VERSION_URL",
@@ -649,8 +667,8 @@ REQUIRED_README_SECTIONS = {
     "## Development",
 }
 REQUIRED_README_OVERVIEW_GUIDANCE = {
-    "`alphainsider`",
-    "`strategy-creator`",
+    "`alphainsider-api`",
+    "`alphainsider-strategy-creator`",
     "npx skills@latest add",
     "`docs/plan.md`",
     "paper-trading",
@@ -664,7 +682,7 @@ REQUIRED_README_OVERVIEW_GUIDANCE = {
     "prefer it for supported current market data",
     "Backtests require credible external history",
     "`contract_version`",
-    "npx skills@latest update alphainsider strategy-creator",
+    "npx skills@latest update alphainsider-api alphainsider-strategy-creator",
     "never installed automatically",
     "verifies its required API-key permissions",
     "**AI Agent** preset",
@@ -864,7 +882,7 @@ def validate() -> list[str]:
         if len(fields.get("description", "")) < 40:
             errors.append(f"{name}: description is too short")
 
-    strategy = SKILLS_DIR / "strategy-creator"
+    strategy = SKILLS_DIR / "alphainsider-strategy-creator"
     strategy_references = strategy / "references"
     actual_strategy_refs = {
         path.name for path in strategy_references.iterdir() if path.is_file()
@@ -1134,6 +1152,26 @@ def validate() -> list[str]:
         errors.append(
             "strategy-creator contains obsolete operation guidance "
             f"{sorted(stale_operation_guidance)}"
+        )
+    missing_independence_guidance = {
+        guidance
+        for guidance in REQUIRED_INDEPENDENCE_GUIDANCE
+        if guidance not in current_contract_text
+    }
+    if missing_independence_guidance:
+        errors.append(
+            "strategy-creator is missing independence guidance "
+            f"{sorted(missing_independence_guidance)}"
+        )
+    stale_sibling_dependency = {
+        guidance
+        for guidance in REMOVED_SIBLING_DEPENDENCY_GUIDANCE
+        if guidance in current_contract_text
+    }
+    if stale_sibling_dependency:
+        errors.append(
+            "strategy-creator still requires the sibling API skill "
+            f"{sorted(stale_sibling_dependency)}"
         )
     vendor_specific_agent_guidance = {
         term
@@ -1415,6 +1453,50 @@ def validate() -> list[str]:
                 "strategy environment helper must reject imports before defining functions"
             )
 
+    setup_wrapper = strategy / "scripts" / "alphainsider_setup_request.py"
+    if setup_wrapper.is_file():
+        wrapper_source = setup_wrapper.read_text(encoding="utf-8")
+        required_wrapper_source = {
+            'if __name__ != "__main__":',
+            "alphainsider_setup_request.py is CLI-only",
+            "--print-config",
+            'ALPHAINSIDER_STRATEGY_ID"',
+            "_PRINTABLE_CONFIG = \"ALPHAINSIDER_STRATEGY_ID\"",
+            "headers[\"Authorization\"] = api_key",
+            "def _print_config(",
+            "def _send_request(",
+        }
+        missing_wrapper_source = {
+            marker for marker in required_wrapper_source if marker not in wrapper_source
+        }
+        if missing_wrapper_source:
+            errors.append(
+                "strategy setup wrapper is missing CLI-only safeguards "
+                f"{sorted(missing_wrapper_source)}"
+            )
+        if "STRATEGY_QUERY_PATHS" in wrapper_source or "STRATEGY_BODY_PATHS" in wrapper_source:
+            errors.append(
+                "strategy setup wrapper must not inject default strategy IDs"
+            )
+        public_wrapper_functions = re.findall(
+            r"^def ([A-Za-z][A-Za-z0-9_]*)\(", wrapper_source, re.MULTILINE
+        )
+        if public_wrapper_functions:
+            errors.append(
+                "strategy setup wrapper exposes public Python functions "
+                f"{sorted(public_wrapper_functions)}"
+            )
+        import_guard_position = wrapper_source.find('if __name__ != "__main__":')
+        first_function_position = wrapper_source.find("\ndef ")
+        if (
+            import_guard_position == -1
+            or first_function_position == -1
+            or import_guard_position > first_function_position
+        ):
+            errors.append(
+                "strategy setup wrapper must reject imports before defining functions"
+            )
+
     readme_text = (ROOT / "README.md").read_text(encoding="utf-8")
     normalized_readme = " ".join(readme_text.split())
     missing_readme_sections = REQUIRED_README_SECTIONS - set(
@@ -1443,7 +1525,7 @@ def validate() -> list[str]:
             f"{sorted(missing_readme_overview_guidance)}"
         )
 
-    alphainsider = SKILLS_DIR / "alphainsider"
+    alphainsider = SKILLS_DIR / "alphainsider-api"
     alphainsider_text = (alphainsider / "SKILL.md").read_text(encoding="utf-8")
     missing_alpha_credential_guidance = {
         guidance
@@ -1620,7 +1702,7 @@ def main() -> int:
         for error in errors:
             print(f"error: {error}", file=sys.stderr)
         return 1
-    print("validated skills: alphainsider, strategy-creator")
+    print("validated skills: alphainsider-api, alphainsider-strategy-creator")
     return 0
 
 

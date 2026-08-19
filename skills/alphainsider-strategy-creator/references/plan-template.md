@@ -69,7 +69,7 @@ strategy ID after the user selects or confirmation creates a target.
 - Capability check and selected runner or environment: _not yet decided_
 - Resource identifier and exact native definitions or agent task: _not applicable for unmanaged foreground operation_
 - Missed-run or catch-up behavior and acceptance: _not applicable unless recurring schedule_
-- Initial activation and autostart: _not applicable for unmanaged foreground operation_ <!-- inactive | active -->
+- Initial activation and autostart: _not yet decided_ <!-- inactive | active -->
 - Overlap, retry, and persistent-service restart policy: _not yet decided_
 - Logs, run history, notifications, rotation, and retention: _not yet decided_
 - Installation state and next scheduled run: _not applicable until managed operation is selected_
