@@ -1,12 +1,12 @@
 ---
-name: strategy-creator
+name: alphainsider-strategy-creator
 description: Interview users in frontier rounds, maintain a decision-complete plan, and build, test, backtest, document, change, replace, retire, or clean up one automated AlphaInsider paper-trading strategy. Use for stock or cryptocurrency strategies that may depend on market data, models, APIs, or authorized web data but send orders only to AlphaInsider.
 ---
 
 # AlphaInsider Strategy Creator
 
 Build only the project justified by a confirmed strategy plan. Keep this skill
-and the sibling `alphainsider` skill read-only.
+read-only.
 
 ## Scope
 
@@ -15,20 +15,22 @@ and the sibling `alphainsider` skill read-only.
 - Plan one strict `stock` or `cryptocurrency` asset class and fixed, dynamic,
   or constrained-dynamic selection. Every traded instrument and target must
   match that class.
-- Never inspect or print existing `.env` values or API keys.
+- Never inspect or print existing `.env` values or API keys. Public strategy
+  IDs may be shown.
 - Keep generated artifacts in the selected project root. Exact confirmed
   user-level native operation definitions are the only host-write exception;
-  confirmed agent scheduled tasks are external managed resources.
+  confirmed agent schedulers are external managed resources.
 
 ## Start
 
-1. Require this skill's two scripts and the sibling `alphainsider` skill and
-   its two scripts. If any are missing, stop and show:
+1. Require this skill's three scripts. If any are missing, stop and show:
 
    ```bash
    npx skills@latest add https://github.com/AlphaInsider/skills \
-     --skill alphainsider --skill strategy-creator
+     --skill alphainsider-api --skill alphainsider-strategy-creator
    ```
+
+   Do not require the `alphainsider-api` skill to continue.
 
 2. Run `scripts/check_for_update.py` once per invocation. Show its notice once,
    never run or offer its update command, and continue on no output or failure.
@@ -66,7 +68,8 @@ action begins:
 - [`references/implementation.md`](references/implementation.md) — confirmed
   execution and maintenance.
 
-Read the sibling `alphainsider` skill only for needed API behavior.
+If `alphainsider-api` is installed, read it only for needed API behavior. If
+it is not, read `https://api.alphainsider.com`.
 
 ## Plan contract
 
@@ -115,11 +118,15 @@ calls, operational commands, managed resources, or `implemented` state.
 - **Cleanup:** Only for an explicit request, follow `cleanup.md`.
 - **Implemented:** Return changes to `draft`, preserve unaffected decisions,
   interview affected choices, and fully reconfirm.
-- **Retired:** Preserve the plan as a non-operational audit record. Resume only
-  an explicitly requested pending cleanup; never run the strategy.
+- **Retired:** Preserve the plan as a non-operational audit record. Resume
+  pending cleanup only when explicitly requested. Run it only if the user
+  explicitly asks.
 
 Never manually run a one-cycle command, start a persistent process, or trigger
 a scheduled task during build or verification. These actions can submit
-planned AlphaInsider paper orders without an interactive confirmation. Final
-confirmation may authorize an active resource to run at its recorded future
-occurrence or login, never as an immediate test run.
+planned AlphaInsider paper orders without an interactive confirmation. After
+the plan is `implemented`, if Initial activation and autostart is `active`,
+start the matching planned command and warn once that paper orders can submit.
+An explicit later chat request may run an `implemented`, `local-only`, or
+`retired` strategy the same way. Do not ask for another plan confirmation.
+Never treat a build or verification step as an immediate test run.

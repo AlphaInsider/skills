@@ -14,9 +14,9 @@ VERSION_REFERENCE = (
 )
 REMOTE_VERSION_URL = (
     "https://raw.githubusercontent.com/AlphaInsider/skills/master/"
-    "skills/strategy-creator/references/versioning.md"
+    "skills/alphainsider-strategy-creator/references/versioning.md"
 )
-UPDATE_COMMAND = "npx skills@latest update alphainsider strategy-creator"
+UPDATE_COMMAND = "npx skills@latest update alphainsider-api alphainsider-strategy-creator"
 TIMEOUT_SECONDS = 3
 MAX_RESPONSE_BYTES = 64 * 1024
 SEMVER_PATTERN = re.compile(

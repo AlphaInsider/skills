@@ -1,5 +1,5 @@
 ---
-current_version: 1.8.0
+current_version: 2.0.0
 ---
 
 # Strategy Creator Versioning
@@ -29,7 +29,7 @@ values with no prerelease or build suffixes.
   documented release on the same version.
 
 The canonical source is
-`https://github.com/AlphaInsider/skills/tree/master/skills/strategy-creator`.
+`https://github.com/AlphaInsider/skills/tree/master/skills/alphainsider-strategy-creator`.
 Run `scripts/check_for_update.py` once at the start of every invocation. It
 compares this installed version with the canonical repository and reports only
 a newer valid version. The notice is advisory: never run its update command or
@@ -39,6 +39,7 @@ check returns no output, continue silently.
 ## Version logs
 
 - [Version 1](versions/v1.md)
+- [Version 2](versions/v2.md)
 
 ## Project recognition
 
@@ -59,7 +60,7 @@ check returns no output, continue silently.
   remote version. If the project is newer, stop and show:
 
   ```bash
-  npx skills@latest update alphainsider strategy-creator
+  npx skills@latest update alphainsider-api alphainsider-strategy-creator
   ```
 
   Tell the user to invoke Strategy Creator again after updating.

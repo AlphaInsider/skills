@@ -10,7 +10,55 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = ROOT / "skills"
-EXPECTED_SKILLS = {"alphainsider", "strategy-creator"}
+EXPECTED_SKILLS = {
+    "alphainsider",
+    "alphainsider-api",
+    "alphainsider-strategy-creator",
+}
+WRAPPER_NAME = "alphainsider"
+EXPECTED_WRAPPER_REFERENCES = {
+    "catalog.md",
+    "versioning.md",
+}
+EXPECTED_WRAPPER_SCRIPTS = {
+    "check_for_update.py",
+}
+REQUIRED_WRAPPER_TRIGGERS = {
+    "/alphainsider",
+    "use the alphainsider skill",
+    "route this with alphainsider",
+    "which AlphaInsider skill",
+}
+REQUIRED_WRAPPER_GUIDANCE = {
+    "scripts/check_for_update.py",
+    "never run or offer its update command",
+    "references/catalog.md",
+    "always ask",
+    "npx skills list",
+    "npx skills@latest use",
+    "Never pass `--agent`",
+    "only when the user asks",
+    "recommend global",
+    "--skill <name> -g -y",
+    "Do not require any specialist",
+}
+REQUIRED_WRAPPER_VERSION_GUIDANCE = {
+    "`MAJOR.MINOR.PATCH`",
+    "Do not keep version logs",
+    "npx skills@latest update alphainsider",
+    "never run its update command",
+}
+REQUIRED_WRAPPER_UPDATE_CHECKER_SOURCE = {
+    "https://raw.githubusercontent.com/AlphaInsider/skills/master/",
+    "skills/alphainsider/references/versioning.md",
+    'UPDATE_COMMAND = "npx skills@latest update alphainsider"',
+    "TIMEOUT_SECONDS = 3",
+    "MAX_RESPONSE_BYTES = 64 * 1024",
+    "response.geturl() != REMOTE_VERSION_URL",
+}
+CATALOG_HEADING_PATTERN = re.compile(
+    r"^## ([a-z0-9]+(?:-[a-z0-9]+)*)$", re.MULTILINE
+)
 EXPECTED_ALPHA_SCRIPTS = {
     "alphainsider_request.py",
     "alphainsider_stream.py",
@@ -171,13 +219,29 @@ REQUIRED_STRATEGY_RELEASES = {
     "1.6.0",
     "1.7.0",
     "1.8.0",
+    "2.0.0",
 }
 STRATEGY_SKILL_MAX_WORDS = 950
 REQUIRED_PROGRESSIVE_DISCLOSURE_GUIDANCE = {
     "Do not preload every reference",
     "Read each file in full only when its phase or action begins",
 }
-EXPECTED_STRATEGY_SCRIPTS = {"check_for_update.py", "set_env_value.py"}
+REQUIRED_INDEPENDENCE_GUIDANCE = {
+    "Require this skill's three scripts",
+    "Do not require the `alphainsider-api` skill to continue",
+    "If `alphainsider-api` is installed, read it only for needed API behavior",
+    "Never copy this skill's setup wrapper",
+}
+REMOVED_SIBLING_DEPENDENCY_GUIDANCE = {
+    "Require this skill's two scripts and the sibling",
+    "use the sibling request helper",
+    "read the sibling `scripts/alphainsider_request.py`",
+}
+EXPECTED_STRATEGY_SCRIPTS = {
+    "alphainsider_setup_request.py",
+    "check_for_update.py",
+    "set_env_value.py",
+}
 EXPECTED_PLAN_STATES = {"draft", "confirmed", "implemented", "retired"}
 STRICT_SEMVER_PATTERN = re.compile(
     r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$"
@@ -327,8 +391,7 @@ REQUIRED_REPLACEMENT_GUIDANCE = {
 }
 REQUIRED_CREDENTIAL_GUIDANCE = {
     "`scripts/set_env_value.py`",
-    "`scripts/alphainsider_request.py`",
-    "`scripts/alphainsider_stream.py`",
+    "`scripts/alphainsider_setup_request.py`",
     "Recommend that the user add the values to `.env` themselves",
     "they may paste the values in chat",
     "pasting credentials is less secure",
@@ -342,7 +405,8 @@ REQUIRED_CREDENTIAL_GUIDANCE = {
     "Never show this command to the user",
     "Do not open `.env` before or after the update",
     "approval to update only those names",
-    "use the sibling request helper",
+    "use the setup request wrapper",
+    "--print-config ALPHAINSIDER_STRATEGY_ID",
     "--remove ALPHAINSIDER_STRATEGY_ID",
     "agent-only helper",
     "Never import the helper",
@@ -474,6 +538,7 @@ REQUIRED_SINGLE_CONFIRMATION_GUIDANCE = {
     "must not prompt for confirmation before submitting planned paper orders",
     "Running either command is the user's execution action",
     "Never manually run a one-cycle command, start a persistent process, or trigger a scheduled task during build or verification",
+    "An explicit later chat request may run",
 }
 REQUIRED_LOCAL_ONLY_TARGET_GUIDANCE = {
     "after strategy, backtesting, implementation-contract, and operation-and-scheduling planning as the final AlphaInsider forward-test setup phase before confirmation",
@@ -496,10 +561,12 @@ REQUIRED_OPERATION_GUIDANCE = {
     "a `single run` executes one decision cycle",
     "a `persistent process` stays visible or managed and performs cycles itself",
     "a `recurring schedule` invokes the finite one-cycle command at each planned interval",
-    "Always offer `foreground`",
+    "Always present `foreground`",
     "Linux systemd and macOS launchd may run a persistent process or recurring finite cycles",
     "Windows Task Scheduler supports only recurring finite cycles",
-    "Recommend a compatible native user-system runner before an agent scheduled task",
+    "Recommend a compatible `background process` runner before an `agent scheduler`",
+    "Never omit a family",
+    "Inspect those tools",
     "worst-case cycle duration is shorter than the interval",
     "require the user's acceptance",
     "Recurring one-cycle execution cannot overlap",
@@ -515,20 +582,28 @@ REQUIRED_OPERATION_GUIDANCE = {
     "`StartCalendarInterval`",
     "`MultipleInstancesPolicy`",
     "Do not require a named agent product, proprietary task schema, or vendor-specific conversation type",
-    "independent recurring scheduled task whose saved instruction and lifecycle do not depend on the planning conversation",
-    "confirmed persistent project rather than an ephemeral or isolated copy",
+    "does not mean skip this agent's own scheduler or automation tools",
+    "Prefer the confirmed persistent project rather than an ephemeral or isolated copy",
     "already available durable runtime",
     "Do not provision cloud infrastructure",
+    "recorded limitations, not reasons to hide the family",
+    "create the task even when project access, runtime, or durability is missing",
     "run the exact confirmed one-cycle invocation once",
     "Never manually trigger a run during creation or validation",
     "recommend active",
+    "Ask Initial activation and autostart",
     "create no native definition or agent task",
     "not an immediate test run",
+    "explicit later chat request",
 }
 REMOVED_CURRENT_OPERATION_GUIDANCE = {
     "Offer tmux only when it is installed",
     "a one-cycle command always remains foreground-only",
     "tmux is manual-only",
+    "offer only usable runners",
+    "Offer `agent scheduled task` only when",
+    "native user-system",
+    "independent recurring scheduled task whose saved instruction and lifecycle do not depend on the planning conversation",
 }
 FORBIDDEN_AGENT_SCHEDULER_VENDOR_TERMS = {
     "ChatGPT",
@@ -555,7 +630,7 @@ REQUIRED_ALPHA_STREAM_GUIDANCE = {
     "authentication failures remain terminal",
 }
 REQUIRED_ALPHA_DOC_AUDIT_GUIDANCE = {
-    "Before finalizing any change under `skills/alphainsider/`",
+    "Before finalizing any change under `skills/alphainsider-api/`",
     "https://api.alphainsider.com/llms.txt",
     "https://api.alphainsider.com/openapi.yaml",
     "https://api.alphainsider.com/asyncapi.yaml",
@@ -598,7 +673,7 @@ REQUIRED_VERSION_GUIDANCE = {
     "Treat that exact legacy shape as `0.0.0`",
     "Compare the project with the installed version",
     "never a remote version",
-    "npx skills@latest update alphainsider strategy-creator",
+    "npx skills@latest update alphainsider-api alphainsider-strategy-creator",
     "one `vN.md` file per major version",
     "Select every documented release greater than",
     "less than or equal to the installed version",
@@ -624,13 +699,13 @@ REQUIRED_STRATEGY_VERSION_LAYOUT_GUIDANCE = {
 }
 REQUIRED_UPDATE_CHECKER_SOURCE = {
     "https://raw.githubusercontent.com/AlphaInsider/skills/master/",
-    "skills/strategy-creator/references/versioning.md",
-    'UPDATE_COMMAND = "npx skills@latest update alphainsider strategy-creator"',
+    "skills/alphainsider-strategy-creator/references/versioning.md",
+    'UPDATE_COMMAND = "npx skills@latest update alphainsider-api alphainsider-strategy-creator"',
     "TIMEOUT_SECONDS = 3",
     "MAX_RESPONSE_BYTES = 64 * 1024",
     "response.geturl() != REMOTE_VERSION_URL",
 }
-README_MAX_WORDS = 450
+README_MAX_WORDS = 550
 REQUIRED_README_SECTIONS = {
     "# AlphaInsider Skills",
     "## Overview",
@@ -641,8 +716,12 @@ REQUIRED_README_SECTIONS = {
 }
 REQUIRED_README_OVERVIEW_GUIDANCE = {
     "`alphainsider`",
-    "`strategy-creator`",
+    "`alphainsider-api`",
+    "`alphainsider-strategy-creator`",
+    "/alphainsider",
+    "use the alphainsider skill",
     "npx skills@latest add",
+    "npx skills@latest update alphainsider",
     "`docs/plan.md`",
     "paper-trading",
     "Credentials remain",
@@ -655,7 +734,7 @@ REQUIRED_README_OVERVIEW_GUIDANCE = {
     "prefer it for supported current market data",
     "Backtests require credible external history",
     "`contract_version`",
-    "npx skills@latest update alphainsider strategy-creator",
+    "npx skills@latest update alphainsider-api alphainsider-strategy-creator",
     "never installed automatically",
     "verifies its required API-key permissions",
     "**AI Agent** preset",
@@ -666,7 +745,7 @@ REQUIRED_README_OVERVIEW_GUIDANCE = {
     "Operation and scheduling",
     "user-level systemd or launchd",
     "Windows Task Scheduler",
-    "local or remote agent scheduler",
+    "or an agent scheduler",
     "default active",
     "retain and detach",
     "retired audit plan",
@@ -703,6 +782,11 @@ def semver_tuple(value: str) -> tuple[int, int, int] | None:
     if match is None:
         return None
     return tuple(int(part) for part in match.groups())
+
+
+def catalog_specialists(text: str) -> list[str]:
+    """Return routable specialist names from catalog headings."""
+    return CATALOG_HEADING_PATTERN.findall(text)
 
 
 def markdown_section_lines(text: str, heading: str) -> list[str] | None:
@@ -835,7 +919,10 @@ def validate() -> list[str]:
 
     all_skill_files = list(ROOT.rglob("SKILL.md"))
     if len(all_skill_files) != len(EXPECTED_SKILLS):
-        errors.append(f"expected exactly two SKILL.md files, found {len(all_skill_files)}")
+        errors.append(
+            f"expected exactly {len(EXPECTED_SKILLS)} SKILL.md files, "
+            f"found {len(all_skill_files)}"
+        )
 
     for name in sorted(EXPECTED_SKILLS):
         skill_dir = SKILLS_DIR / name
@@ -855,7 +942,140 @@ def validate() -> list[str]:
         if len(fields.get("description", "")) < 40:
             errors.append(f"{name}: description is too short")
 
-    strategy = SKILLS_DIR / "strategy-creator"
+    wrapper = SKILLS_DIR / WRAPPER_NAME
+    wrapper_skill = wrapper / "SKILL.md"
+    wrapper_references = wrapper / "references"
+    wrapper_scripts = wrapper / "scripts"
+    if wrapper_skill.is_file():
+        wrapper_text = wrapper_skill.read_text(encoding="utf-8")
+        wrapper_fields = frontmatter(wrapper_skill)
+        missing_wrapper_triggers = {
+            trigger
+            for trigger in REQUIRED_WRAPPER_TRIGGERS
+            if trigger not in wrapper_fields.get("description", "")
+        }
+        if missing_wrapper_triggers:
+            errors.append(
+                "alphainsider description is missing explicit invoke triggers "
+                f"{sorted(missing_wrapper_triggers)}"
+            )
+        missing_wrapper_guidance = {
+            guidance
+            for guidance in REQUIRED_WRAPPER_GUIDANCE
+            if guidance not in wrapper_text
+        }
+        if missing_wrapper_guidance:
+            errors.append(
+                "alphainsider is missing facade guidance "
+                f"{sorted(missing_wrapper_guidance)}"
+            )
+
+    actual_wrapper_refs = {
+        path.name
+        for path in wrapper_references.iterdir()
+        if path.is_file()
+    } if wrapper_references.is_dir() else set()
+    if actual_wrapper_refs != EXPECTED_WRAPPER_REFERENCES:
+        errors.append(
+            "alphainsider references must be exactly "
+            f"{sorted(EXPECTED_WRAPPER_REFERENCES)}"
+        )
+    if wrapper_references.is_dir():
+        extra_wrapper_dirs = {
+            path.name for path in wrapper_references.iterdir() if path.is_dir()
+        }
+        if extra_wrapper_dirs:
+            errors.append(
+                "alphainsider references must not contain nested directories "
+                f"{sorted(extra_wrapper_dirs)}"
+            )
+
+    actual_wrapper_scripts = {
+        path.relative_to(wrapper_scripts).as_posix()
+        for path in wrapper_scripts.rglob("*")
+        if path.is_file() and "__pycache__" not in path.parts
+    } if wrapper_scripts.is_dir() else set()
+    if actual_wrapper_scripts != EXPECTED_WRAPPER_SCRIPTS:
+        errors.append(
+            "alphainsider scripts must be exactly "
+            f"{sorted(EXPECTED_WRAPPER_SCRIPTS)}"
+        )
+
+    catalog_path = wrapper_references / "catalog.md"
+    catalog_names: list[str] = []
+    if catalog_path.is_file():
+        catalog_text = catalog_path.read_text(encoding="utf-8")
+        catalog_names = catalog_specialists(catalog_text)
+        catalog_set = set(catalog_names)
+        if WRAPPER_NAME in catalog_set:
+            errors.append("alphainsider catalog must not list itself")
+        if len(catalog_names) != len(catalog_set):
+            errors.append("alphainsider catalog headings must be unique")
+        if catalog_set | {WRAPPER_NAME} != EXPECTED_SKILLS:
+            errors.append(
+                "alphainsider catalog must list every specialist skill exactly "
+                f"once: expected {sorted(EXPECTED_SKILLS - {WRAPPER_NAME})}, "
+                f"found {sorted(catalog_set)}"
+            )
+        for name in catalog_names:
+            if not (SKILLS_DIR / name / "SKILL.md").is_file():
+                errors.append(
+                    f"alphainsider catalog lists {name} without skills/{name}/SKILL.md"
+                )
+            if f"--skill {name}" not in catalog_text:
+                errors.append(
+                    f"alphainsider catalog must include the {name} install command"
+                )
+        if catalog_names != sorted(catalog_names):
+            errors.append(
+                "alphainsider catalog headings must be in ascending name order"
+            )
+
+    version_path = wrapper_references / "versioning.md"
+    if version_path.is_file():
+        try:
+            wrapper_version_fields = frontmatter(version_path)
+        except ValueError as exc:
+            errors.append(str(exc))
+        else:
+            if set(wrapper_version_fields) != {"current_version"}:
+                errors.append(
+                    "alphainsider version reference must declare only current_version"
+                )
+            wrapper_version = wrapper_version_fields.get("current_version")
+            if wrapper_version is None or STRICT_SEMVER_PATTERN.fullmatch(
+                wrapper_version
+            ) is None:
+                errors.append(
+                    "alphainsider version reference must use strict MAJOR.MINOR.PATCH"
+                )
+        wrapper_version_text = version_path.read_text(encoding="utf-8")
+        missing_wrapper_version_guidance = {
+            guidance
+            for guidance in REQUIRED_WRAPPER_VERSION_GUIDANCE
+            if guidance not in wrapper_version_text
+        }
+        if missing_wrapper_version_guidance:
+            errors.append(
+                "alphainsider version reference is missing guidance "
+                f"{sorted(missing_wrapper_version_guidance)}"
+            )
+
+    wrapper_checker = wrapper_scripts / "check_for_update.py"
+    if wrapper_checker.is_file():
+        wrapper_checker_source = wrapper_checker.read_text(encoding="utf-8")
+        missing_wrapper_checker_source = {
+            marker
+            for marker in REQUIRED_WRAPPER_UPDATE_CHECKER_SOURCE
+            if marker not in wrapper_checker_source
+        }
+        if missing_wrapper_checker_source:
+            errors.append(
+                "alphainsider update checker is missing required safeguards "
+                f"{sorted(missing_wrapper_checker_source)}"
+            )
+
+    strategy = SKILLS_DIR / "alphainsider-strategy-creator"
     strategy_references = strategy / "references"
     actual_strategy_refs = {
         path.name for path in strategy_references.iterdir() if path.is_file()
@@ -1125,6 +1345,26 @@ def validate() -> list[str]:
         errors.append(
             "strategy-creator contains obsolete operation guidance "
             f"{sorted(stale_operation_guidance)}"
+        )
+    missing_independence_guidance = {
+        guidance
+        for guidance in REQUIRED_INDEPENDENCE_GUIDANCE
+        if guidance not in current_contract_text
+    }
+    if missing_independence_guidance:
+        errors.append(
+            "strategy-creator is missing independence guidance "
+            f"{sorted(missing_independence_guidance)}"
+        )
+    stale_sibling_dependency = {
+        guidance
+        for guidance in REMOVED_SIBLING_DEPENDENCY_GUIDANCE
+        if guidance in current_contract_text
+    }
+    if stale_sibling_dependency:
+        errors.append(
+            "strategy-creator still requires the sibling API skill "
+            f"{sorted(stale_sibling_dependency)}"
         )
     vendor_specific_agent_guidance = {
         term
@@ -1406,6 +1646,50 @@ def validate() -> list[str]:
                 "strategy environment helper must reject imports before defining functions"
             )
 
+    setup_wrapper = strategy / "scripts" / "alphainsider_setup_request.py"
+    if setup_wrapper.is_file():
+        wrapper_source = setup_wrapper.read_text(encoding="utf-8")
+        required_wrapper_source = {
+            'if __name__ != "__main__":',
+            "alphainsider_setup_request.py is CLI-only",
+            "--print-config",
+            'ALPHAINSIDER_STRATEGY_ID"',
+            "_PRINTABLE_CONFIG = \"ALPHAINSIDER_STRATEGY_ID\"",
+            "headers[\"Authorization\"] = api_key",
+            "def _print_config(",
+            "def _send_request(",
+        }
+        missing_wrapper_source = {
+            marker for marker in required_wrapper_source if marker not in wrapper_source
+        }
+        if missing_wrapper_source:
+            errors.append(
+                "strategy setup wrapper is missing CLI-only safeguards "
+                f"{sorted(missing_wrapper_source)}"
+            )
+        if "STRATEGY_QUERY_PATHS" in wrapper_source or "STRATEGY_BODY_PATHS" in wrapper_source:
+            errors.append(
+                "strategy setup wrapper must not inject default strategy IDs"
+            )
+        public_wrapper_functions = re.findall(
+            r"^def ([A-Za-z][A-Za-z0-9_]*)\(", wrapper_source, re.MULTILINE
+        )
+        if public_wrapper_functions:
+            errors.append(
+                "strategy setup wrapper exposes public Python functions "
+                f"{sorted(public_wrapper_functions)}"
+            )
+        import_guard_position = wrapper_source.find('if __name__ != "__main__":')
+        first_function_position = wrapper_source.find("\ndef ")
+        if (
+            import_guard_position == -1
+            or first_function_position == -1
+            or import_guard_position > first_function_position
+        ):
+            errors.append(
+                "strategy setup wrapper must reject imports before defining functions"
+            )
+
     readme_text = (ROOT / "README.md").read_text(encoding="utf-8")
     normalized_readme = " ".join(readme_text.split())
     missing_readme_sections = REQUIRED_README_SECTIONS - set(
@@ -1433,8 +1717,11 @@ def validate() -> list[str]:
             "README is missing high-level guidance "
             f"{sorted(missing_readme_overview_guidance)}"
         )
+    readme_install_skills = re.findall(r"--skill ([a-z0-9-]+)", readme_text)
+    if not readme_install_skills or readme_install_skills[0] != WRAPPER_NAME:
+        errors.append("README must lead with the alphainsider install")
 
-    alphainsider = SKILLS_DIR / "alphainsider"
+    alphainsider = SKILLS_DIR / "alphainsider-api"
     alphainsider_text = (alphainsider / "SKILL.md").read_text(encoding="utf-8")
     missing_alpha_credential_guidance = {
         guidance
@@ -1611,7 +1898,7 @@ def main() -> int:
         for error in errors:
             print(f"error: {error}", file=sys.stderr)
         return 1
-    print("validated skills: alphainsider, strategy-creator")
+    print("validated skills: " + ", ".join(sorted(EXPECTED_SKILLS)))
     return 0
 
 

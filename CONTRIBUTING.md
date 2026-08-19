@@ -8,9 +8,12 @@ vendor-specific metadata or behavior.
 
 When adding a public skill, update `EXPECTED_SKILLS` in
 `scripts/validate_catalog.py`, add installation and behavior coverage, and
-document its separate and combined installation forms in `README.md`. Do not
-copy source-repository caches, local plans, generated strategies, virtual
-environments, IDE files, or credentials into this catalog.
+document its separate and combined installation forms in `README.md`. A new
+public specialist must also be added to
+`skills/alphainsider/references/catalog.md` and that wrapper's
+`current_version` must be bumped. Do not copy source-repository caches, local
+plans, generated strategies, virtual environments, IDE files, or credentials
+into this catalog.
 
 Before opening a change, run:
 
