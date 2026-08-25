@@ -82,7 +82,7 @@ EXPECTED_ALPHA_REFERENCES = {
 }
 EXPECTED_ALPHA_REST_SECTIONS = {
     "authentication.md": (
-        ("verifyToken", "POST", "/verifyToken"),
+        ("verifyToken", "GET", "/verifyToken"),
     ),
     "users.md": (
         ("getUsers", "GET", "/getUsers"),
@@ -222,6 +222,7 @@ REQUIRED_STRATEGY_RELEASES = {
     "1.8.0",
     "2.0.0",
     "2.1.0",
+    "2.1.1",
 }
 STRATEGY_SKILL_MAX_WORDS = 950
 REQUIRED_PROGRESSIVE_DISCLOSURE_GUIDANCE = {

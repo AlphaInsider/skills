@@ -69,7 +69,7 @@ Timeline permissions allow reading, creating, previewing, and deleting posts;
 read-only and never authorize starting, changing, or cancelling a subscription.
 
 After the key is available, use the setup request wrapper to call
-`POST /verifyToken`. Read only the returned `user_id` and `scope`; never expose
+`GET /verifyToken`. Read only the returned `user_id` and `scope`; never expose
 the token. Compare `scope` with the complete bundle above. If any permission is
 missing, list only the missing permission names, instruct the user to create or
 replace the key with the **AI Agent** preset, and pause AlphaInsider target
