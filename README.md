@@ -45,11 +45,13 @@ Strategy Creator does not require `alphainsider-api`.
 
 ## How it works
 
-Use `alphainsider-strategy-creator` to maintain `docs/plan.md`. It plans Objective, Market
-and instruments, Strategy behavior, Data and resources, Execution and risk,
-Backtesting, and Implementation before Operation and scheduling and final
-AlphaInsider target setup. Confirmation builds offline tests and is the sole
-approval for every exact planned implementation or update action.
+Use `alphainsider-strategy-creator` to maintain `docs/plan.md`. A new strategy is
+created as a dedicated child folder of the session working directory. It plans
+Objective, Market and instruments, Strategy behavior, Data and resources,
+Execution and risk, Backtesting, and Implementation before Operation and
+scheduling and final AlphaInsider target setup. Confirmation builds offline
+tests and is the sole approval for every exact planned implementation or
+update action.
 
 Strategies use AlphaInsider as their only paper-trading order
 destination and prefer it for supported current market data. Backtests require
