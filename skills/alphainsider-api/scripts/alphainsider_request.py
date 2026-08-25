@@ -93,7 +93,6 @@ BOT_BODY_PATHS = {
 }
 
 BODY_TOKEN_PATHS = {
-    "/verifyToken": "token",
     "/newOrderWebhook": "api_token",
 }
 
