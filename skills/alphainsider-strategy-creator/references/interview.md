@@ -69,8 +69,9 @@ pacing.
 After preflight recognizes and checks a project under `versioning.md`, ask
 exactly one existing-project question through the interactive question prompt:
 "Would you like to update the existing plan, replace the trading strategy with
-a new one, or retire and clean it up?" Present those as three short choices and
-recommend updating because it preserves prior decisions.
+a new one, or retire and clean it up?" Present those as three short choices.
+Recommend the matched intent when the prompt clearly asks to update, replace,
+or retire; otherwise recommend updating because it preserves prior decisions.
 
 - For **update**, preserve unaffected decisions and interview only the choices
   the requested change affects. Return a `confirmed` or `implemented` plan to
@@ -116,7 +117,8 @@ up or continue that cleanup.
 ## Design tree
 
 1. **Objective** — Ask "What do you want this strategy to do?" and record the
-   answer as the strategy goal.
+   answer as the strategy goal. For a new project root, follow
+   `project-root.md` after this answer before later rounds.
 2. **Market and instruments** — Choose the strict `stock` or `cryptocurrency`
    asset class and an instrument-selection mode: `fixed`, `dynamic`, or
    `constrained dynamic`. For fixed selection, record explicitly named

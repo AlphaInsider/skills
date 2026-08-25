@@ -203,6 +203,7 @@ EXPECTED_STRATEGY_REFERENCES = {
     "interview.md",
     "operation-and-scheduling.md",
     "plan-template.md",
+    "project-root.md",
     "versioning.md",
 }
 REQUIRED_STRATEGY_RELEASES = {
@@ -220,6 +221,7 @@ REQUIRED_STRATEGY_RELEASES = {
     "1.7.0",
     "1.8.0",
     "2.0.0",
+    "2.1.0",
 }
 STRATEGY_SKILL_MAX_WORDS = 950
 REQUIRED_PROGRESSIVE_DISCLOSURE_GUIDANCE = {
@@ -307,6 +309,21 @@ REQUIRED_OPERATION_PLAN_FIELDS = {
     "- Logs, run history, notifications, rotation, and retention:",
     "- Installation state and next scheduled run:",
     "- Operation cleanup state and removal verification:",
+}
+REQUIRED_PROJECT_ROOT_GUIDANCE = {
+    "Resolve the project root from the session working directory",
+    "Do not ask where to store the project",
+    "dedicated child folder",
+    "nearest recognized strategy ancestor",
+    "Never create a nested strategy",
+    "immediate children",
+    "slug from the Objective",
+    "Rename only if the user asks",
+    "Recommend the matched intent",
+}
+REMOVED_PROJECT_ROOT_GUIDANCE = {
+    "Ask for the project root",
+    "recommend the invocation directory",
 }
 REQUIRED_GRILL_PROTOCOL_GUIDANCE = {
     "Ask every currently unblocked user decision in one turn",
@@ -1510,6 +1527,27 @@ def validate() -> list[str]:
         errors.append(
             "strategy-creator is missing grill-interview protocol guidance "
             f"{sorted(missing_grill_protocol_guidance)}"
+        )
+
+    missing_project_root_guidance = {
+        guidance
+        for guidance in REQUIRED_PROJECT_ROOT_GUIDANCE
+        if guidance not in manual_text
+    }
+    if missing_project_root_guidance:
+        errors.append(
+            "strategy-creator is missing project-root placement guidance "
+            f"{sorted(missing_project_root_guidance)}"
+        )
+    stale_project_root_guidance = {
+        guidance
+        for guidance in REMOVED_PROJECT_ROOT_GUIDANCE
+        if guidance in manual_text
+    }
+    if stale_project_root_guidance:
+        errors.append(
+            "strategy-creator still asks for a project location "
+            f"{sorted(stale_project_root_guidance)}"
         )
 
     missing_operation_guidance = {

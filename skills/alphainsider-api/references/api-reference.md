@@ -15,7 +15,7 @@ Protected REST endpoints use this wire format:
 Authorization: <api-token>
 ```
 
-Do not add a `Bearer` prefix. `verifyToken` uses a body field named `token`; `newOrderWebhook` uses a body field named `api_token`.
+Do not add a `Bearer` prefix. `verifyToken` uses the `Authorization` header. `newOrderWebhook` uses a body field named `api_token`.
 
 ## Response Shape
 

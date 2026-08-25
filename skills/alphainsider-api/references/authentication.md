@@ -8,13 +8,13 @@ Token verification for AlphaInsider API credentials.
 
 Verify that an API token is valid.
 
-Note: This endpoint sends the token in the JSON body as `token`; do not send an `Authorization` header.
+Provide the API token as the exact `Authorization` header value. Do not add a `Bearer` prefix.
 
 Inputs:
 
 | Location | Name | Required | Type / values | Description |
 | --- | --- | --- | --- | --- |
-| body | `token` | Yes | string (JWT) | AlphaInsider API token to verify. |
+| header | `Authorization` | Yes | string (JWT) | AlphaInsider API token to verify, sent exactly as the header value. |
 
 Outputs:
 
@@ -33,7 +33,5 @@ Example request:
 
 ```http
 POST /verifyToken
-Content-Type: application/json
-
-{"token":"<API_TOKEN>"}
+Authorization: <API_TOKEN>
 ```

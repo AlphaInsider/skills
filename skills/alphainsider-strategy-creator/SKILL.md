@@ -34,10 +34,8 @@ read-only.
 
 2. Run `scripts/check_for_update.py` once per invocation. Show its notice once,
    never run or offer its update command, and continue on no output or failure.
-3. Ask for the project root and recommend the invocation directory. Accept a
-   normal writable user-controlled location, including beneath the user's
-   home. Reject an installed skill directory, unsafe system location, or
-   unusable path without elaborate denylist checks.
+3. Resolve the project root from the session working directory per
+   `references/project-root.md`. Do not ask where to store the project.
 4. Read `references/versioning.md` to recognize an existing project without
    opening `.env`. Stop on malformed or newer versions. For a recognized
    project, follow `interview.md`.
@@ -52,6 +50,8 @@ read-only.
 Do not preload every reference. Read each file in full only when its phase or
 action begins:
 
+- [`references/project-root.md`](references/project-root.md) — session-directory
+  placement; load at Start when resolving the project root.
 - [`references/versioning.md`](references/versioning.md) — recognition and
   upgrades; load only selected version-log sections.
 - [`references/plan-template.md`](references/plan-template.md) — active plans.
