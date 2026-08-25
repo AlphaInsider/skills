@@ -4,7 +4,7 @@ REST base URL: `https://alphainsider.com/api`.
 
 Token verification for AlphaInsider API credentials.
 
-## verifyToken - POST `/verifyToken`
+## verifyToken - GET `/verifyToken`
 
 Verify that an API token is valid.
 
@@ -32,6 +32,6 @@ Outputs:
 Example request:
 
 ```http
-POST /verifyToken
+GET /verifyToken
 Authorization: <API_TOKEN>
 ```
