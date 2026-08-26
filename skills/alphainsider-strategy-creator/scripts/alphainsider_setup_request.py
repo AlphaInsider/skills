@@ -5,8 +5,7 @@ from __future__ import annotations
 
 if __name__ != "__main__":
     raise RuntimeError(
-        "alphainsider_setup_request.py is CLI-only; run it from the strategy "
-        "project root"
+        "alphainsider_setup_request.py is CLI-only; do not import it"
     )
 
 import argparse
@@ -16,6 +15,7 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
+from pathlib import Path
 from typing import Any
 
 
@@ -29,6 +29,20 @@ class _SetupRequestError(ValueError):
     """The setup request cannot be built or sent safely."""
 
 
+def _validate_project_root(project_root: Path) -> Path:
+    resolved_root = project_root.expanduser().resolve()
+    if not resolved_root.is_dir():
+        raise _SetupRequestError("project root must be an existing directory")
+    skills_root = Path(__file__).resolve().parents[2]
+    if resolved_root == skills_root or skills_root in resolved_root.parents:
+        raise _SetupRequestError(
+            "refusing to use an installed skill directory"
+        )
+    if not (resolved_root / "docs" / "plan.md").is_file():
+        raise _SetupRequestError("project root must contain docs/plan.md")
+    return resolved_root
+
+
 class _SafeArgumentParser(argparse.ArgumentParser):
     def error(self, _message: str) -> None:
         self.exit(
@@ -38,7 +52,7 @@ class _SafeArgumentParser(argparse.ArgumentParser):
         )
 
 
-def _configured_value(name: str, cwd: str) -> str | None:
+def _configured_value(name: str, project_root: str) -> str | None:
     if name not in _READABLE_NAMES:
         raise _SetupRequestError(f"unsupported AlphaInsider setting: {name}")
 
@@ -46,7 +60,7 @@ def _configured_value(name: str, cwd: str) -> str | None:
     if environment_value:
         return environment_value
 
-    path = os.path.join(cwd, ".env")
+    path = os.path.join(project_root, ".env")
     if not os.path.isfile(path):
         return None
 
@@ -265,14 +279,14 @@ def _print_dry_run(
     )
 
 
-def _print_config(name: str) -> int:
+def _print_config(name: str, project_root: str) -> int:
     if name != _PRINTABLE_CONFIG:
         print(
             "error: --print-config accepts only ALPHAINSIDER_STRATEGY_ID",
             file=sys.stderr,
         )
         return 2
-    value = _configured_value(name, os.getcwd())
+    value = _configured_value(name, project_root)
     if not value:
         print(f"error: {name} is not configured", file=sys.stderr)
         return 1
@@ -286,6 +300,11 @@ def _main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("method", nargs="?", help="HTTP method, such as GET or POST.")
     parser.add_argument("path", nargs="?", help="API path, such as /verifyToken.")
+    parser.add_argument(
+        "--project-root",
+        metavar="PATH",
+        help="Selected strategy project root. Defaults to the current directory.",
+    )
     parser.add_argument(
         "--print-config",
         metavar="NAME",
@@ -309,11 +328,18 @@ def _main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
+    chosen_root = Path(args.project_root) if args.project_root else Path.cwd()
+    try:
+        project_root = str(_validate_project_root(chosen_root))
+    except (_SetupRequestError, OSError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
     if args.print_config:
         if args.method is not None or args.path is not None or args.dry_run:
             parser.error("a config lookup does not accept METHOD PATH or --dry-run")
         try:
-            return _print_config(args.print_config)
+            return _print_config(args.print_config, project_root)
         except (_SetupRequestError, OSError, UnicodeError) as exc:
             print(f"error: {exc}", file=sys.stderr)
             return 1
@@ -327,7 +353,7 @@ def _main(argv: list[str] | None = None) -> int:
         print(f"invalid --json: {exc}", file=sys.stderr)
         return 2
 
-    api_key = _configured_value("ALPHAINSIDER_API_KEY", os.getcwd())
+    api_key = _configured_value("ALPHAINSIDER_API_KEY", project_root)
     try:
         prepared, prepared_body, secrets = _build_request(
             args.method,

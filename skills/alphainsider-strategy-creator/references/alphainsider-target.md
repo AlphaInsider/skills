@@ -101,6 +101,7 @@ Run this flow only after the API key passes the permission gate.
 
    ```bash
    python /absolute/path/to/alphainsider-strategy-creator/scripts/set_env_value.py \
+     --project-root /absolute/selected/project \
      ALPHAINSIDER_STRATEGY_ID VALUE
    ```
 

@@ -25,8 +25,9 @@ A new strategy is a dedicated child folder of that directory. Never write
 generated strategy files directly into the invocation directory.
 
 The selected project root may differ from the session working directory. Run
-project commands and helpers from the project root. Announce the exact
-project path once when the root is resolved.
+project commands from the project root. Announce the exact project path once
+when the root is resolved. Credential and setup helpers use `--project-root`
+as specified in `credentials.md`.
 
 ## Unusable location
 

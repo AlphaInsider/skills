@@ -1,6 +1,6 @@
 ---
 status: draft
-contract_version: 2.1.1
+contract_version: 2.2.0
 ---
 
 # Strategy Plan
