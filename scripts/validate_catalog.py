@@ -223,6 +223,7 @@ REQUIRED_STRATEGY_RELEASES = {
     "2.0.0",
     "2.1.0",
     "2.1.1",
+    "2.2.0",
 }
 STRATEGY_SKILL_MAX_WORDS = 950
 REQUIRED_PROGRESSIVE_DISCLOSURE_GUIDANCE = {
@@ -416,7 +417,9 @@ REQUIRED_CREDENTIAL_GUIDANCE = {
     "the value is visible to the agent",
     "tool metadata",
     "transient process listing",
-    "`set_env_value.py NAME VALUE`",
+    "set_env_value.py --project-root",
+    "Always pass `--project-root`",
+    "announced selected project root",
     "pass the complete value as exactly one argument",
     "structured argument-array",
     "quote the value as one literal argument",
@@ -450,6 +453,11 @@ REMOVED_LIVE_INPUT_CREDENTIAL_GUIDANCE = {
     "non-echoing prompt",
     "process-input channel",
     "readiness prompt",
+}
+REMOVED_CREDENTIAL_CWD_GUIDANCE = {
+    "From the project root, launch",
+    "from the project root and report",
+    "Run project commands and helpers from the project root",
 }
 REQUIRED_STRATEGY_API_PERMISSIONS = (
     "getUserInfo",
@@ -1485,6 +1493,16 @@ def validate() -> list[str]:
             "strategy-creator contains obsolete live-input credential guidance "
             f"{sorted(stale_live_input_guidance)}"
         )
+    stale_credential_cwd_guidance = {
+        guidance
+        for guidance in REMOVED_CREDENTIAL_CWD_GUIDANCE
+        if guidance in manual_text
+    }
+    if stale_credential_cwd_guidance:
+        errors.append(
+            "strategy-creator still launches .env helpers from session cwd "
+            f"{sorted(stale_credential_cwd_guidance)}"
+        )
 
     missing_provisioning_guidance = {
         guidance
@@ -1636,6 +1654,7 @@ def validate() -> list[str]:
         helper_source = env_helper.read_text(encoding="utf-8")
         required_helper_source = {
             '"--remove",',
+            '"--project-root",',
             'parser.add_argument("value", nargs="?"',
             'if __name__ != "__main__":',
             "set_env_value.py is CLI-only",
@@ -1647,6 +1666,9 @@ def validate() -> list[str]:
             "if args.value is None:",
             "_update_env(env_path, args.name, args.value)",
             'action = "Removed" if args.remove else "Updated"',
+            "docs/plan.md",
+            "Path.cwd()",
+            "if args.project_root else Path.cwd()",
         }
         missing_helper_source = {
             marker for marker in required_helper_source if marker not in helper_source
@@ -1692,11 +1714,14 @@ def validate() -> list[str]:
             'if __name__ != "__main__":',
             "alphainsider_setup_request.py is CLI-only",
             "--print-config",
+            '"--project-root",',
             'ALPHAINSIDER_STRATEGY_ID"',
             "_PRINTABLE_CONFIG = \"ALPHAINSIDER_STRATEGY_ID\"",
             "headers[\"Authorization\"] = api_key",
             "def _print_config(",
             "def _send_request(",
+            "docs/plan.md",
+            "if args.project_root else Path.cwd()",
         }
         missing_wrapper_source = {
             marker for marker in required_wrapper_source if marker not in wrapper_source
@@ -1709,6 +1734,10 @@ def validate() -> list[str]:
         if "STRATEGY_QUERY_PATHS" in wrapper_source or "STRATEGY_BODY_PATHS" in wrapper_source:
             errors.append(
                 "strategy setup wrapper must not inject default strategy IDs"
+            )
+        if "os.getcwd()" in wrapper_source:
+            errors.append(
+                "strategy setup wrapper must not read .env from os.getcwd()"
             )
         public_wrapper_functions = re.findall(
             r"^def ([A-Za-z][A-Za-z0-9_]*)\(", wrapper_source, re.MULTILINE

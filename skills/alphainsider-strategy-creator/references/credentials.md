@@ -17,10 +17,14 @@ For each missing value:
 4. Pasted values grant approval to update only those names. Never echo, quote,
    summarize, log, or record values in plans, `.env.example`, source, tests,
    or documentation. Use each value in only the exact helper invocation below.
-5. From the project root, launch this exact agent-only CLI, once per name:
+5. Always pass `--project-root` with the announced selected project root.
+   Do not use the session working directory unless it is that root. Do not
+   chdir to make this helper work. Launch `set_env_value.py --project-root`
+   with NAME VALUE as this exact agent-only CLI, once per name:
 
    ```bash
-   python /absolute/path/to/alphainsider-strategy-creator/scripts/set_env_value.py NAME VALUE
+   python /absolute/path/to/alphainsider-strategy-creator/scripts/set_env_value.py \
+     --project-root /absolute/selected/project NAME VALUE
    ```
 
    Replace `NAME` and `VALUE`; pass the complete value as exactly one argument.
@@ -39,18 +43,19 @@ For each missing value:
    workflow. Do not improvise another write path. Defer the affected setup only
    when the user declines or cannot complete that workflow.
 7. Rerun the non-ordering check. For AlphaInsider configuration, use
-   `scripts/alphainsider_setup_request.py` from the project root and report
-   only the result, never credentials. Public strategy IDs and other
-   non-secret values may be shown, including a value returned by
-   `--print-config ALPHAINSIDER_STRATEGY_ID`. Launch this exact agent-only
-   CLI and never import the setup wrapper or show it to the user:
+   `scripts/alphainsider_setup_request.py` with `--project-root` set to the
+   announced selected project root and report only the result, never
+   credentials. Public strategy IDs and other non-secret values may be shown,
+   including a value returned by `--print-config ALPHAINSIDER_STRATEGY_ID`.
+   Always pass `--project-root`. Launch this exact agent-only CLI and never
+   import the setup wrapper or show it to the user:
 
    ```bash
    python /absolute/path/to/alphainsider-strategy-creator/scripts/alphainsider_setup_request.py \
-     METHOD PATH
+     --project-root /absolute/selected/project METHOD PATH
 
    python /absolute/path/to/alphainsider-strategy-creator/scripts/alphainsider_setup_request.py \
-     --print-config ALPHAINSIDER_STRATEGY_ID
+     --project-root /absolute/selected/project --print-config ALPHAINSIDER_STRATEGY_ID
    ```
 
 A missing API key is a setup gap, not a strategy decision. A non-local-only
@@ -71,4 +76,5 @@ and identify chat entry and command transport as the less-secure agent-assisted
 fallback, but never show the helper command. Generated `AGENTS.md` files must
 point at the installed skill for the write path and never show the helper.
 `--remove NAME` receives no value and is also agent-only. Removing a saved
-strategy binding uses `--remove ALPHAINSIDER_STRATEGY_ID`.
+strategy binding uses `--remove ALPHAINSIDER_STRATEGY_ID` and must also
+pass `--project-root`.

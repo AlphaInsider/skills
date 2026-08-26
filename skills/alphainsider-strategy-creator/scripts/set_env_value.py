@@ -4,9 +4,7 @@
 from __future__ import annotations
 
 if __name__ != "__main__":
-    raise RuntimeError(
-        "set_env_value.py is CLI-only; run it from the strategy project root"
-    )
+    raise RuntimeError("set_env_value.py is CLI-only; do not import it")
 
 import argparse
 import json
@@ -49,11 +47,16 @@ def _validate_value(value: str) -> None:
         raise _EnvUpdateError("value must be a single line")
 
 
-def _validate_project_root(project_root: Path) -> None:
+def _validate_project_root(project_root: Path) -> Path:
+    resolved_root = project_root.expanduser().resolve()
+    if not resolved_root.is_dir():
+        raise _EnvUpdateError("project root must be an existing directory")
     skills_root = Path(__file__).resolve().parents[2]
-    resolved_root = project_root.resolve()
     if resolved_root == skills_root or skills_root in resolved_root.parents:
         raise _EnvUpdateError("refusing to write inside an installed skill directory")
+    if not (resolved_root / "docs" / "plan.md").is_file():
+        raise _EnvUpdateError("project root must contain docs/plan.md")
+    return resolved_root
 
 
 def _render_assignment(name: str, value: str) -> str:
@@ -155,22 +158,28 @@ def _main(argv: Sequence[str] | None = None) -> int:
         action="store_true",
         help="Remove the named variable without receiving a value.",
     )
+    parser.add_argument(
+        "--project-root",
+        metavar="PATH",
+        help="Selected strategy project root. Defaults to the current directory.",
+    )
     parser.add_argument("name", help="Environment variable name to create, update, or remove.")
     parser.add_argument("value", nargs="?", help="Value to create or update.")
     args = parser.parse_args(argv)
 
-    project_root = Path.cwd()
-    env_path = project_root / ".env"
+    if args.remove:
+        if args.value is not None:
+            parser.error("a removal does not accept a value")
+    elif args.value is None:
+        parser.error("an update requires a value")
+
+    chosen_root = Path(args.project_root) if args.project_root else Path.cwd()
     try:
-        _validate_project_root(project_root)
-        _validate_name(args.name)
+        project_root = _validate_project_root(chosen_root)
+        env_path = project_root / ".env"
         if args.remove:
-            if args.value is not None:
-                parser.error("a removal does not accept a value")
             _remove_env(env_path, args.name)
         else:
-            if args.value is None:
-                parser.error("an update requires a value")
             _update_env(env_path, args.name, args.value)
     except (_EnvUpdateError, OSError, UnicodeError) as exc:
         parser.exit(1, f"error: {exc}\n")
