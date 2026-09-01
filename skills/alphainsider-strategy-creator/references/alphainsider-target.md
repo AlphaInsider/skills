@@ -67,6 +67,8 @@ retain-or-delete decision.
 Timeline permissions allow reading, creating, previewing, and deleting posts;
 `like` and `unlike` are not required. The subscription permissions are
 read-only and never authorize starting, changing, or cancelling a subscription.
+Strategy Creator never requires or uses permissions for account-subscription
+changes, payments, withdrawals, bots, webhooks, or `updateStrategyPrice`.
 
 After the key is available, use the setup request wrapper to call
 `GET /verifyToken`. Read only the returned `user_id` and `scope`; never expose

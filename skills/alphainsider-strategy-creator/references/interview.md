@@ -42,8 +42,8 @@ pacing.
 - Record the user's answer, not the recommendation or conversation. Update the
   matching active plan after every round: `docs/plan.md` for a new or updated
   strategy, or `docs/replacement-plan.md` for a staged replacement. Surface
-  contradictions immediately. Preserve `contract_version` until the versioning
-  workflow authorizes advancing it.
+  contradictions immediately. Normalize plan frontmatter to only its lifecycle
+  `status` whenever writing the plan.
 - Use plain trading language for a user who understands profit, loss, fees,
   trades, and percentage limits. Avoid specialist terms when familiar words
   work. If a specialist term is necessary, explain it immediately; for
@@ -66,8 +66,8 @@ pacing.
 
 ## Existing project
 
-After preflight recognizes and checks a project under `versioning.md`, ask
-exactly one existing-project question through the interactive question prompt:
+After `project-root.md` recognizes and audits a project, ask exactly one
+existing-project question through the interactive question prompt:
 "Would you like to update the existing plan, replace the trading strategy with
 a new one, or retire and clean it up?" Present those as three short choices.
 Recommend the matched intent when the prompt clearly asks to update, replace,
@@ -75,17 +75,19 @@ or retire; otherwise recommend updating because it preserves prior decisions.
 
 - For **update**, preserve unaffected decisions and interview only the choices
   the requested change affects. Return a `confirmed` or `implemented` plan to
-  `draft` before recording the exact action inventory. For an older project,
-  complete the combined target audit and exact-path decisions in
-  `versioning.md`. Do not ask a behavior question for a documentation-only gap.
+  `draft` before recording the exact action inventory. Treat missing current
+  fields as unresolved and interview only those gaps. For a documentation-only
+  gap, derive its value from read-only plan, project, and live-state facts,
+  record no implementation or external action, and ask no behavior question.
+  After complete-plan confirmation, restore the prior lifecycle status once the
+  plan and current artifacts are consistent.
 - For **replace**, leave the current plan and implementation untouched. Create
-  or resume `docs/replacement-plan.md` on the installed version and run the
-  complete design tree for the new strategy. Do not upgrade the outgoing
-  strategy. Ask the outgoing remote-disposition decision when that frontier is
-  unblocked. Inventory every exact replacement action while the replacement is
-  draft; final confirmation sets them to `confirmed` and authorizes the exact
-  recorded deletion, promotion, cleanup, and implementation actions without
-  another approval.
+  or resume `docs/replacement-plan.md` from the current template and run the
+  complete design tree for the new strategy. Ask the outgoing
+  remote-disposition decision when that frontier is unblocked. Inventory every
+  exact replacement action while the replacement is draft; final confirmation
+  sets it to `confirmed` and authorizes the exact recorded deletion, promotion,
+  cleanup, and implementation actions without another approval.
 - For **retire**, leave the active plan and implementation unchanged while
   drafting. Follow `cleanup.md`. Retirement always preserves an auditable
   retired plan and asks whether the verified owned AlphaInsider target should
@@ -166,10 +168,12 @@ up or continue that cleanup.
    Use `getMaxOrderSize` as the fixed-order authority. Resolve
    position/exposure limits, stops or exit constraints, in-process retries,
    duplicate events, automatic pause or shutdown conditions, logging, and
-   recovery. For dynamic instruments, resolve validation freshness and whether
-   one invalid candidate causes the cycle to continue with valid candidates or
-   abort. Propose safe, simple defaults when the strategy does not require a
-   special choice.
+   recovery. For every WebSocket input, explicitly choose continuous reconnect
+   and re-subscribe or stop on a stream error; an unresolved choice keeps the
+   plan `draft`. For dynamic instruments, resolve validation freshness and
+   whether one invalid candidate causes the cycle to continue with valid
+   candidates or abort. Propose safe, simple defaults when the strategy does
+   not require a special choice.
 6. **Backtesting** — Determine whether every signal input and decision timestamp
    can be reconstructed without future information. For dynamic selection,
    require the historical candidate set and selection inputs as they existed at
@@ -284,9 +288,6 @@ presenting the plan:
   target readiness is `ready`. For a ready new target, the same confirmation
   is the sole authorization for `newStrategy` and persist its returned
   ID on this plan; do not request another creation confirmation.
-- For an upgrade, ensure the installed target contract and its applicable tests
-  conform before advancing `contract_version`; never advance to a remote
-  version that this installed skill does not contain.
 - State backtesting as unavailable, declined, or accepted with its exact scope.
 - Present the complete normalized plan, including every agent default and
   exact action, and ask once for final confirmation through the interactive

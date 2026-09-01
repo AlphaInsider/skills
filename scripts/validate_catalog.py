@@ -18,11 +18,8 @@ EXPECTED_SKILLS = {
 WRAPPER_NAME = "alphainsider"
 EXPECTED_WRAPPER_REFERENCES = {
     "catalog.md",
-    "versioning.md",
 }
-EXPECTED_WRAPPER_SCRIPTS = {
-    "check_for_update.py",
-}
+EXPECTED_WRAPPER_SCRIPTS: set[str] = set()
 REQUIRED_WRAPPER_TRIGGERS = {
     "/alphainsider",
     "use the alphainsider skill",
@@ -30,8 +27,6 @@ REQUIRED_WRAPPER_TRIGGERS = {
     "which AlphaInsider skill",
 }
 REQUIRED_WRAPPER_GUIDANCE = {
-    "scripts/check_for_update.py",
-    "never run or offer its update command",
     "references/catalog.md",
     "always ask",
     "npx skills list",
@@ -41,20 +36,6 @@ REQUIRED_WRAPPER_GUIDANCE = {
     "recommend global",
     "--skill <name> -g -y",
     "Do not require any specialist",
-}
-REQUIRED_WRAPPER_VERSION_GUIDANCE = {
-    "`MAJOR.MINOR.PATCH`",
-    "Do not keep version logs",
-    "npx skills@latest update alphainsider",
-    "never run its update command",
-}
-REQUIRED_WRAPPER_UPDATE_CHECKER_SOURCE = {
-    "https://raw.githubusercontent.com/AlphaInsider/skills/master/",
-    "skills/alphainsider/references/versioning.md",
-    'UPDATE_COMMAND = "npx skills@latest update alphainsider"',
-    "TIMEOUT_SECONDS = 3",
-    "MAX_RESPONSE_BYTES = 64 * 1024",
-    "response.geturl() != REMOTE_VERSION_URL",
 }
 CATALOG_HEADING_PATTERN = re.compile(
     r"^## ([a-z0-9]+(?:-[a-z0-9]+)*)$", re.MULTILINE
@@ -204,26 +185,6 @@ EXPECTED_STRATEGY_REFERENCES = {
     "operation-and-scheduling.md",
     "plan-template.md",
     "project-root.md",
-    "versioning.md",
-}
-REQUIRED_STRATEGY_RELEASES = {
-    "1.0.0",
-    "1.1.0",
-    "1.2.0",
-    "1.3.0",
-    "1.3.1",
-    "1.4.0",
-    "1.4.1",
-    "1.4.2",
-    "1.5.0",
-    "1.5.1",
-    "1.6.0",
-    "1.7.0",
-    "1.8.0",
-    "2.0.0",
-    "2.1.0",
-    "2.1.1",
-    "2.2.0",
 }
 STRATEGY_SKILL_MAX_WORDS = 950
 REQUIRED_PROGRESSIVE_DISCLOSURE_GUIDANCE = {
@@ -231,7 +192,7 @@ REQUIRED_PROGRESSIVE_DISCLOSURE_GUIDANCE = {
     "Read each file in full only when its phase or action begins",
 }
 REQUIRED_INDEPENDENCE_GUIDANCE = {
-    "Require this skill's three scripts",
+    "Require this skill's two scripts",
     "Do not require the `alphainsider-api` skill to continue",
     "If `alphainsider-api` is installed, read it only for needed API behavior",
     "Never copy this skill's setup wrapper",
@@ -243,14 +204,9 @@ REMOVED_SIBLING_DEPENDENCY_GUIDANCE = {
 }
 EXPECTED_STRATEGY_SCRIPTS = {
     "alphainsider_setup_request.py",
-    "check_for_update.py",
     "set_env_value.py",
 }
 EXPECTED_PLAN_STATES = {"draft", "confirmed", "implemented", "retired"}
-STRICT_SEMVER_PATTERN = re.compile(
-    r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$"
-)
-STRATEGY_VERSION_FILE_PATTERN = re.compile(r"^v([1-9][0-9]*)\.md$")
 REQUIRED_PLAN_SECTION_ORDER = (
     "# Strategy Plan",
     "## Objective",
@@ -316,6 +272,12 @@ REQUIRED_PROJECT_ROOT_GUIDANCE = {
     "Resolve the project root from the session working directory",
     "Do not ask where to store the project",
     "dedicated child folder",
+    "exactly one `# Strategy Plan` title",
+    "Ignore additional frontmatter fields during recognition",
+    "normalize frontmatter to contain only `status`",
+    "Missing current content is an unresolved decision",
+    "record no implementation or external action",
+    "restore the prior lifecycle status",
     "nearest recognized strategy ancestor",
     "Never create a nested strategy",
     "immediate children",
@@ -396,12 +358,11 @@ REMOVED_TARGET_DELETION_GUIDANCE = {
     "never authorizes routine deletion or deletion of a selected existing strategy",
 }
 REQUIRED_REPLACEMENT_GUIDANCE = {
-    "every section heading from the current plan template",
     "update the existing plan",
     "replace the trading strategy with a new one",
     "`docs/replacement-plan.md`",
     "Show and record every exact deletion, overwrite, promotion",
-    "final confirmation sets them to `confirmed`",
+    "final confirmation sets it to `confirmed`",
     "authorizes the exact recorded deletion, promotion, cleanup, and implementation actions",
     "perform only the recorded actions",
     "Never recursively delete the project root",
@@ -420,6 +381,13 @@ REQUIRED_CREDENTIAL_GUIDANCE = {
     "set_env_value.py --project-root",
     "Always pass `--project-root`",
     "announced selected project root",
+    "exact project directory",
+    "must directly contain `docs/plan.md`",
+    "Helpers never search ancestors",
+    "replaces `.env` atomically",
+    "mode `0600`",
+    "preserves an existing file's mode",
+    "leaves the original unchanged on failure",
     "pass the complete value as exactly one argument",
     "structured argument-array",
     "quote the value as one literal argument",
@@ -497,6 +465,8 @@ REQUIRED_PROVISIONING_GUIDANCE = {
     "stock REST lookup endpoints require no API-key permission",
     "`like` and `unlike` are not required",
     "subscription permissions are read-only",
+    "account-subscription changes, payments, withdrawals, bots, webhooks",
+    "`updateStrategyPrice`",
     "list only the missing permission names",
     "pause AlphaInsider target setup and every remote action",
     "use the verified token's `user_id` with `getUserStrategies`",
@@ -562,7 +532,7 @@ REQUIRED_SINGLE_CONFIRMATION_GUIDANCE = {
     "sole authorization to call `newStrategy` and persist the returned strategy ID",
     "do not ask again",
     "must not prompt for confirmation before submitting planned paper orders",
-    "Running either command is the user's execution action",
+    "Running either generated operational command is the user's execution action",
     "Never manually run a one-cycle command, start a persistent process, or trigger a scheduled task during build or verification",
     "An explicit later chat request may run",
 }
@@ -691,45 +661,13 @@ REQUIRED_MARKET_DATA_GUIDANCE = {
     "same decision-logic input contract",
     "timestamp, symbol, price-adjustment, and coverage differences",
 }
-REQUIRED_VERSION_GUIDANCE = {
-    "`scripts/check_for_update.py` once at the start of every invocation",
-    "never run its update command or ask for permission to run it",
-    "`MAJOR.MINOR.PATCH`",
-    "Increment the version for every published Strategy Creator change",
-    "Treat that exact legacy shape as `0.0.0`",
-    "Compare the project with the installed version",
-    "never a remote version",
-    "npx skills@latest update alphainsider-api alphainsider-strategy-creator",
-    "one `vN.md` file per major version",
-    "Select every documented release greater than",
-    "less than or equal to the installed version",
-    "Process the selected release sections in ascending semantic-version order",
-    "Audit the project against the installed skill",
-    "Combine all selected increments into one target audit",
-    "every exact create, modify, and delete path",
-    "Final complete-plan confirmation is the sole authorization for the exact recorded upgrade actions",
-    "instead of requesting a one-off approval",
-    "Advance `contract_version` only after",
-    "do not write intermediate contract versions",
-    "interrupted or failed upgrade",
-    "For a version-only upgrade, classify the configured target as an existing strategy",
-    "do not create a strategy or sync its description",
-    "The upgrade alone does not require runtime-code or dependency changes",
+REQUIRED_WEBSOCKET_STRATEGY_GUIDANCE = {
+    "explicitly choose continuous reconnect and re-subscribe or stop on a stream error",
+    "an unresolved choice keeps the plan `draft`",
     "Pass `reconnect=True` to `stream_events` when the plan requires continuous reconnection and re-subscription",
     "retain the default one-session behavior when the plan requires the strategy to stop on a stream error",
-}
-REQUIRED_STRATEGY_VERSION_LAYOUT_GUIDANCE = {
-    "sole nested exception",
-    "`references/versions/vN.md`",
-    "highest documented release",
-}
-REQUIRED_UPDATE_CHECKER_SOURCE = {
-    "https://raw.githubusercontent.com/AlphaInsider/skills/master/",
-    "skills/alphainsider-strategy-creator/references/versioning.md",
-    'UPDATE_COMMAND = "npx skills@latest update alphainsider-api alphainsider-strategy-creator"',
-    "TIMEOUT_SECONDS = 3",
-    "MAX_RESPONSE_BYTES = 64 * 1024",
-    "response.geturl() != REMOTE_VERSION_URL",
+    "re-subscribes after a recoverable disconnect",
+    "stop mode exits without reconnecting",
 }
 README_MAX_WORDS = 550
 REQUIRED_README_SECTIONS = {
@@ -747,7 +685,6 @@ REQUIRED_README_OVERVIEW_GUIDANCE = {
     "/alphainsider",
     "use the alphainsider skill",
     "npx skills@latest add",
-    "npx skills@latest update alphainsider",
     "`docs/plan.md`",
     "paper-trading",
     "Credentials remain",
@@ -759,15 +696,10 @@ REQUIRED_README_OVERVIEW_GUIDANCE = {
     "never submits AlphaInsider orders",
     "prefer it for supported current market data",
     "Backtests require credible external history",
-    "`contract_version`",
-    "npx skills@latest update alphainsider-api alphainsider-strategy-creator",
-    "never installed automatically",
     "verifies its required API-key permissions",
     "**AI Agent** preset",
     "discovers owned strategies",
     "syncs the confirmed description",
-    "`references/versions/vN.md`",
-    "final-confirmation upgrade",
     "Operation and scheduling",
     "user-level systemd or launchd",
     "Windows Task Scheduler",
@@ -803,133 +735,9 @@ def section_link(label: str, reference: str, heading: str) -> str:
     return f"[`{label}`]({reference}#{markdown_anchor(heading)})"
 
 
-def semver_tuple(value: str) -> tuple[int, int, int] | None:
-    match = STRICT_SEMVER_PATTERN.fullmatch(value)
-    if match is None:
-        return None
-    return tuple(int(part) for part in match.groups())
-
-
 def catalog_specialists(text: str) -> list[str]:
     """Return routable specialist names from catalog headings."""
     return CATALOG_HEADING_PATTERN.findall(text)
-
-
-def markdown_section_lines(text: str, heading: str) -> list[str] | None:
-    match = re.search(
-        rf"^## {re.escape(heading)}\n(?P<body>.*?)(?=^## |\Z)",
-        text,
-        re.MULTILINE | re.DOTALL,
-    )
-    if match is None:
-        return None
-    return [line.strip() for line in match.group("body").splitlines() if line.strip()]
-
-
-def validate_strategy_version_history(
-    version_text: str,
-    version_files: dict[str, str],
-    current_version: str | None,
-) -> tuple[list[str], list[str]]:
-    errors: list[str] = []
-    release_versions: list[str] = []
-    major_files: list[tuple[int, str, str]] = []
-
-    for relative_path, text in version_files.items():
-        match = STRATEGY_VERSION_FILE_PATTERN.fullmatch(relative_path)
-        if match is None:
-            errors.append(
-                "strategy version logs must use references/versions/vN.md: "
-                f"{relative_path}"
-            )
-            continue
-        major_files.append((int(match.group(1)), relative_path, text))
-
-    major_files.sort(key=lambda item: item[0])
-    expected_index = [
-        f"- [Version {major}](versions/{relative_path})"
-        for major, relative_path, _text in major_files
-    ]
-    actual_index = markdown_section_lines(version_text, "Version logs")
-    if actual_index != expected_index:
-        errors.append(
-            "strategy version index must link every major-version log exactly "
-            "once in ascending order"
-        )
-
-    for major, relative_path, text in major_files:
-        title = f"# Strategy Creator Version {major}"
-        if text.splitlines().count(title) != 1:
-            errors.append(
-                f"strategy version log {relative_path} must contain exactly "
-                f"one {title!r} heading"
-            )
-
-        headings = re.findall(r"^## (.+)$", text, re.MULTILINE)
-        if not headings or headings[0] != "Contents" or headings.count("Contents") != 1:
-            errors.append(
-                f"strategy version log {relative_path} must start with one "
-                "Contents section"
-            )
-        release_headings = [heading for heading in headings if heading != "Contents"]
-        parsed_releases: list[tuple[int, int, int]] = []
-        for release in release_headings:
-            parsed = semver_tuple(release)
-            if parsed is None:
-                errors.append(
-                    f"strategy version log {relative_path} has malformed "
-                    f"release heading {release!r}"
-                )
-                continue
-            if parsed[0] != major:
-                errors.append(
-                    f"strategy version log {relative_path} contains release "
-                    f"{release} from major version {parsed[0]}"
-                )
-            parsed_releases.append(parsed)
-            release_versions.append(release)
-
-        if parsed_releases != sorted(parsed_releases) or len(parsed_releases) != len(
-            set(parsed_releases)
-        ):
-            errors.append(
-                f"strategy version log {relative_path} releases must be unique "
-                "and in ascending order"
-            )
-
-        expected_contents = [
-            f"- [`{release}`](#{markdown_anchor(release)})"
-            for release in release_headings
-        ]
-        actual_contents = markdown_section_lines(text, "Contents")
-        if actual_contents != expected_contents:
-            errors.append(
-                f"strategy version log {relative_path} contents must link "
-                "every release exactly once in heading order"
-            )
-
-    if len(release_versions) != len(set(release_versions)):
-        errors.append("strategy release headings must be unique across version logs")
-
-    missing_releases = REQUIRED_STRATEGY_RELEASES - set(release_versions)
-    if missing_releases:
-        errors.append(
-            "strategy version history is missing releases "
-            f"{sorted(missing_releases)}"
-        )
-
-    current = semver_tuple(current_version) if current_version is not None else None
-    documented = [
-        parsed
-        for release in release_versions
-        if (parsed := semver_tuple(release)) is not None
-    ]
-    if current is not None and (not documented or max(documented) != current):
-        errors.append(
-            "strategy current_version must match the highest documented release"
-        )
-
-    return errors, release_versions
 
 
 def validate() -> list[str]:
@@ -1057,50 +865,6 @@ def validate() -> list[str]:
                 "alphainsider catalog headings must be in ascending name order"
             )
 
-    version_path = wrapper_references / "versioning.md"
-    if version_path.is_file():
-        try:
-            wrapper_version_fields = frontmatter(version_path)
-        except ValueError as exc:
-            errors.append(str(exc))
-        else:
-            if set(wrapper_version_fields) != {"current_version"}:
-                errors.append(
-                    "alphainsider version reference must declare only current_version"
-                )
-            wrapper_version = wrapper_version_fields.get("current_version")
-            if wrapper_version is None or STRICT_SEMVER_PATTERN.fullmatch(
-                wrapper_version
-            ) is None:
-                errors.append(
-                    "alphainsider version reference must use strict MAJOR.MINOR.PATCH"
-                )
-        wrapper_version_text = version_path.read_text(encoding="utf-8")
-        missing_wrapper_version_guidance = {
-            guidance
-            for guidance in REQUIRED_WRAPPER_VERSION_GUIDANCE
-            if guidance not in wrapper_version_text
-        }
-        if missing_wrapper_version_guidance:
-            errors.append(
-                "alphainsider version reference is missing guidance "
-                f"{sorted(missing_wrapper_version_guidance)}"
-            )
-
-    wrapper_checker = wrapper_scripts / "check_for_update.py"
-    if wrapper_checker.is_file():
-        wrapper_checker_source = wrapper_checker.read_text(encoding="utf-8")
-        missing_wrapper_checker_source = {
-            marker
-            for marker in REQUIRED_WRAPPER_UPDATE_CHECKER_SOURCE
-            if marker not in wrapper_checker_source
-        }
-        if missing_wrapper_checker_source:
-            errors.append(
-                "alphainsider update checker is missing required safeguards "
-                f"{sorted(missing_wrapper_checker_source)}"
-            )
-
     strategy = SKILLS_DIR / "alphainsider-strategy-creator"
     strategy_references = strategy / "references"
     actual_strategy_refs = {
@@ -1114,9 +878,10 @@ def validate() -> list[str]:
     strategy_reference_directories = {
         path.name for path in strategy_references.iterdir() if path.is_dir()
     }
-    if strategy_reference_directories != {"versions"}:
+    if strategy_reference_directories:
         errors.append(
-            "strategy-creator reference directories must contain only versions"
+            "strategy-creator references must not contain nested directories "
+            f"{sorted(strategy_reference_directories)}"
         )
 
     strategy_scripts = {
@@ -1131,45 +896,6 @@ def validate() -> list[str]:
         )
 
     plan_template = strategy / "references" / "plan-template.md"
-    version_reference = strategy / "references" / "versioning.md"
-    version_directory = strategy / "references" / "versions"
-    version_files = {
-        path.relative_to(version_directory).as_posix(): path.read_text(
-            encoding="utf-8"
-        )
-        for path in version_directory.rglob("*")
-        if path.is_file()
-    }
-    current_version: str | None = None
-    if version_reference.is_file():
-        try:
-            version_fields = frontmatter(version_reference)
-        except ValueError as exc:
-            errors.append(str(exc))
-        else:
-            if set(version_fields) != {"current_version"}:
-                errors.append(
-                    "strategy version reference must declare only current_version"
-                )
-            current_version = version_fields.get("current_version")
-            if current_version is None or STRICT_SEMVER_PATTERN.fullmatch(
-                current_version
-            ) is None:
-                errors.append(
-                    "strategy version reference must use strict MAJOR.MINOR.PATCH"
-                )
-
-    version_text = (
-        version_reference.read_text(encoding="utf-8")
-        if version_reference.is_file()
-        else ""
-    )
-    version_errors, _release_versions = validate_strategy_version_history(
-        version_text,
-        version_files,
-        current_version,
-    )
-    errors.extend(version_errors)
 
     if plan_template.is_file():
         plan_text = plan_template.read_text(encoding="utf-8")
@@ -1180,22 +906,9 @@ def validate() -> list[str]:
         else:
             if plan_fields.get("status") != "draft":
                 errors.append("strategy plan template must start in draft status")
-            if set(plan_fields) != {"status", "contract_version"}:
+            if set(plan_fields) != {"status"}:
                 errors.append(
-                    "strategy plan template must declare status and contract_version"
-                )
-            plan_version = plan_fields.get("contract_version")
-            if plan_version is None or STRICT_SEMVER_PATTERN.fullmatch(
-                plan_version
-            ) is None:
-                errors.append(
-                    "strategy plan template contract_version must use strict "
-                    "MAJOR.MINOR.PATCH"
-                )
-            elif current_version is not None and plan_version != current_version:
-                errors.append(
-                    "strategy plan template contract_version must match the "
-                    "strategy version reference"
+                    "strategy plan template must declare only lifecycle status"
                 )
         missing_sections = REQUIRED_PLAN_SECTIONS - set(plan_text.splitlines())
         if missing_sections:
@@ -1350,15 +1063,10 @@ def validate() -> list[str]:
             "strategy interview contains removed phases "
             f"{sorted(obsolete_interview_phases)}"
         )
-    version_history_text = "\n".join(version_files.values())
     all_reference_text = "\n".join(
         reference_texts[name] for name in sorted(reference_texts)
     )
-    manual_text = " ".join(
-        (
-            f"{strategy_text}\n{all_reference_text}\n{version_history_text}"
-        ).split()
-    )
+    manual_text = " ".join(f"{strategy_text}\n{all_reference_text}".split())
     current_contract_text = " ".join(
         (f"{strategy_text}\n{all_reference_text}").split()
     )
@@ -1613,41 +1321,16 @@ def validate() -> list[str]:
             f"{sorted(missing_market_data_guidance)}"
         )
 
-    missing_version_guidance = {
+    missing_websocket_strategy_guidance = {
         guidance
-        for guidance in REQUIRED_VERSION_GUIDANCE
+        for guidance in REQUIRED_WEBSOCKET_STRATEGY_GUIDANCE
         if guidance not in manual_text
     }
-    if missing_version_guidance:
+    if missing_websocket_strategy_guidance:
         errors.append(
-            "strategy-creator is missing versioning guidance "
-            f"{sorted(missing_version_guidance)}"
+            "strategy-creator is missing WebSocket recovery guidance "
+            f"{sorted(missing_websocket_strategy_guidance)}"
         )
-
-    missing_strategy_version_layout_guidance = {
-        guidance
-        for guidance in REQUIRED_STRATEGY_VERSION_LAYOUT_GUIDANCE
-        if guidance not in agent_guide_text
-    }
-    if missing_strategy_version_layout_guidance:
-        errors.append(
-            "AGENTS.md is missing Strategy Creator version-layout guidance "
-            f"{sorted(missing_strategy_version_layout_guidance)}"
-        )
-
-    update_checker = strategy / "scripts" / "check_for_update.py"
-    if update_checker.is_file():
-        checker_source = update_checker.read_text(encoding="utf-8")
-        missing_checker_source = {
-            marker
-            for marker in REQUIRED_UPDATE_CHECKER_SOURCE
-            if marker not in checker_source
-        }
-        if missing_checker_source:
-            errors.append(
-                "strategy update checker is missing required safeguards "
-                f"{sorted(missing_checker_source)}"
-            )
 
     env_helper = strategy / "scripts" / "set_env_value.py"
     if env_helper.is_file():

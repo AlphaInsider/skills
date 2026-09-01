@@ -1,7 +1,8 @@
 # Credential Setup
 
 Read this reference only when a required credential or configuration value is
-missing. Never inspect or print existing `.env` values.
+missing. Never inspect or print existing `.env` values. Use
+`scripts/set_env_value.py` only through its agent-only CLI.
 
 For each missing value:
 
@@ -36,6 +37,13 @@ For each missing value:
    script, environment or shell variable, command substitution, temporary
    file, patch, direct `.env` edit, or clipboard. Do not open `.env` before or
    after the update. The helper preserves other entries.
+   Both helpers treat `--project-root` as the exact project directory. It must
+   exist, must not be an installed skill directory, and must directly contain
+   `docs/plan.md`; a parent or subdirectory fails closed. Helpers never search
+   ancestors for a plan.
+   `set_env_value.py` validates the name and value before writing, replaces
+   `.env` atomically, creates a new file with mode `0600`, preserves an existing
+   file's mode, and leaves the original unchanged on failure.
 6. If the pasted value remains available in the active task, use it once at the
    helper without requesting another approval. If it is unavailable, ask the
    user to enter it again or edit `.env`; never recover it from `.env`. If a

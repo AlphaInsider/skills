@@ -1,13 +1,14 @@
 # Project Root
 
 Read this reference at Start when resolving the project root. Do not ask
-where to store the project. Recognize a plan only with `versioning.md`.
-Placement questions use the interactive question prompt in `interview.md`.
+where to store the project. Placement questions use the interactive question
+prompt in `interview.md`.
 
 ## Contents
 
 - [Invocation directory](#invocation-directory)
 - [Unusable location](#unusable-location)
+- [Plan recognition](#plan-recognition)
 - [Walk-up](#walk-up)
 - [Existing strategy](#existing-strategy)
 - [Non-strategy software project](#non-strategy-software-project)
@@ -38,6 +39,20 @@ from a writable user-controlled folder. Do not fall back to `~/Desktop` or
 
 Accept a normal writable user-controlled location, including beneath the
 user's home, as the parent of a new child.
+
+## Plan recognition
+
+Recognize `docs/plan.md` when it has exactly one `# Strategy Plan` title and
+YAML frontmatter containing exactly one lifecycle `status` whose value is
+`draft`, `confirmed`, `implemented`, or `retired`. Ignore additional
+frontmatter fields during recognition and never interpret them. On the next
+normal plan write, normalize frontmatter to contain only `status`.
+
+Audit every recognized plan against the current `plan-template.md` headings and
+fields. Missing current content is an unresolved decision, not a reason to
+reject the plan. Follow `interview.md` to resolve only missing or affected
+choices before confirmation. Malformed title, frontmatter, or status is not a
+recognized plan.
 
 ## Walk-up
 

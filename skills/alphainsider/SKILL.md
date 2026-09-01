@@ -10,19 +10,8 @@ independently installable.
 
 ## Start
 
-1. Require this skill's update checker. If `scripts/check_for_update.py` is
-   missing, stop and show:
-
-   ```bash
-   npx skills@latest add https://github.com/AlphaInsider/skills \
-     --skill alphainsider
-   ```
-
-2. Run `scripts/check_for_update.py` once per invocation. Show its notice
-   once, never run or offer its update command, and continue on no output or
-   failure.
-3. Read [`references/catalog.md`](references/catalog.md). Match the user query
-   to catalog entries. Do not preload specialist skills.
+Read [`references/catalog.md`](references/catalog.md). Match the user query to
+catalog entries. Do not preload specialist skills.
 
 ## Route
 
@@ -64,5 +53,3 @@ as a side effect of routing. Never inspect or print existing API keys or
 ## References
 
 - [`references/catalog.md`](references/catalog.md) — routable specialists
-- [`references/versioning.md`](references/versioning.md) — wrapper version
-  and update notice

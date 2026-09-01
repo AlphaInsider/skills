@@ -95,7 +95,9 @@ Build the smallest standalone project that satisfies the plan:
   may load project `.env`; agents still never open `.env`. Pass
   `reconnect=True` to `stream_events` when the plan requires continuous
   reconnection and re-subscription; retain the default one-session behavior
-  when the plan requires the strategy to stop on a stream error.
+  when the plan requires the strategy to stop on a stream error. Add offline
+  tests proving reconnect mode re-subscribes after a recoverable disconnect and
+  stop mode exits without reconnecting.
 - Put only names and safe examples in `.env.example`. Ignore `.env`, secrets,
   caches, and build outputs; keep plans, source, tests, and docs commit-ready.
   Follow `credentials.md` for missing values.
@@ -106,8 +108,10 @@ Build the smallest standalone project that satisfies the plan:
   Never manually run a cycle, start a persistent process, or trigger a
   schedule during build and verification. After the plan is `implemented`,
   follow this skill's run rule: honor `active` autostart, and honor an
-  explicit later chat request. For a local-only target, document operational commands but mark
-  them unavailable until target readiness is resolved.
+  explicit later chat request. Running either generated operational command is
+  the user's execution action; build and verification never start one. For a
+  local-only target, document operational commands but mark them unavailable
+  until target readiness is resolved.
 - For every finite-cycle and persistent entry point, acquire a fail-closed
   process-lifetime lock before external data or order work and release it
   automatically when the process exits. Include only non-secret project,

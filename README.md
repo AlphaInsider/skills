@@ -87,12 +87,9 @@ delete any exactly verified owned AlphaInsider target. It preserves `.env`,
 Deletion warns about live state and undocumented cascades but never cancels
 orders, liquidates positions, or submits a trade.
 
-Strategy Creator plans share `contract_version`. A read-only check reports a
-newer canonical release with
-`npx skills@latest update alphainsider-api alphainsider-strategy-creator`, but it is never
-installed automatically. Update the router with
-`npx skills@latest update alphainsider`. The installed index routes older
-projects through `references/versions/vN.md` into one final-confirmation upgrade.
+Strategy Creator recognizes an existing `docs/plan.md` by its Strategy Plan
+title and lifecycle status. It audits recognized plans against the current
+fields and returns missing decisions to the interview before making changes.
 
 ## Development
 

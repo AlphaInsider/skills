@@ -23,7 +23,7 @@ read-only.
 
 ## Start
 
-1. Require this skill's three scripts. If any are missing, stop and show:
+1. Require this skill's two scripts. If either is missing, stop and show:
 
    ```bash
    npx skills@latest add https://github.com/AlphaInsider/skills \
@@ -32,14 +32,11 @@ read-only.
 
    Do not require the `alphainsider-api` skill to continue.
 
-2. Run `scripts/check_for_update.py` once per invocation. Show its notice once,
-   never run or offer its update command, and continue on no output or failure.
-3. Resolve the project root from the session working directory per
-   `references/project-root.md`. Do not ask where to store the project.
-4. Read `references/versioning.md` to recognize an existing project without
-   opening `.env`. Stop on malformed or newer versions. For a recognized
-   project, follow `interview.md`.
-5. Before confirmation, inventory every changed project path, native
+2. Resolve the project root from the session working directory and recognize
+   existing plans per `references/project-root.md`, without opening `.env`.
+   For a recognized project, follow `interview.md`. Do not ask where to store
+   the project.
+3. Before confirmation, inventory every changed project path, native
    definition, and agent task. Research collisions, explain consequences,
    resolve overwrite or alternate-identity choices, and record every action.
    Preserve unrelated resources, never overwrite an active unrelated runner,
@@ -51,9 +48,7 @@ Do not preload every reference. Read each file in full only when its phase or
 action begins:
 
 - [`references/project-root.md`](references/project-root.md) — session-directory
-  placement; load at Start when resolving the project root.
-- [`references/versioning.md`](references/versioning.md) — recognition and
-  upgrades; load only selected version-log sections.
+  placement and plan recognition; load at Start.
 - [`references/plan-template.md`](references/plan-template.md) — active plans.
 - [`references/interview.md`](references/interview.md) — draft through final
   confirmation.
@@ -76,8 +71,7 @@ it is not, read `https://api.alphainsider.com`.
 `docs/plan.md` is authoritative and may record the non-secret AlphaInsider
 strategy ID. Stage a replacement in `docs/replacement-plan.md` without altering
 the current strategy. Active plans use `draft`, `confirmed`, or `implemented`;
-completed retirement uses `retired`. Retain `contract_version` until
-`versioning.md` permits advancement.
+completed retirement uses `retired`.
 
 Follow `interview.md`: ask every unblocked decision in one frontier round
 through the agent's interactive question prompt, not as ordinary chat text,

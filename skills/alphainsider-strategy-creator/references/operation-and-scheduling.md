@@ -210,7 +210,7 @@ runner.
 
 Prefer the confirmed persistent project rather than an ephemeral or isolated
 copy, and prefer an already available durable runtime with the confirmed code
-version, dependencies, persistent state, non-prompt secrets, network access,
+and dependencies, persistent state, non-prompt secrets, network access,
 and exact one-cycle invocation. Do not provision cloud infrastructure, upload
 local secrets, or reconstruct the strategy from chat context. Missing access,
 session scope, expiry, conversation attachment, and missing pause, status, or

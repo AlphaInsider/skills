@@ -3,7 +3,7 @@
 Use this reference only when the user explicitly asks to retire, delete, clean
 up, or replace a recognized Strategy Creator project. Cleanup is a lifecycle
 branch, not a Strategy Plan interview phase. Never run it during unrelated
-maintenance or a version-only upgrade.
+maintenance.
 
 ## Contents
 
@@ -19,10 +19,10 @@ maintenance or a version-only upgrade.
 ## Recognition
 
 Recognize the project through the valid authoritative `docs/plan.md`, its
-contract version and lifecycle status, and the exact managed-artifact and
-operation-resource inventory. Perform read-only checks for every project path,
-native definition, agent task, runtime lock or marker, process state, and
-AlphaInsider target before proposing a destructive action.
+lifecycle status, and the exact managed-artifact and operation-resource
+inventory. Perform read-only checks for every project path, native definition,
+agent task, runtime lock or marker, process state, and AlphaInsider target
+before proposing a destructive action.
 
 Refuse to infer ownership from a filename, process name, target name, or
 schedule name alone. Do not remove a path or resource unless the plan and live
