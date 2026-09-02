@@ -1,245 +1,111 @@
-# AlphaInsider Target Setup
+# AlphaInsider Target
 
-Use this reference after strategy, backtesting, implementation-contract, and
-operation-and-scheduling planning as the final AlphaInsider forward-test setup
-phase before confirmation. Record the non-secret strategy ID on the active or
-replacement plan after the user selects an existing target or confirmation
-creates one. Never record credentials. Follow `cleanup.md` for retirement or
-outgoing replacement.
+Read this file after the user chooses AlphaInsider forward testing and the API
+key is available. Target discovery happens before final implementation
+agreement. Creation happens only after the agreed implementation passes every
+offline, order-free check.
 
-## Contents
+Read the installed `alphainsider-api` skill for current endpoint behavior. If
+it is unavailable, read the live AlphaInsider documentation index and relevant
+OpenAPI sections. Do not copy a fixed API catalog into the project.
 
-- [API-key permission gate](#api-key-permission-gate)
-- [Resolve the target](#resolve-the-target)
-- [Target deferral](#target-deferral)
-- [Confirmed provisioning](#confirmed-provisioning)
-- [Post-creation cleanup](#post-creation-cleanup)
-- [Description synchronization](#description-synchronization)
-- [Generated project documentation](#generated-project-documentation)
+## Verify access
 
-## API-key permission gate
+Use the setup wrapper from `credentials.md`. Verify the token type, user ID,
+and permissions without showing the key. Require only permissions used by the
+recorded setup and runtime plan. Recommend the **AI Agent** preset because it
+supports later plan changes. Accept a sufficient narrower or broader key.
 
-Before asking the user to set `ALPHAINSIDER_API_KEY`, link to
-[AlphaInsider developer settings](https://alphainsider.com/settings/developers)
-and instruct them to create one key by selecting the **AI Agent** preset. The
-preset selects every required permission below; the user may alternatively
-select the complete list individually:
+If required access is missing, list the missing permission names and give one
+clear setup action. Preserve all earlier work. Do not make a remote mutation or
+activate automation until the check passes.
 
-```text
-getUserInfo
-getStrategies
-getStrategyValues
-getUserStrategies
-getStrategyPerformance
-getRecommendedStrategies
-searchStrategies
-newStrategy
-updateStrategy
-deleteStrategy
-getStrategySubscriptions
-getStrategyCalculation
-getAccountSubscription
-getTimelines
-getStrategyTimelines
-newPost
-previewPost
-deletePost
-getPositions
-getOrders
-getMaxOrderSize
-newOrder
-newOrderAllocations
-deleteOrder
-wsStockPrice
-wsStrategyValue
-wsOrders
-wsPositions
-wsTimelines
-```
+## Choose a target
 
-Explain that `verifyToken` has no selectable permission and that AlphaInsider's
-stock REST lookup endpoints require no API-key permission. `deleteStrategy` is
-included for a separately confirmed retirement or outgoing replacement
-cleanup. Token scope alone never authorizes deletion; the cleanup workflow
-must verify exact identity and ownership and record the user's
-retain-or-delete decision.
+After token verification, call `getUserStrategies` with the verified user ID.
+Show compatible owned strategies, including public, private, and paid
+strategies when eligible. Display only useful public facts such as name, type,
+access mode, public strategy ID, creation time, and whether it is already bound
+to this project.
 
-Timeline permissions allow reading, creating, previewing, and deleting posts;
-`like` and `unlike` are not required. The subscription permissions are
-read-only and never authorize starting, changing, or cancelling a subscription.
-Strategy Creator never requires or uses permissions for account-subscription
-changes, payments, withdrawals, bots, webhooks, or `updateStrategyPrice`.
+Ask the user to choose:
 
-After the key is available, use the setup request wrapper to call
-`GET /verifyToken`. Read only the returned `user_id` and `scope`; never expose
-the token. Compare `scope` with the complete bundle above. If any permission is
-missing, list only the missing permission names, instruct the user to create or
-replace the key with the **AI Agent** preset, and pause AlphaInsider target
-setup and every remote action.
-Record the target as local-only if the key cannot be corrected in the current
-run; preserve every completed earlier planning decision. Accept extra
-permissions without treating them as Strategy Creator requirements.
+1. **Create a new strategy** — recommended for a new project because it keeps
+   history and behavior separate.
+2. A compatible owned strategy.
 
-## Resolve the target
+If many targets exist, first ask new versus existing, then present a short
+searchable or paginated existing-target list. Never choose the first result.
+Never bind a target whose type differs from the plan. A cryptocurrency target
+cannot run a stock plan, and a stock target cannot run a cryptocurrency plan.
 
-Run this flow only after the API key passes the permission gate.
+For an existing target:
 
-1. If `--print-config ALPHAINSIDER_STRATEGY_ID` resolves a configured strategy
-   ID, validate it with `getStrategies` and `getStrategySubscriptions`. Require
-   an owned strategy,
-   its owner `input_value` and `input_multiplier`, and a strict `stock` or
-   `cryptocurrency` type matching the planned asset class. Record the target
-   source as `selected existing` only when it is compatible.
-   If it is incompatible, preserve the strategy and offer a compatible owned
-   target or a new target; also allow the user to reopen the affected strategy
-   decisions. Never silently change the strategy or configured target.
-2. If no ID is configured, use the verified token's `user_id` with
-   `getUserStrategies`. Show safe distinguishing metadata without credentials
-   and identify which owned strategies match the planned asset class. Ask the
-   user to select a compatible strategy or explicitly create a new one. Never
-   pick the first result or create a duplicate silently. Persist the user's
-   selection by following the agent-only one-shot workflow in
-   `credentials.md` with:
+- verify exact ownership, type, current strategy details, and owner
+  `input_multiplier`;
+- preserve all existing performance and trade history;
+- do not reset, repurpose, rename, or change core settings unless the user
+  separately adds that change to the plan; and
+- persist the selected public ID through the safe configuration workflow.
 
-   ```bash
-   python /absolute/path/to/alphainsider-strategy-creator/scripts/set_env_value.py \
-     --project-root /absolute/selected/project \
-     ALPHAINSIDER_STRATEGY_ID VALUE
-   ```
+## Plan a new target
 
-   Replace `VALUE` with the selected ID as one safely quoted argument, then
-   validate it as in step 1.
-3. Before planning a new target, call `getAccountSubscription` and
-   `getUserInfo`; stop if either eligibility check fails. Compare the owned
-   strategy count with `limits.max_strategies` and stop creation at capacity,
-   while still allowing selection of an existing strategy.
-4. For a new target, use the plan's strict `stock` or `cryptocurrency` asset
-   class, propose a concise name from the goal, and require the user to choose
-   the owner starting balance. Public access is always eligible. Offer private
-   access only when `getAccountSubscription.level > 0`. Offer paid access only
-   when the type is `cryptocurrency` and `getUserInfo.verified` is true. If
-   neither enhanced mode is eligible, record public access without an extra
-   access question. Never offer paid stock creation because its special
-   approval cannot be verified through the documented API.
-5. For paid cryptocurrency access, require one launch price from $10 through
-   $1000 and convert the user-visible dollars to AlphaInsider's integer-cent
-   `price`. Creation maps public to `private: false, price: 0`, private to
-   `private: true, price: 0`, and paid to `private: false` with that confirmed
-   price. Strategy Creator never changes the price later.
-6. While the plan is `draft`, show the exact type, name, starting balance,
-   access, and price when applicable and record them without an ID. Do not ask
-   for separate creation approval. Changing a core field before confirmation
-   updates the draft; changing one after confirmation returns the plan to
-   `draft` and requires complete plan reconfirmation. Do not call `newStrategy`
-   before complete plan confirmation.
-7. Generate the exact AlphaInsider description from the completed strategy
-   design: one to three plain-language sentences covering the traded universe,
-   signal and entry/exit behavior, cadence, and sizing or risk. Do not include
-   performance claims, credentials, implementation paths, or unsupported
-   promises. Normal confirmation of the active plan approves this exact
-   description and the recorded core creation fields together. It is the sole
-   authorization to call `newStrategy` and persist the returned strategy ID;
-   do not ask again. Record that ID on the plan. A replacement plan's final
-   confirmation also authorizes its exact recorded promotion actions under
-   `interview.md` and `implementation.md`. If later work fails before
-   `implemented`, retain the created target and saved ID and report how to
-   resume. Never request another skill-level approval for that retain default.
+Check current account eligibility and target limits. Ask only fields that the
+API and current account permit:
 
-## Target deferral
+- a concise strategy name;
+- paper starting balance;
+- public, private, or paid access when eligible; and
+- the paid launch price when an eligible paid cryptocurrency strategy is
+  selected.
 
-When permissions, eligibility, capacity, or compatible-target resolution
-cannot complete in the current run, record target readiness as `local-only` and
-record only a non-secret reason. Normalize every unavailable target field as
-local-only rather than leaving a placeholder. Make no remote calls after
-local-only readiness, but continue to plan confirmation.
+Explain that the starting balance sets the paper strategy's display and sizing
+scale. It is not real money, broker cash, a deposit, or the user's account
+balance. Recommend `$100,000` when that value is within current platform
+limits and no strategy-specific amount fits better.
 
-A confirmed local-only plan authorizes a complete local build, including
-project-local AlphaInsider adapters, order mapping, documentation, backtests,
-and mocked tests. It does not authorize provisioning, remote target validation,
-synchronization, a native operation definition, or an agent scheduler. Keep
-the plan `confirmed` and never set it to `implemented`. An explicit later
-chat request may still run the planned command; warn that there may be no
-ready remote target. After local-only confirmation, keep the plan `confirmed`.
+Explain maximum leverage separately in the strategy interview. AlphaInsider
+supports up to `2×`. Recommend `1×` unless the agreed strategy supports a
+different maximum. Never treat the maximum as a target exposure.
 
-When setup becomes possible, return the plan to `draft`, preserve unaffected
-decisions and local artifacts, resolve only the target gaps, and reconfirm the
-complete plan before any remote work. If target facts invalidate market,
-execution, risk, cadence, or runner decisions, reopen only those affected
-branches, rerun every dependent phase including Operation and scheduling when
-needed, and return to target setup before confirmation.
+Validate current public, private, and paid eligibility from the API and current
+product rules. Never offer a mode that the account or strategy type cannot use.
+Do not change a paid price after creation unless the user explicitly starts a
+separate supported update.
 
-## Confirmed provisioning
+Generate a concise remote description from `plan.md`. Include the universe,
+decision approach, entry and exit behavior, cadence, and important sizing or
+risk rules. Do not include performance promises, implementation paths,
+credentials, or unsupported claims.
 
-Run this section only for a confirmed plan whose target readiness is `ready`.
-Before remote provisioning, reverify the API-key permission bundle.
-For a new target, also recheck capacity and access eligibility, then call
-`newStrategy` with only the confirmed type, name, owner `input_value`, access
-mapping, price, and confirmed description. On success:
+Record all fields and the exact `newStrategy` action before final agreement.
+Do not ask for another creation approval after the user agrees to that complete
+implementation plan.
 
-1. Capture the returned non-secret strategy ID, write it only to
-   `ALPHAINSIDER_STRATEGY_ID` through the non-echoing helper, record it on the
-   plan, and report it once so the user can recover the target if later local
-   work fails.
-2. Validate the created strategy and owner subscription context through the
-   setup request wrapper. Do not continue if its type, ownership, starting
-   value, or multiplier is unusable.
-3. If ID persistence, validation, or any later work fails before the plan is
-   `implemented`, retain the created target and saved ID, report how to resume,
-   and leave later cleanup of any verified owned target to the separately
-   confirmed workflow in `cleanup.md`. Never request another skill-level
-   approval for that retain default. Never remove a default that now refers to
-   another strategy.
+## Provision after offline verification
 
-## Post-creation cleanup
+Immediately before creation, recheck the key, account limit, eligibility, and
+planned fields. Call `newStrategy` only after code, docs, static checks, and
+mocked tests pass. Never run an order-capable cycle as a creation test.
 
-For an explicit retirement or the outgoing side of a replacement, read and
-follow `cleanup.md`. Stage the exact non-secret target ID and ownership
-evidence on the active or replacement plan, offer retain-and-detach or
-deletion for both Strategy Creator-created and selected existing owned
-targets, and obtain the workflow's one final confirmation.
+After creation:
 
-Immediately before deletion, reverify the API-key permission, token user,
-exact target, and ownership. Use `getStrategies`, `getUserStrategies`,
-`getStrategySubscriptions`, `getOrders`, and `getPositions` for read-only
-metadata, owner-subscription context, subscriber, open-order, and nonzero-
-position findings. Warn that the documented `deleteStrategy` operation does
-not specify cascade behavior. The user may still confirm deletion; never cancel
-orders, liquidate positions, or submit any trading action as cleanup.
+1. capture the returned public strategy ID;
+2. store it through the safe configuration workflow;
+3. record it in `plan.md`;
+4. validate ownership, strict type, paper starting balance, and owner
+   multiplier; and
+5. verify the current public web route and record a working strategy URL.
 
-Call `deleteStrategy` only with the plan's exact confirmed ID. Verify that it
-no longer resolves before removing a matching configured default. Only after
-deletion succeeds, and only when that comparison matched, remove the saved
-default. For retention, make no deletion call and detach only an exact matching
-binding. A replacement keeps its ready target binding. On failure, preserve the
-confirmed plan and exact ID for an explicit retry; never retry during unrelated
-work.
+For an existing target, revalidate the exact target and binding at the same
+point.
 
-## Description synchronization
+Synchronize the generated description when the selected target does not
+already have the agreed text. Preserve API-required current fields when an
+update operation needs them. If description sync or later scheduling fails,
+retain the target and saved ID. Report the exact next step; do not create a
+duplicate on resumption.
 
-After offline tests and static checks, synchronize the confirmed remote
-description for every selected existing target and for every subsequent
-confirmed behavior change. Immediately before `updateStrategy`, re-fetch the
-target metadata and owned subscription; send the current name and owner
-`input_value` unchanged because the endpoint requires them, plus only the
-confirmed description. Never use a stale plan value to overwrite either field.
-If synchronization fails, leave the plan `confirmed`. Set `implemented` only
-when code, tests, plan, docs, remote description, and every required operation
-resource agree.
-
-## Generated project documentation
-
-The generated `README.md` API-key prerequisites must link to AlphaInsider
-developer settings, tell the user they can select the **AI Agent** preset, list
-the complete permission bundle above exactly, and explain that `verifyToken`
-and stock REST lookups need no selectable permission. Identify
-`deleteStrategy` as authorized only by a confirmed retirement or outgoing
-replacement on the plan. Copy the permission list from this file at generation
-time.
-
-Generated `AGENTS.md` must point at the installed alphainsider-strategy-creator skill for
-target, cleanup, and local-only rules. Keep only project-specific commands,
-runner identity, and env names. Agents never change strategy price. Operational
-commands must not prompt for confirmation before submitting planned paper
-orders. Never manually run a cycle, start a persistent process, or trigger a
-scheduled task during build and verification. After `implemented`, follow
-this skill's run rule.
+Target creation, description updates, and deletion are setup mutations. They
+never authorize orders. Orders are allowed only through an active agreed
+normal-run contract.

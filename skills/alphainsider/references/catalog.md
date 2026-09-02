@@ -17,8 +17,9 @@ Routable specialists published from this repository. This file does not list
 
 ## alphainsider-strategy-creator
 
-- When to use: interview, plan, build, test, backtest, change, replace,
-  retire, or clean up one automated AlphaInsider paper-trading strategy.
+- When to use: create, resume, interview, plan, backtest, implement, automate,
+  run, dry-run, update, or explicitly delete one AlphaInsider paper-trading
+  strategy.
 - Install:
 
   ```bash

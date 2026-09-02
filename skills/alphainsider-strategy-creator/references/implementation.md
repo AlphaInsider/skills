@@ -1,212 +1,146 @@
 # Strategy Implementation
 
-Read this reference only after a complete plan is confirmed, when executing a
-confirmed replacement or cleanup, or when maintaining an implemented strategy.
+Read this file after the applicable plan is Agreed. Build the smallest project
+that follows `plan.md` and supports the selected code-led, agent-led, or hybrid
+mode.
 
-## Contents
+## Build order and boundaries
 
-- [Execution gates](#execution-gates)
-- [Replacement execution](#replacement-execution)
-- [Cleanup execution](#cleanup-execution)
-- [Project build](#project-build)
-- [Generated documentation](#generated-documentation)
-- [Completion and maintenance](#completion-and-maintenance)
+1. Recheck all planned paths and existing user changes.
+2. Build source, state, docs, the runbook, and tests.
+3. Run static checks and mocked or offline tests.
+4. Set **Phase** to Configuring automation, then create or bind the
+   AlphaInsider target only after those checks pass.
+5. Validate the target and synchronize its description.
+6. Create and activate the native AI schedule for its next normal occurrence.
 
-## Execution gates
+If an unplanned path, permission, target mutation, or high-level behavior
+change becomes necessary, stop and return the affected decision to Draft.
+Routine plan-preserving implementation fixes need no new interview.
 
-If `alphainsider-api` is installed, read it and only the API references needed
-for authentication, instruments, orders, sizing, and selected WebSockets. If
-it is not, read `https://api.alphainsider.com` (`llms.txt`, then OpenAPI or
-AsyncAPI) for those details. Do not embed a second API catalog. Before
-writing, inventory every path again. Confirmation authorizes new files and
-every exact overwrite recorded in the plan. If an unplanned path or collision
-appears, return the plan to `draft` and reconfirm the complete updated plan
-instead of requesting a one-off approval.
+Never run an order-capable cycle during build or verification. AlphaInsider
+setup calls can create or configure the agreed target, but must not submit or
+cancel an order.
 
-Keep project writes inside the selected project root; use absolute paths only
-during the run and persist project-relative paths. Exact confirmed user-level
-native operation definitions are the sole host-write exception and confirmed
-agent schedulers are external managed resources. Create either only under
-`operation-and-scheduling.md` after all preceding gates pass.
+## Project structure
 
-For a `ready` target, complete **Confirmed provisioning** in
-`alphainsider-target.md` before implementation files. A replacement first
-quiesces the attributable outgoing runner under `cleanup.md`, provisions and
-validates the ready replacement target, and only then applies the outgoing
-remote disposition. For a `local-only` target, make no remote calls, complete
-the local build with mocked external interactions for a new or updated
-strategy, create no native definition or agent task, and leave the plan
-`confirmed`. A local-only replacement leaves the outgoing strategy, binding,
-implementation, and operation resources unchanged.
+Use the core layout in `project-root.md`. Default to Python when no ecosystem
+requirement favors another language. Add only needed dependency files. Keep
+paths project-relative.
 
-## Replacement execution
+- `strategy/` contains reusable decision, data, risk, reconciliation, and
+  AlphaInsider runtime code.
+- `backtest/` contains historical replay code, data manifests, charts, and
+  reports.
+- `runtime/runbook.md` contains one finite AI-occurrence procedure.
+- `runtime/` contains structured state, the shared lock, health, run history,
+  repair journal, and snapshots.
+- `tests/` contains order-free plan-conformance tests.
 
-For a confirmed replacement, follow `cleanup.md`. Perform only the recorded
-actions. A local-only replacement stops before any outgoing cleanup or
-promotion. For a ready replacement, disable the outgoing runner and wait for a
-safe cycle boundary, then resolve, provision when applicable, validate, and
-persist the replacement target.
+Put names and safe examples in `.env.example`. Ignore `.env`, caches, temporary
+files, repair snapshots, and generated secrets. Keep `plan.md`, source, tests,
+docs, and safe result summaries ready for source control.
 
-After replacement readiness, remove and verify the outgoing native definitions
-or agent tasks, then apply its target disposition. Remove only exact
-attributable source, tests, copied AlphaInsider helpers, dependencies,
-`.env.example`, generated `README.md`, and generated `AGENTS.md` listed in the
-confirmed plan. Preserve `.env`, `.gitignore`, credentials, caches, historical
-data, unrelated files, and every resource whose ownership is uncertain. Never
-recursively delete the project root.
+## Decision modes
 
-Delete the outgoing `docs/plan.md`, then replace `docs/plan.md` with
-`docs/replacement-plan.md`, remove the temporary path, and build from the
-promoted plan. If outgoing remote deletion alone fails, keep the outgoing ID
-on the new plan and allow the ready replacement's confirmed future activation
-with a prominent warning. Any shutdown, operation-removal, promotion, or
-local-cleanup failure blocks activation. Leave the new plan `confirmed` unless
-every required replacement gate succeeds.
+### Code-led
 
-## Cleanup execution
+Implement deterministic rules in project code. The scheduled AI reads the plan
+and runbook, invokes one finite cycle, evaluates its structured result, and
+handles the agreed error policy.
 
-Execute an explicit retirement only from a confirmed `docs/plan.md`.
-Revalidate every exact path, operation resource, runtime identity, target ID,
-and ownership under `cleanup.md`. Disable future cycles, wait for safe
-completion, remove exact operation resources, apply the confirmed remote
-retain-or-delete disposition, and then remove only the attributable generated
-artifacts in the plan.
+### Agent-led
 
-Preserve the project root, `.env`, `.gitignore`, credentials, caches,
-historical logs and state, backtest outputs, unrelated files, and uncertain
-resources. Mark `docs/plan.md` as `retired` and keep the strategy ID on that
-retired record. If remote deletion fails after safe operation shutdown,
-complete local retirement, retain the pending outgoing ID for explicit
-resumption, and never retry it during unrelated work.
+The scheduled AI reads the plan, obtains the agreed inputs, makes the bounded
+decision itself, applies risk checks, and uses project helpers for safe state
+and AlphaInsider actions. It can use the calling AI model. Do not require a
+separate model API key unless `plan.md` explicitly selects an external model.
 
-## Project build
+### Hybrid
 
-Build the smallest standalone project that satisfies the plan:
+Programs gather or calculate inputs and enforce mechanical limits. The
+scheduled AI makes only the judgments that `plan.md` assigns to it.
 
-- Default to Python. Use another language only for a recorded ecosystem reason
-  with equivalent AlphaInsider integration. Create `strategy/`, `tests/`,
-  `.env.example`, dependency configuration, `.gitignore`, `README.md`, and
-  `AGENTS.md` without a generic framework.
-- Write a small project-local AlphaInsider client in the selected language.
-  Record the HTTP library as an agent default under Implementation unless the
-  user already named a preference. Never copy this skill's setup wrapper or
-  `alphainsider-api` scripts into the project. Leave an existing copied helper
-  in place unless this change already inventories that path. The running app
-  may load project `.env`; agents still never open `.env`. Pass
-  `reconnect=True` to `stream_events` when the plan requires continuous
-  reconnection and re-subscription; retain the default one-session behavior
-  when the plan requires the strategy to stop on a stream error. Add offline
-  tests proving reconnect mode re-subscribes after a recoverable disconnect and
-  stop mode exits without reconnecting.
-- Put only names and safe examples in `.env.example`. Ignore `.env`, secrets,
-  caches, and build outputs; keep plans, source, tests, and docs commit-ready.
-  Follow `credentials.md` for missing values.
-- Expose project-native commands for one finite decision cycle, a persistent
-  process when planned, tests, and a selected backtest. A recurring schedule
-  must invoke the same finite one-cycle entry point once per occurrence. Do not
-  add dry-run mode or an interactive confirmation before planned paper orders.
-  Never manually run a cycle, start a persistent process, or trigger a
-  schedule during build and verification. After the plan is `implemented`,
-  follow this skill's run rule: honor `active` autostart, and honor an
-  explicit later chat request. Running either generated operational command is
-  the user's execution action; build and verification never start one. For a
-  local-only target, document operational commands but mark them unavailable
-  until target readiness is resolved.
-- For every finite-cycle and persistent entry point, acquire a fail-closed
-  process-lifetime lock before external data or order work and release it
-  automatically when the process exits. Include only non-secret project,
-  invocation, process or run identity, and start-time attribution. Use an
-  equivalent shared lock when multiple remote instances can run the strategy.
-  Add offline tests proving a second overlapping occurrence exits before
-  signal, reconciliation, or order behavior and a stale marker is not removed
-  while its attributable process or occurrence remains active.
-- Make a persistent entry point handle the platform's normal graceful-stop
-  request by preventing another internal cycle, allowing the active cycle to
-  reach its planned safe boundary, releasing its runtime marker, and exiting.
-  Test that behavior offline without starting the strategy command.
-- Implement the planned fixed, dynamic, or constrained-dynamic selection. For
-  runtime candidates without exact IDs, use `search_stocks`; reject missing or
-  ambiguous results and never guess a mapping. Validate resolved IDs with `get_stocks`,
-  batch when practical, require the planned `security` type, and apply the
-  freshness rule. Never order an invalid candidate; continue with valid
-  candidates or abort as planned.
-- Reconcile relevant AlphaInsider positions and open orders before decisions,
-  validate target type at startup, and implement planned data, retry,
-  duplicate, recovery, logging, sizing, and risk behavior. Never default a
-  missing `input_multiplier` to `1`.
-- Keep decisions testable. Backtests replay production logic chronologically
-  without AlphaInsider calls or future information, reconstruct dynamic
-  candidate sets without survivorship bias, and add portfolio accounting only
-  with credible execution and cost assumptions.
-- Add offline tests for signals, risk, order mapping, orchestration, and any
-  backtest; mock external services. Verification must never submit an order or
-  run an order-submitting command.
+For agent-led and hybrid projects, the runbook must state the allowed evidence,
+decision space, output shape, uncertainty behavior, hard risk limits, and
+prohibited changes. Keep any decision-affecting prompt or rubric aligned with
+`plan.md`.
 
-## Generated documentation
+## One finite normal cycle
 
-Write `README.md` for humans with purpose, behavior, prerequisites, setup,
-environment names, commands, monitoring, limitations, and recovery. Apply the
-target reference's API-key and cleanup requirements. Include a short `## Start`
-section with ordered, copy-paste commands for dependency installation and
-`.env` preparation. Label a single cycle, persistent operation when available,
-and recurring scheduling equally. Match the selected language. For Python,
-place `source .venv/bin/activate` immediately before the execution commands. For
-another language, use the project's exact package-manager and runtime commands
-and omit Python steps.
+Every scheduled occurrence, scheduler **Run now**, and chat normal run uses the
+same logical cycle:
 
-For a local-only target, state that operational commands are unavailable until
-the plan is reconfirmed with a ready target. For a ready target, warn that a
-user-run command or future active schedule can submit paper orders without
-another prompt. Include the selected runner's installation, lifecycle,
-schedule, management, logging or history, notification, limitation, and
-activation warnings from `operation-and-scheduling.md`.
+1. acquire the project-wide atomic run lock before external work;
+2. read `plan.md` and `runtime/runbook.md`;
+3. verify Plan agreement, target identity, strict asset type, automation state,
+   pause reason, and durable trading block;
+4. reconcile relevant positions, open orders, and prior uncertain actions;
+5. obtain fresh inputs with the agreed as-of and missing-data rules;
+6. calculate or make the agreed decision;
+7. enforce instrument, sizing, leverage, exposure, loss, timing, and duplicate
+   protections;
+8. submit only the planned AlphaInsider paper action when normal trading is
+   allowed; and
+9. persist a structured result and release the lock.
 
-Write `AGENTS.md` to make `docs/plan.md` authoritative and require the
-installed alphainsider-strategy-creator skill before changing, scheduling, or retiring the
-strategy. List only this project's commands, runner identity, and env names.
-Do not copy interview, cleanup, or credential procedures. Never show
-`set_env_value.py` to the user. State that agents must not run operational
-commands during build or verification, may start the matching planned command
-after `implemented` when autostart is `active`, and may run on an explicit
-later chat request.
+Update **Current status** with the last completed step, next step, open error,
+and UTC time without changing the agreed strategy.
 
-## Completion and maintenance
+The result must distinguish no-order success, confirmed order response,
+confirmed pre-order failure, ambiguous possible order, warning, and skipped
+overlap. Do not store credentials or unnecessary private response data.
 
-Run all offline tests and static checks. Before setting `implemented`, replace
-the plan's `not initiated` cleanup values with the exact project-relative
-managed-artifact inventory and `active` retirement state, the current operation
-resource identity or unmanaged foreground state with cleanup marked not
-requested, and the active target lifecycle disposition. Never infer those
-values later from names alone.
+Use one lock across every local or hosted runtime. The first occurrence runs.
+Any overlapping occurrence records a skip and exits before data, decision, or
+order work. Never remove a stale lock until liveness checks prove its owner is
+not active.
 
-For a ready target, complete
-**Description synchronization**, then install and verify every confirmed
-native definition or agent scheduler in its confirmed active or inactive
-state. Do not trigger it as a build or verification test. If autostart is
-`active`, start the matching planned command after `implemented` and warn
-once that paper orders can submit. Report the next occurrence for an active
-schedule when known. A created agent-scheduler task object counts as
-installed even when recorded limitations remain. Set `implemented` only after
-the remote and applicable operation gates pass; a local-only target or failed
-required background-process installation remains `confirmed`. Exclude
-other deployment unless separately requested. Before handoff, verify every
-changed path or external task is exact, attributable, and confirmed, and
-this skill was not changed.
+## AlphaInsider behavior
 
-For behavior changes to an `implemented` plan, return it to `draft`, interview
-only affected decisions, and reconfirm before code edits. Update code, tests,
-`README.md`, and `AGENTS.md` together; regenerate the remote description and
-restore `implemented` only after every gate passes. For a runtime-affecting
-change, follow `operation-and-scheduling.md`: pause or disable future cycles,
-allow an active cycle to finish, stop a persistent process at a safe boundary,
-and never resume automatically. Report the final state and the exact resume
-command. An explicit later chat request may run that command.
+When `alphainsider-api` is installed, read its current instructions and only
+the endpoint sections needed by this project. Otherwise, verify against current
+AlphaInsider documentation.
 
-To resume a confirmed local-only target, return the plan to `draft`, preserve
-the offline implementation and unaffected decisions, resolve only target gaps,
-and reconfirm before provisioning, synchronization, or other remote work.
+- Resolve unknown instruments without guessing. Validate each result and its
+  `security` type. Dynamic candidates must stay inside the planned asset type.
+- Reconcile before deciding. Treat an uncertain prior submission as an error
+  that blocks another possible duplicate.
+- Never assume a missing `input_multiplier` is `1`.
+- Use current AlphaInsider sizing and allocation rules. Enforce both the
+  user's maximum leverage and the platform's `2×` ceiling.
+- Use bounded in-cycle backoff for planned transient failures. Keep retries
+  duplicate-safe.
 
-For a `retired` plan or a pending outgoing deletion, follow `cleanup.md` only
-when the user explicitly requests cleanup or recovery. Do not run the
-strategy unless the user explicitly asks. Otherwise preserve the audit record
-unchanged.
+## Verification
+
+Test observable plan conformance, not profitability or speed. Include the
+applicable cases:
+
+- signal or agent-decision contract;
+- timestamps, freshness, missing data, and strict asset type;
+- sizing, leverage, exposure, and order mapping;
+- positions, open orders, uncertain submissions, and reconciliation;
+- overlapping normal and dry runs;
+- dry-run prevention of orders and canonical state changes;
+- scheduler pause and durable-block behavior;
+- notification labels and failure handling;
+- self-heal scope, snapshots, repeated dry checks, rollback, and time limit;
+  and
+- backtest logic and protection from future information.
+
+Mock external services. Tests must not submit or cancel an AlphaInsider paper
+order. Performance differences from the backtest can prompt a correctness
+review, but they fail verification only when evidence shows plan
+nonconformance.
+
+## Documentation and completion
+
+Follow `generated-project.md` for `README.md`, `AGENTS.md`, and the runbook.
+Record the exact managed files, task identity, public target ID, checks, and
+current next step in `plan.md`.
+
+An incomplete target or scheduler gate does not discard the build. Preserve
+the project, set the appropriate highest completed outcome, and identify the
+next action. Set Automated strategy only after every completion condition in
+`interview.md` passes.

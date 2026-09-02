@@ -1,319 +1,178 @@
 # Strategy Interview
 
-Use this design tree adaptively. Resolve dependencies before downstream
-questions and skip branches that cannot affect the project.
-
-## Contents
-
-- [Protocol](#protocol)
-- [Existing project](#existing-project)
-- [Design tree](#design-tree)
-- [Missing environment values](#missing-environment-values)
-- [Confirmation gate](#confirmation-gate)
+Use the communication rules in `user-communication.md`. This interview is
+dependency-aware: ask every available decision in the current round, record the
+answers, then open the next dependent round. Skip irrelevant branches.
 
 ## Protocol
 
-Interview in frontier rounds. Do not depend on any other skill for this
-pacing.
-
-- Research repository, API, host, and provider facts instead of asking the
-  user.
-- The frontier is every user decision whose prerequisites are already settled.
-  Ask every currently unblocked user decision in one turn through the agent's
-  interactive question prompt — the blocking multiple-choice question UI, not
-  ordinary chat text. One prompt may contain the whole frontier. For each
-  decision: a short question, two or three choices when that fits, the
-  recommended option first, and a short reason in that option's description.
-  Wait for the answers.
-- Do not print interview questions, choices, or recommended answers as
-  assistant feed text. Chat may give brief context or the complete plan; the
-  decisions themselves belong in the question prompt.
-- If the runtime has no interactive question prompt, fall back to this chat
-  format and wait:
-
-  ```
-  ❓ **Q1** - **<title>**: <question and choices>
-
-  ➡️ <recommended answer>
-  ```
-
-- A question that depends on an answer still open in this round belongs to a
-  later round.
-- Record the user's answer, not the recommendation or conversation. Update the
-  matching active plan after every round: `docs/plan.md` for a new or updated
-  strategy, or `docs/replacement-plan.md` for a staged replacement. Surface
-  contradictions immediately. Normalize plan frontmatter to only its lifecycle
-  `status` whenever writing the plan.
-- Use plain trading language for a user who understands profit, loss, fees,
-  trades, and percentage limits. Avoid specialist terms when familiar words
-  work. If a specialist term is necessary, explain it immediately; for
-  example, describe drawdown as the largest drop from a previous high.
-- Make each question easy to answer by including a brief example or two or
-  three short choices. Use earlier answers to recommend a concrete choice that
-  the user can accept or adjust instead of asking them to invent an answer from
-  scratch.
-- Challenge lookahead, overfitting, unavailable data, timing mismatches,
-  hidden cost, unreliable execution, and unnecessary complexity. Offer the
-  simplest feasible alternative and resolve the choice.
-- Allow conservative defaults for incidental mechanics. Label them as agent
-  defaults so the user accepts them with the complete plan.
-- Treat API-key permissions, owned-strategy discovery, eligibility, account
-  limits, and endpoint fields as discoverable facts. Follow
-  `alphainsider-target.md` and `credentials.md` rather than
-  asking the user to find IDs, scopes, or account details.
-- Do not code while the plan is `draft`. When the tree is complete, present
-  one normalized complete plan for confirmation.
+- Research project, market-data, AlphaInsider, storage, and scheduler facts.
+  Ask the user only for intent, user-held facts, material choices, or required
+  authority.
+- Update `plan.md` after every answer and completed action. Set **Plan
+  agreement** to Draft when an open decision can change intended behavior.
+  For an active update, keep the current plan Agreed and mark
+  `pending-update.md` Draft instead.
+- Use conservative agent defaults for routine technical choices. Record each
+  default, but do not make the user approve implementation trivia.
+- Ask one normalized agreement question before executing each new stage. Do
+  not add action-by-action approvals for work already listed in that agreed
+  stage.
+- Do not code a strategy while its applicable plan is Draft.
+- If the user revises an earlier answer, keep unaffected decisions and reopen
+  every dependent decision.
+- If a technical discovery requires a high-level behavior change, explain the
+  conflict and ask the affected strategy question again. Do not silently change
+  the agreement to make code or a backtest work.
 
 ## Existing project
 
-After `project-root.md` recognizes and audits a project, ask exactly one
-existing-project question through the interactive question prompt:
-"Would you like to update the existing plan, replace the trading strategy with
-a new one, or retire and clean it up?" Present those as three short choices.
-Recommend the matched intent when the prompt clearly asks to update, replace,
-or retire; otherwise recommend updating because it preserves prior decisions.
+Read **Current status** and continue at **Next step** unless the user asks for
+another supported action. Infer update, normal run, dry run, inspection, or
+deletion from clear wording. Ask only when several projects or actions are
+plausible.
 
-- For **update**, preserve unaffected decisions and interview only the choices
-  the requested change affects. Return a `confirmed` or `implemented` plan to
-  `draft` before recording the exact action inventory. Treat missing current
-  fields as unresolved and interview only those gaps. For a documentation-only
-  gap, derive its value from read-only plan, project, and live-state facts,
-  record no implementation or external action, and ask no behavior question.
-  After complete-plan confirmation, restore the prior lifecycle status once the
-  plan and current artifacts are consistent.
-- For **replace**, leave the current plan and implementation untouched. Create
-  or resume `docs/replacement-plan.md` from the current template and run the
-  complete design tree for the new strategy. Ask the outgoing
-  remote-disposition decision when that frontier is unblocked. Inventory every
-  exact replacement action while the replacement is draft; final confirmation
-  sets it to `confirmed` and authorizes the exact recorded deletion, promotion,
-  cleanup, and implementation actions without another approval.
-- For **retire**, leave the active plan and implementation unchanged while
-  drafting. Follow `cleanup.md`. Retirement always preserves an auditable
-  retired plan and asks whether the verified owned AlphaInsider target should
-  be retained and detached or deleted.
+For an update, use `changes-and-deletion.md`. If the new objective is a
+different strategy, create a separate project. For deletion, use that reference
+only after an explicit request.
 
-Resume `docs/replacement-plan.md` when it is a recognized `draft` or
-`confirmed` plan. Treat any other existing file at that path as an ordinary
-collision. Otherwise create it from `plan-template.md` after the first
-interview answer and update it after every round. Do not modify `docs/plan.md`
-or any current implementation artifact while drafting.
+## Stage 1: High-level strategy
 
-Before confirmation, inventory attributable source, tests, copied
-AlphaInsider helpers, dependencies, `.env.example`, `.gitignore`, `README.md`,
-`AGENTS.md`, and every attributable native definition, agent task, and running
-state. Show and record every exact deletion, overwrite, promotion, stop, pause,
-disable, activation, native-definition, and agent-task action. Never
-recursively delete the project root.
-Never delete `.env`, credentials, caches, unrelated files, or files whose
-ownership is uncertain.
+Ask in this dependency order.
 
-If the user does not confirm, retain the replacement plan as `draft`. If a
-valid replacement plan is already `draft`, resume its next unresolved
-frontier. If it is `confirmed`, use `implementation.md` to perform only the
-recorded actions without another interview or approval.
+### Objective and market
 
-Resume unfinished remote deletion only when the user explicitly asks to clean
-up or continue that cleanup.
+1. What should the strategy do?
+2. Will it trade stocks or cryptocurrency?
+3. Which instruments can it select?
+4. Is selection fixed, dynamic, or constrained dynamic?
 
-## Design tree
+Define a hard asset-type boundary. A cryptocurrency strategy cannot trade
+stocks, and a stock strategy cannot trade cryptocurrency.
 
-1. **Objective** — Ask "What do you want this strategy to do?" and record the
-   answer as the strategy goal. For a new project root, follow
-   `project-root.md` after this answer before later rounds.
-2. **Market and instruments** — Choose the strict `stock` or `cryptocurrency`
-   asset class and an instrument-selection mode: `fixed`, `dynamic`, or
-   `constrained dynamic`. For fixed selection, record explicitly named
-   instruments; validate their mappings later in the AlphaInsider phase. For
-   dynamic selection, define the runtime selector without requiring an advance
-   list. For constrained dynamic selection, define the category, allowlist, or
-   other boundary within which runtime selection may operate. Every traded
-   candidate must match the planned asset class.
-3. **Strategy behavior** — Define every input, transformation, entry decision,
-   exit or holding rule, and tie-breaking behavior. Prefer deterministic rules.
-   For an LLM or hosted model, additionally define the prompt/input contract,
-   output schema, model expectations, cost ceiling, timeout, invalid-output
-   handling, and fallback. Resolve bar or event timing, polling or streaming,
-   schedule, market-hours behavior, decision latency, late events, and when an
-   order is evaluated relative to its signal.
-4. **Data and resources** — After cadence exists, this phase may share a
-   frontier with execution and backtesting. Derive technical requirements
-   before selecting tools. Research current primary documentation for plausible
-   sources and libraries; check coverage, history, timestamps, latency,
-   authentication, price, rate limits, licensing, reliability, and maintenance
-   burden. Recommend the smallest stack and record routine selections as agent
-   defaults. Ask the user only when cost, credentials, scraping, or another
-   meaningful tradeoff needs their decision. Resolve required inputs, as-of
-   timing, freshness, and missing, stale, delayed, or conflicting data
-   behavior. Prefer AlphaInsider's applicable stock REST endpoints and
-   `wsStockPrice` for supported current instrument metadata, exchange status,
-   and bid, ask, or last prices when their coverage, freshness, and cadence fit.
-   Use an external provider when AlphaInsider does not supply the required live
-   market, cadence, freshness, or signal-specific input. For historical inputs
-   used by live operation, compare AlphaInsider and external sources case by
-   case under the same research criteria. Offer scraping only with permitted
-   access, no suitable supported feed, a documented failure/maintenance plan,
-   and a recorded user decision before final confirmation.
-5. **Execution and risk** — Resolve fixed versus allocation orders, types,
-   sizing, entries, reductions, exits, and position/open-order reconciliation;
-   apply installed `alphainsider-api` normalized sizing/order rules when that
-   skill is present; otherwise read the live AlphaInsider docs and keep these
-   fail-closed rules: never default a missing `input_multiplier` to `1`, and
-   use `getMaxOrderSize` as the fixed-order authority. For
-   allocations or webhook leverage, ask a separate maximum-exposure question:
-   100% is 1× portfolio value, while AlphaInsider permits up to 200% (2×).
-   Treat 200% as the platform ceiling, not a default; do not assume 100% is the
-   platform maximum. Record the user's chosen cap under sizing and exposure
-   constraints. Buying power, fees, and slippage may lower executable exposure.
-   Use `getMaxOrderSize` as the fixed-order authority. Resolve
-   position/exposure limits, stops or exit constraints, in-process retries,
-   duplicate events, automatic pause or shutdown conditions, logging, and
-   recovery. For every WebSocket input, explicitly choose continuous reconnect
-   and re-subscribe or stop on a stream error; an unresolved choice keeps the
-   plan `draft`. For dynamic instruments, resolve validation freshness and
-   whether one invalid candidate causes the cycle to continue with valid
-   candidates or abort. Propose safe, simple defaults when the strategy does
-   not require a special choice.
-6. **Backtesting** — Determine whether every signal input and decision timestamp
-   can be reconstructed without future information. For dynamic selection,
-   require the historical candidate set and selection inputs as they existed at
-   each decision time; reject current-universe substitution and survivorship
-   bias. Never use AlphaInsider's `getStockPriceHistory` for a backtest. Require
-   a credible external historical source; if none is feasible, record the
-   reason, mark backtesting unavailable, and do not offer it. If replay is
-   otherwise feasible, always ask whether to backtest, then resolve the
-   historical window, when results are measured, execution assumptions, costs,
-   and results to report. Reuse production decision logic and implement only
-   the smallest credible replay; signal-only evaluation is valid when portfolio
-   accounting would be speculative. When production and replay use different
-   providers, normalize them to the same decision-logic input contract and
-   document timestamp, symbol, price-adjustment, and coverage differences.
-7. **Implementation** — Resolve language when Python is unsuitable, module
-   responsibilities, data flow, persistent state, configuration names, the
-   finite one-cycle command, persistent command when applicable, tests to run,
-   and expected results.
-   Select routine implementation details as agent defaults; ask the user only
-   when a material tradeoff requires their decision. Ask about the AlphaInsider
-   client only when the user already named a library or request style;
-   otherwise pick an idiomatic library and record it as an agent default.
-   Require the generated README's short startup sequence to use those exact
-   language-specific setup and run commands; for Python, include
-   `source .venv/bin/activate` before the run choices. Do not add an
-   interactive confirmation to an operational command. Never manually run a
-   cycle, start a persistent process, or trigger a schedule during build and
-   verification. After implementation, follow this skill's run rule.
-   Treat the selected project root as `.` in every persisted project path;
-   never embed machine-specific absolute paths except in confirmed native
-   operation definitions, or write generated artifacts into an installed skill
-   directory.
-8. **Operation and scheduling** — After cadence, worst-case cycle duration, and
-   host and agent-tool discovery, follow `operation-and-scheduling.md`.
-   Distinguish a single run, persistent process, and recurring schedule.
-   Present `foreground`, `background process`, and `agent scheduler` with a
-   usable or not-usable result; never omit a family. Foreground supports a
-   single run or visible persistent process and is always selectable. A
-   background process may use a Linux systemd or macOS launchd persistent
-   service, or recurring finite cycles through systemd timers, launchd
-   calendar intervals, or Windows Task Scheduler, and is selectable only when
-   those native gates pass. An agent scheduler is listed whenever any
-   future-invocation tool exists and is selectable for recurring operation
-   when that tool can repeat, including session-scoped or conversation-
-   attached automations; each occurrence runs exactly one finite cycle.
-   Resolve capability, collision, schedule, missed-run, non-overlap, retry,
-   activation, log or history, notification, recorded limitations, and
-   installation decisions without creating or starting a resource.
-   Recommend a background process before an agent scheduler, keep foreground
-   available, and ask Initial activation and autostart for every invocation
-   model. Recommend active for a first-session ready target.
-9. **AlphaInsider target** — After class and execution, follow
-   `alphainsider-target.md`. Resolve a compatible target and instrument
-   validation when possible; otherwise record explicit local-only readiness.
-   Verify that the target's owner context and multiplier do not invalidate
-   planned sizing or risk behavior. Reopen only affected earlier decisions when
-   they do, rerun every dependent phase, and return here before confirmation.
+### Behavior and decision mode
 
-Objective unblocks market. Market unblocks behavior. Behavior cadence unblocks
-data, execution, and backtesting as one frontier. Implementation defaults may
-join that frontier when no material language tradeoff exists. Operation waits
-for cadence, worst-case duration, and host and agent-tool facts. Target waits for class and
-execution. Confirmation waits for a complete tree.
+Define inputs, transformations, signals, entries, exits, holding behavior,
+tie-breakers, and missing-data behavior. Ask whether the strategy is:
 
-## Missing environment values
+- **code-led:** code applies fully specified rules;
+- **agent-led:** each scheduled AI instance makes the decision; or
+- **hybrid:** programs collect or calculate inputs and the scheduled AI makes
+  a bounded decision.
 
-A missing API key or other required credential is a setup gap, not a strategy
-decision. Follow `credentials.md`. Name the missing variables
-and exact project `.env` path, then recommend that the user add the values there
-themselves and tell you when ready. If the user wants agent-assisted entry,
-they may paste values in chat so you can add them. Always warn first that
-pasting credentials is less secure because each value is visible to the agent
-and may appear in tool metadata or a transient process listing.
-A missing `ALPHAINSIDER_STRATEGY_ID` follows the target branch above instead of
-being treated as a credential gap.
+For agent-led or hybrid behavior, define:
 
-During AlphaInsider forward-test setup, an unavailable or insufficient
-`ALPHAINSIDER_API_KEY` permits explicit local-only target readiness and
-continuation to plan confirmation; it never permits a remote call. A missing
-credential required to validate another selected data source pauses that
-affected branch until the user supplies it or selects a feasible alternative.
+- the exact information the AI may use;
+- the judgments it may make and decisions it may output;
+- the allowed instrument set and risk limits;
+- how it handles uncertainty, conflicting evidence, or invalid output; and
+- what is a strategy decision versus a repairable implementation detail.
 
-For pasted values, follow `credentials.md`. Use the setup request wrapper for
-AlphaInsider strategy configuration only when the target is not local-only.
+The scheduled AI can use its own reasoning. Do not require a separate model API
+key unless the agreed strategy explicitly calls an external model service.
 
-## Confirmation gate
+### Data, timing, execution, and risk
 
-Complete plan confirmation is the only skill-level execution approval. Before
-presenting the plan:
+Research the smallest credible data stack. Resolve availability, timestamps,
+freshness, licensing, cost, rate limits, and failure behavior. Ask only when a
+cost, credential, scraping source, or material reliability tradeoff needs the
+user's choice.
 
-- Require target readiness to be exactly `ready` or `local-only`. For `ready`,
-  verify the permission bundle, compatible ownership and type, complete core
-  creation fields, and explicit mappings or runtime validation contract. For
-  `local-only`, record a non-secret reason and normalize target-dependent
-  fields; do not leave `_pending_` or `_not yet decided_` placeholders.
-- Ensure the selected data and library stack is available and resolve every
-  cost, credential, scraping, or other material tradeoff as a recorded
-  interview decision.
-- Require operation and scheduling to contain one compatible invocation model
-  and runner with every applicable dependent decision complete. Include every
-  exact native definition or agent task, active or inactive state, future-login
-  effect or next scheduled run, missed-run acceptance, and runtime-location
-  requirement in the complete plan.
-- Ensure no unresolved placeholder or contradiction remains outside the
-  explicitly local-only target fields.
-- Include every exact create, modify, overwrite, delete, stop, pause, disable,
-  activation, promotion, provisioning, synchronization, ID-persistence,
-  native-operation, and agent-task action. Research collisions and present
-  warnings while the plan is draft.
-- Include the exact generated AlphaInsider description. Plan confirmation
-  authorizes its initial creation value and later synchronization only when
-  target readiness is `ready`. For a ready new target, the same confirmation
-  is the sole authorization for `newStrategy` and persist its returned
-  ID on this plan; do not request another creation confirmation.
-- State backtesting as unavailable, declined, or accepted with its exact scope.
-- Present the complete normalized plan, including every agent default and
-  exact action, and ask once for final confirmation through the interactive
-  question prompt, not as ordinary chat text. That confirmation is the
-  only skill-level execution approval; do not request another approval for any
-  confirmed implementation or update action. Never request a one-off approval
-  against a confirmed plan.
-- Confirmation with a `local-only` target authorizes a complete local build,
-  including AlphaInsider adapters, order mapping, documentation, backtests, and
-  mocked tests, but no remote calls or order-submitting commands. Keep the plan
-  `confirmed`, never `implemented`, and mark operational commands unavailable
-  until target readiness is resolved. Retain operation decisions but create no
-  native definition or agent task.
-- To resume a local-only target, return the plan to `draft`, preserve every
-  unaffected decision, interview only target gaps, and reconfirm the complete
-  plan before provisioning, synchronization, or any other remote work.
-- For a replacement, include the exact deletion list, stop/disable effects,
-  target disposition, live-state warning, overwrites, and promotion in the
-  replacement draft. Final replacement-plan confirmation authorizes all of
-  them; do not use a separate deletion, cleanup, or promotion gate. A
-  local-only replacement target authorizes none of the outgoing cleanup
-  actions.
-- For retirement, require the plan's exact target ID and ownership, operation
-  shutdown, local path inventory, preserve list, remote disposition, binding
-  action, and ordered failures. Its one final confirmation is the sole
-  cleanup execution approval.
-- If any required action, identity, or path was absent or changes afterward,
-  return the plan to `draft`, resolve only the affected decisions, and present
-  the complete plan for one new final confirmation.
+Define order method, sizing, positions, open orders, duplicate prevention,
+reconciliation, loss controls, and maximum total exposure. Explain that
+AlphaInsider permits up to `2×` leverage:
+
+- `1×` means total exposure can equal the paper strategy value.
+- `2×` means total exposure can be twice the paper strategy value.
+- The selected value is a maximum, not a target.
+
+Recommend `1×` unless the strategy and risk design support more. Never infer
+`2×` from the platform limit.
+
+Before asking cadence, inspect the current native AI scheduler's actual
+interval, timezone, and market-hours options. Offer only supported schedules.
+Record the exact timezone and daylight-saving-time behavior. If the requested
+cadence is unsupported, explain the closest supported choices and ask the user
+to select one.
+
+### Strategy agreement
+
+Show one concise normalized summary of the complete high-level strategy. Ask
+whether to agree and continue, revise it, or stop with the plan. Recommend
+agreement when no contradiction remains.
+
+On agreement:
+
+- set **Plan agreement** to Agreed;
+- set **Highest completed outcome** to Plan;
+- keep **Phase** at Interviewing until the backtest choice is made; and
+- record the next step explicitly.
+
+## Stage 2: Backtest choice and results
+
+Determine historical feasibility before asking. Follow `backtesting.md`.
+When a credible replay is possible, ask whether to backtest. Recommend yes.
+When it is not possible, explain the missing history or reconstruction problem
+and record Backtesting as unavailable.
+
+If accepted, settle replay choices, ask agreement for the listed local build
+and data access, then build and run it. Set **Phase** to Building backtest and
+then Reviewing results. Show results and ask whether to keep the strategy,
+revise it, or stop with the backtest. Never make profitability a pass/fail
+gate. A plan-conforming strategy may continue with poor results.
+
+After the results are settled, or after a declined/unavailable backtest, offer
+AlphaInsider forward testing as the recommended next step.
+
+If the user declines forward testing, set **Phase** to Complete and preserve
+the Plan or Backtest outcome. Do not show the automated-strategy success
+message.
+
+## Stage 3: AlphaInsider and automation
+
+Enter this stage only after the user chooses AlphaInsider forward testing.
+Change **Phase** to Building implementation and **Plan agreement** to Draft
+while new high-level implementation decisions remain.
+
+Follow this order:
+
+1. Recheck persistent project access from scheduled runs.
+2. Follow `automation.md` to verify native scheduler capabilities.
+3. Define code-led, agent-led, or hybrid runtime responsibilities.
+4. Ask whether self-healing is enabled. Recommend enabled when the project has
+   a safe plan-preserving repair scope.
+5. Ask whether notifications are enabled. Recommend enabled. If enabled,
+   discover supported channels and ask for the exact destination.
+6. Follow `credentials.md` for the API key.
+7. Follow `alphainsider-target.md` to show compatible owned targets and the
+   recommended new-target option.
+8. Record the exact offline build, target, description, scheduler, notification
+   check, and activation actions.
+
+When complete, show one normalized implementation summary. State clearly that
+an active schedule and later user-triggered normal runs can submit
+plan-conforming AlphaInsider paper orders without another prompt. Ask whether
+to agree and build, create or bind the target, and activate the listed native
+AI schedule. Offer revise or stop as alternatives.
+
+That agreement authorizes only the listed local and external actions. Build and
+pass all offline, order-free checks before `newStrategy`. If a new path,
+permission, target action, or schedule identity becomes necessary, return the
+affected plan to Draft and resolve it.
+
+## Completion
+
+Set **Phase** to Complete and **Highest completed outcome** to Automated
+strategy only after:
+
+- the implementation and docs conform to `plan.md`;
+- offline plan-conformance tests pass;
+- the AlphaInsider target and saved public ID validate;
+- its description is current;
+- the scheduler is active for the next normal occurrence; and
+- notification delivery has been attempted when enabled.
+
+Keep **Plan agreement** Agreed and **Automation state** Active. Follow the
+success handoff in `generated-project.md`. If any gate remains open, record the
+highest completed outcome, blocker, and exact next step instead of claiming
+success.

@@ -7,17 +7,21 @@ if __name__ != "__main__":
     raise RuntimeError("set_env_value.py is CLI-only; do not import it")
 
 import argparse
+import getpass
 import json
 import os
 import re
 import stat
+import sys
 import tempfile
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 
 
 ENV_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 _UNQUOTED_VALUE = re.compile(r"^[A-Za-z0-9_./:@%+=,-]+$")
+_MAX_VALUE_BYTES = 16 * 1024
+_MAX_ENV_BYTES = 1024 * 1024
 
 
 class _EnvUpdateError(ValueError):
@@ -28,7 +32,8 @@ class _SafeArgumentParser(argparse.ArgumentParser):
     def error(self, _message: str) -> None:
         self.exit(
             2,
-            "error: invalid arguments; pass NAME VALUE or --remove NAME\n",
+            "error: invalid arguments; pass NAME and provide its value through "
+            "protected standard input, or pass --remove NAME\n",
         )
 
 
@@ -47,6 +52,24 @@ def _validate_value(value: str) -> None:
         raise _EnvUpdateError("value must be a single line")
 
 
+def _read_value() -> str:
+    if sys.stdin.isatty():
+        value = getpass.getpass("Value: ")
+    else:
+        encoded = sys.stdin.buffer.read(_MAX_VALUE_BYTES + 1)
+        if len(encoded) > _MAX_VALUE_BYTES:
+            raise _EnvUpdateError("value is too large")
+        try:
+            value = encoded.decode("utf-8")
+        except UnicodeDecodeError:
+            raise _EnvUpdateError("value must be UTF-8") from None
+        if value.endswith("\n"):
+            value = value[:-1]
+            value = value.removesuffix("\r")
+    _validate_value(value)
+    return value
+
+
 def _validate_project_root(project_root: Path) -> Path:
     resolved_root = project_root.expanduser().resolve()
     if not resolved_root.is_dir():
@@ -54,8 +77,8 @@ def _validate_project_root(project_root: Path) -> Path:
     skills_root = Path(__file__).resolve().parents[2]
     if resolved_root == skills_root or skills_root in resolved_root.parents:
         raise _EnvUpdateError("refusing to write inside an installed skill directory")
-    if not (resolved_root / "docs" / "plan.md").is_file():
-        raise _EnvUpdateError("project root must contain docs/plan.md")
+    if not (resolved_root / "plan.md").is_file():
+        raise _EnvUpdateError("project root must contain plan.md")
     return resolved_root
 
 
@@ -123,13 +146,11 @@ def _update_env(env_path: Path, name: str, value: str) -> None:
     if env_path.exists() and not env_path.is_file():
         raise _EnvUpdateError(".env exists but is not a regular file")
 
+    if env_path.exists() and env_path.stat().st_size > _MAX_ENV_BYTES:
+        raise _EnvUpdateError(".env is too large to update safely")
     contents = env_path.read_text(encoding="utf-8") if env_path.exists() else ""
     replacement = _updated_contents(contents, name, value)
-    existing_mode = (
-        stat.S_IMODE(env_path.stat().st_mode) if env_path.exists() else 0o600
-    )
-
-    _replace_file(env_path, replacement, existing_mode)
+    _replace_file(env_path, replacement, 0o600)
 
 
 def _remove_env(env_path: Path, name: str) -> None:
@@ -142,11 +163,15 @@ def _remove_env(env_path: Path, name: str) -> None:
     if not env_path.is_file():
         raise _EnvUpdateError(".env exists but is not a regular file")
 
+    if env_path.stat().st_size > _MAX_ENV_BYTES:
+        raise _EnvUpdateError(".env is too large to update safely")
     contents = env_path.read_text(encoding="utf-8")
     replacement = _removed_contents(contents, name)
     if replacement == contents:
+        if stat.S_IMODE(env_path.stat().st_mode) != 0o600:
+            os.chmod(env_path, 0o600)
         return
-    _replace_file(env_path, replacement, stat.S_IMODE(env_path.stat().st_mode))
+    _replace_file(env_path, replacement, 0o600)
 
 
 def _main(argv: Sequence[str] | None = None) -> int:
@@ -163,15 +188,10 @@ def _main(argv: Sequence[str] | None = None) -> int:
         metavar="PATH",
         help="Selected strategy project root. Defaults to the current directory.",
     )
-    parser.add_argument("name", help="Environment variable name to create, update, or remove.")
-    parser.add_argument("value", nargs="?", help="Value to create or update.")
+    parser.add_argument(
+        "name", help="Environment variable name to create, update, or remove."
+    )
     args = parser.parse_args(argv)
-
-    if args.remove:
-        if args.value is not None:
-            parser.error("a removal does not accept a value")
-    elif args.value is None:
-        parser.error("an update requires a value")
 
     chosen_root = Path(args.project_root) if args.project_root else Path.cwd()
     try:
@@ -180,7 +200,7 @@ def _main(argv: Sequence[str] | None = None) -> int:
         if args.remove:
             _remove_env(env_path, args.name)
         else:
-            _update_env(env_path, args.name, args.value)
+            _update_env(env_path, args.name, _read_value())
     except (_EnvUpdateError, OSError, UnicodeError) as exc:
         parser.exit(1, f"error: {exc}\n")
 
@@ -190,4 +210,10 @@ def _main(argv: Sequence[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(_main())
+    try:
+        raise SystemExit(_main())
+    except KeyboardInterrupt:
+        raise SystemExit(130) from None
+    except Exception:  # noqa: BLE001 - secret-safe CLI boundary
+        print("error: environment update failed safely", file=sys.stderr)
+        raise SystemExit(1) from None

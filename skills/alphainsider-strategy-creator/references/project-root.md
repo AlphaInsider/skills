@@ -1,132 +1,82 @@
-# Project Root
+# Persistent Project
 
-Read this reference at Start when resolving the project root. Do not ask
-where to store the project. Placement questions use the interactive question
-prompt in `interview.md`.
+Read this file at the start. Select the safest persistent location available.
+Do not ask the user where to put the project. If the user names a location,
+use it only when it passes the same checks.
 
-## Contents
+## Persistence requirements
 
-- [Invocation directory](#invocation-directory)
-- [Unusable location](#unusable-location)
-- [Plan recognition](#plan-recognition)
-- [Walk-up](#walk-up)
-- [Existing strategy](#existing-strategy)
-- [Non-strategy software project](#non-strategy-software-project)
-- [Child discovery](#child-discovery)
-- [New child](#new-child)
-- [Rename](#rename)
+The location must outlive this chat and remain available to a new chat. Before
+automation, prove that scheduled AI runs can read and write the same project.
+The project must preserve `plan.md`, source, tests, backtest output, runtime
+state, locks, run history, and repair records.
 
-## Invocation directory
+Do not use chat memory, a temporary upload area, a cache, an installed skill
+directory, or another session-only filesystem as project storage.
 
-Resolve the project root from the session working directory: the process
-current working directory. Do not use the host workspace root or walk to a
-git root unless that directory is already selected by the rules below.
+For a hosted or web platform, prefer its persistent project or workspace when
+new chats and scheduled runs can access it. Otherwise, use an already connected
+durable repository or storage integration. Do not provision an unrelated cloud
+service. If no persistent writable location exists, give one clear action to
+enable or connect one and stop before creating files.
 
-A new strategy is a dedicated child folder of that directory. Never write
-generated strategy files directly into the invocation directory.
+For a local platform, prefer the current durable workspace or a suitable
+user-controlled projects directory. Create a dedicated child directory. Do not
+mix a strategy into an unrelated software project or write into this skill.
 
-The selected project root may differ from the session working directory. Run
-project commands from the project root. Announce the exact project path once
-when the root is resolved. Credential and setup helpers use `--project-root`
-as specified in `credentials.md`.
+Planning storage and scheduled-run access are separate checks. A project can
+support the interview and backtest while automation remains blocked. Record
+that blocker and the exact next step in `plan.md`.
 
-## Unusable location
+## Find or create the project
 
-Reject an installed skill directory, unsafe system location, or unusable
-path without elaborate denylist checks. Stop and tell the user to relaunch
-from a writable user-controlled folder. Do not fall back to `~/Desktop` or
-`$HOME`. Do not ask for another parent path.
+Recognize a project by a root `plan.md` that has exactly one
+`# Strategy Plan` title and one `## Current status` section with the documented
+Phase, Plan agreement, Highest completed outcome, and Automation state fields.
+Do not require YAML frontmatter. Before any run, require each status value to
+match the choices in `plan-template.md`; stop and reconcile an invalid value.
 
-Accept a normal writable user-controlled location, including beneath the
-user's home, as the parent of a new child.
+Search in this order:
 
-## Plan recognition
+1. the current directory and nearest suitable ancestors;
+2. immediate children of the selected persistent parent; and
+3. a new dedicated child.
 
-Recognize `docs/plan.md` when it has exactly one `# Strategy Plan` title and
-YAML frontmatter containing exactly one lifecycle `status` whose value is
-`draft`, `confirmed`, `implemented`, or `retired`. Ignore additional
-frontmatter fields during recognition and never interpret them. On the next
-normal plan write, normalize frontmatter to contain only `status`.
+Do not crawl unrelated source or open `.env`. If one project clearly matches
+the user's words, resume it. If several match, ask which one and include
+**Create a new strategy**. A request for another strategy creates a sibling,
+not a nested project.
 
-Audit every recognized plan against the current `plan-template.md` headings and
-fields. Missing current content is an unresolved decision, not a reason to
-reject the plan. Follow `interview.md` to resolve only missing or affected
-choices before confirmation. Malformed title, frontmatter, or status is not a
-recognized plan.
+For a new project, ask the objective first. Derive a short lowercase
+kebab-case directory name from that objective. Use the next free numeric suffix
+for a collision. Never overwrite or adopt an unrelated directory.
 
-## Walk-up
+## Core project contract
 
-If the invocation directory or a nearer ancestor contains a recognized
-`docs/plan.md`, use the nearest recognized strategy ancestor as the project
-root. Do not keep walking to look for sibling projects or git roots.
-Walk-up never selects an installed skill directory or unsafe system path.
+Create and maintain this core layout:
 
-## Existing strategy
+```text
+plan.md
+.env
+.env.example
+.gitignore
+README.md
+AGENTS.md
+strategy/
+backtest/
+runtime/
+tests/
+```
 
-When the selected root is already a recognized strategy, follow
-`interview.md`. Never create a nested strategy. Never create a sibling
-from inside this project. A second strategy requires relaunching from the
-parent. Replace remains the in-folder new-strategy path.
+Create `.env` only through `scripts/set_env_value.py` when project-file secret
+storage is selected. A hosted secure secret store can replace `.env` when the
+scheduled runtime cannot use project secrets safely. Add only the dependency
+and tool files the implementation needs.
 
-## Non-strategy software project
+Put the scheduled-agent instructions in `runtime/runbook.md`. Keep mutable
+state, locks, histories, and repair records under `runtime/`. Persist
+project-relative paths except where the native scheduler requires a stable
+external project identity.
 
-Ask only when creating a child would clearly mix a trading project into an
-existing non-strategy software project. Stay silent for home, Desktop,
-scratch folders, and container folders such as `~/projects`. If it is not
-clearly a software project, stay silent and continue.
-
-If asked, recommend not creating a child here. A no answer stops; tell the
-user to relaunch from a writable user-controlled folder.
-
-## Child discovery
-
-Scan immediate children only. Do not recurse. Classify each recognized
-child as live (`draft`, `confirmed`, or `implemented`) or `retired`. Match
-the user prompt against the child folder name plus that plan's Objective,
-title, status, and asset class. Never open `.env`. Do not crawl source.
-
-- 0 live children: create.
-- 1 live child, and the prompt clearly refers to it or is a generic
-  Strategy Creator invoke: reuse that child.
-- 1 live child, and the prompt clearly asks for a new, another, or
-  different strategy: create a sibling.
-- N live children, and exactly one clear match: reuse it.
-- N live children, and the prompt is generic or ambiguous: ask which
-  child, including create new.
-- If unsure, ask; do not guess.
-
-Retired children appear in scans and pickers. Do not auto-reuse a retired
-child on a generic invoke: treat that case as 0 live children and create.
-A prompt about that retired bot reuses it.
-
-Reuse still follows `interview.md`. Show each picker choice as the folder
-name and one-line objective.
-
-## New child
-
-Do not create the folder until Objective is answered. Ask Objective first.
-After that answer, slug from the Objective:
-
-- Lowercase ASCII kebab-case `[a-z0-9]+` tokens joined by hyphens.
-- Drop filler such as a, an, the, strategy, bot, or trading when enough
-  content remains.
-- Prefer two to four informative tokens.
-- If nothing usable remains, use `strategy`.
-
-If `cwd/<slug>` does not exist, create it, write `docs/plan.md` from
-`plan-template.md`, and announce the exact path.
-
-If that path exists and is a recognized strategy, ask whether to continue
-it, use the next free `slug-2` or `slug-3` as the recommended choice, or
-abort.
-
-If that path exists and is not a strategy, ask only the proposed `-2`
-path or abort. Never adopt a junk or occupied folder as a new project
-root.
-
-## Rename
-
-Rename only if the user asks. Never auto-rename after the slug is set, for
-a clearer objective, or for the AlphaInsider public strategy name. A user
-requested rename is a path-changing update: return the plan to `draft`,
-inventory the exact path actions, and reconfirm.
+Announce the resolved project once. Update `plan.md` after every answer,
+material finding, completed step, failure, or next-step change.

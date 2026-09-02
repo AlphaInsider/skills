@@ -178,436 +178,146 @@ EXPECTED_ALPHA_WEBSOCKET_SECTIONS = (
 )
 EXPECTED_STRATEGY_REFERENCES = {
     "alphainsider-target.md",
-    "cleanup.md",
+    "automation.md",
+    "backtesting.md",
+    "changes-and-deletion.md",
     "credentials.md",
+    "generated-project.md",
     "implementation.md",
     "interview.md",
-    "operation-and-scheduling.md",
     "plan-template.md",
     "project-root.md",
-}
-STRATEGY_SKILL_MAX_WORDS = 950
-REQUIRED_PROGRESSIVE_DISCLOSURE_GUIDANCE = {
-    "Do not preload every reference",
-    "Read each file in full only when its phase or action begins",
-}
-REQUIRED_INDEPENDENCE_GUIDANCE = {
-    "Require this skill's two scripts",
-    "Do not require the `alphainsider-api` skill to continue",
-    "If `alphainsider-api` is installed, read it only for needed API behavior",
-    "Never copy this skill's setup wrapper",
-}
-REMOVED_SIBLING_DEPENDENCY_GUIDANCE = {
-    "Require this skill's two scripts and the sibling",
-    "use the sibling request helper",
-    "read the sibling `scripts/alphainsider_request.py`",
+    "scheduled-runs.md",
+    "user-communication.md",
 }
 EXPECTED_STRATEGY_SCRIPTS = {
     "alphainsider_setup_request.py",
     "set_env_value.py",
 }
-EXPECTED_PLAN_STATES = {"draft", "confirmed", "implemented", "retired"}
+STRATEGY_SKILL_MAX_WORDS = 1100
 REQUIRED_PLAN_SECTION_ORDER = (
     "# Strategy Plan",
-    "## Objective",
-    "## Market and instruments",
-    "## Strategy behavior",
-    "## Data and resources",
-    "## Execution and risk",
-    "## Backtesting",
-    "## Implementation",
-    "## Operation and scheduling",
-    "## AlphaInsider target",
-    "## Confirmation",
+    "## Strategy plan",
+    "## Backtesting plan",
+    "## Implementation plan",
+    "## Current status",
 )
-REQUIRED_PLAN_SECTIONS = set(REQUIRED_PLAN_SECTION_ORDER)
-REQUIRED_INTERVIEW_PHASE_ORDER = (
-    "1. **Objective**",
-    "2. **Market and instruments**",
-    "3. **Strategy behavior**",
-    "4. **Data and resources**",
-    "5. **Execution and risk**",
-    "6. **Backtesting**",
-    "7. **Implementation**",
-    "8. **Operation and scheduling**",
-    "9. **AlphaInsider target**",
-)
-REQUIRED_PLAIN_LANGUAGE_PLAN_FIELDS = {
+REQUIRED_PLAN_FIELDS = {
     "- Goal:",
-    "- Automatic pause or shutdown conditions and logging:",
-    "- Exact create, modify, overwrite, delete, stop, pause, disable, activation, promotion, provisioning, synchronization, ID-persistence, native-operation, and agent-task actions:",
-    "- Managed artifact inventory and retirement state:",
-    "- Tests to run and expected results:",
-}
-REQUIRED_TARGET_PLAN_FIELDS = {
-    "- Target readiness:",
-    "- Local-only reason:",
-    "- Target source:",
-    "- Owned-strategy discovery:",
-    "- Proposed strategy name:",
-    "- Owner starting balance:",
-    "- Access eligibility and mode:",
-    "- Paid cryptocurrency launch price:",
+    "- Strict asset class:",
+    "- Decision mode:",
+    "- Maximum strategy leverage:",
+    "- User choice:",
+    "- Benchmark:",
+    "- Metrics and charts:",
+    "- Plan-conformance checks:",
     "- AlphaInsider strategy ID:",
-    "- Remote disposition:",
-    "- Pending outgoing strategy ID and result:",
-    "- Generated AlphaInsider description:",
-    "- Description synchronization:",
-    "- Target lifecycle disposition:",
+    "- Native AI scheduler provider and task identity:",
+    "- Self-healing:",
+    "- Notifications:",
+    "- Future plan-conforming paper-order authority:",
+    "- Phase:",
+    "- Plan agreement:",
+    "- Highest completed outcome:",
+    "- Automation state:",
+    "- Automation state reason:",
+    "- Last completed step:",
+    "- Next step:",
+    "- Waiting for:",
+    "- Open questions:",
+    "- Last updated:",
 }
-REQUIRED_OPERATION_PLAN_FIELDS = {
-    "- Operation mode:",
-    "- Invocation model:",
-    "- Cadence, timezone, precision, and worst-case cycle duration:",
-    "- Capability check and selected runner or environment:",
-    "- Resource identifier and exact native definitions or agent task:",
-    "- Missed-run or catch-up behavior and acceptance:",
-    "- Initial activation and autostart:",
-    "- Overlap, retry, and persistent-service restart policy:",
-    "- Logs, run history, notifications, rotation, and retention:",
-    "- Installation state and next scheduled run:",
-    "- Operation cleanup state and removal verification:",
+REQUIRED_STATUS_VALUES = {
+    "Interviewing",
+    "Building backtest",
+    "Reviewing results",
+    "Building implementation",
+    "Configuring automation",
+    "Complete",
+    "Draft",
+    "Agreed",
+    "None",
+    "Plan",
+    "Backtest",
+    "Automated strategy",
+    "Not configured",
+    "Active",
+    "Paused",
 }
-REQUIRED_PROJECT_ROOT_GUIDANCE = {
-    "Resolve the project root from the session working directory",
-    "Do not ask where to store the project",
-    "dedicated child folder",
-    "exactly one `# Strategy Plan` title",
-    "Ignore additional frontmatter fields during recognition",
-    "normalize frontmatter to contain only `status`",
-    "Missing current content is an unresolved decision",
-    "record no implementation or external action",
-    "restore the prior lifecycle status",
-    "nearest recognized strategy ancestor",
-    "Never create a nested strategy",
-    "immediate children",
-    "slug from the Objective",
-    "Rename only if the user asks",
-    "Recommend the matched intent",
-}
-REMOVED_PROJECT_ROOT_GUIDANCE = {
-    "Ask for the project root",
-    "recommend the invocation directory",
-}
-REQUIRED_GRILL_PROTOCOL_GUIDANCE = {
-    "Ask every currently unblocked user decision in one turn",
-    "interactive question prompt",
-    "not ordinary chat text",
-    "recommended option first",
-    "Research repository, API, host, and provider facts",
-    "A question that depends on an answer still open in this round",
-    "Do not depend on any other skill for this pacing",
-}
-REMOVED_PLAN_FIELDS = {
-    "- Why the strategy could work:",
-    "- When results will be reviewed:",
-    "- What would show the strategy is working:",
-    "- What would show the strategy needs changes or should stop:",
-    "- User confirmation:",
-    "- Confirmation time:",
-    "- Core creation fields approval:",
-    "- Continuous-command mode:",
-    "- Manager, identifier, and capability check:",
-    "- User-level host definition:",
-    "- Login autostart:",
-    "- Failure restart policy and bounded parameters:",
-    "- Log exposure, paths, rotation, and retention:",
-    "- Installation state:",
-    "- Deferred reason:",
-    "- Failed-current-run target cleanup:",
-}
-REMOVED_PLAN_SECTIONS = {"## Background operation"}
-REMOVED_INTERVIEW_PHASES = {"8. **Background operation**"}
-REMOVED_INTERVIEW_QUESTIONS = {
-    "Why do you think this trading idea could work?",
-    "After how much time or how many trades should we review the results?",
-    "What results would tell you the strategy is working?",
-    "What loss or behavior would make you change or stop it?",
-}
-REMOVED_TARGET_ORDER_GUIDANCE = {
-    "Complete its permission gate before the interview",
-    "before the strategy interview",
-    "resolve the target before instrument selection",
-    "pause all interview, remote creation, and implementation work",
-    "after strategy design and background-operation planning and before backtesting",
-    "backtesting planning may continue",
-    "continue through backtesting and plan confirmation",
-    "after strategy, backtesting, implementation-contract, and background-operation planning",
-}
-REMOVED_SEPARATE_CONFIRMATION_GUIDANCE = {
-    "Obtain explicit core creation approval",
-    "Changing any core field invalidates that approval",
-    "record approved core fields for a new target",
-}
-REMOVED_POST_CONFIRMATION_APPROVAL_GUIDANCE = {
-    "does not authorize deletion, plan promotion, or implementation",
-    "separate explicit approval",
-    "Plan confirmation and deletion approval are separate decisions",
-    "an existing file still requires explicit overwrite approval",
-    "Request one explicit approval for that inventory",
-    "Request renewed approval before touching any newly discovered path",
-    "ask whether to delete this exact strategy",
-    "If the user approves cleanup",
-    "approval-gated failed-creation cleanup only",
-    "separate deletion-approval gate",
-    "do not combine plan confirmation with deletion approval",
-}
-REMOVED_TARGET_DELETION_GUIDANCE = {
-    "Never delete a selected existing strategy",
-    "failed-current-run cleanup only",
-    "never authorizes routine deletion or deletion of a selected existing strategy",
-}
-REQUIRED_REPLACEMENT_GUIDANCE = {
-    "update the existing plan",
-    "replace the trading strategy with a new one",
-    "`docs/replacement-plan.md`",
-    "Show and record every exact deletion, overwrite, promotion",
-    "final confirmation sets it to `confirmed`",
-    "authorizes the exact recorded deletion, promotion, cleanup, and implementation actions",
-    "perform only the recorded actions",
-    "Never recursively delete the project root",
-    "Never delete `.env`",
-    "replace `docs/plan.md` with `docs/replacement-plan.md`",
-}
-REQUIRED_CREDENTIAL_GUIDANCE = {
-    "`scripts/set_env_value.py`",
-    "`scripts/alphainsider_setup_request.py`",
-    "Recommend that the user add the values to `.env` themselves",
-    "they may paste the values in chat",
-    "pasting credentials is less secure",
-    "the value is visible to the agent",
-    "tool metadata",
-    "transient process listing",
-    "set_env_value.py --project-root",
-    "Always pass `--project-root`",
-    "announced selected project root",
-    "exact project directory",
-    "must directly contain `docs/plan.md`",
-    "Helpers never search ancestors",
-    "replaces `.env` atomically",
-    "mode `0600`",
-    "preserves an existing file's mode",
-    "leaves the original unchanged on failure",
-    "pass the complete value as exactly one argument",
-    "structured argument-array",
-    "quote the value as one literal argument",
-    "Never show this command to the user",
-    "Do not open `.env` before or after the update",
-    "approval to update only those names",
-    "use the setup request wrapper",
-    "--print-config ALPHAINSIDER_STRATEGY_ID",
-    "--remove ALPHAINSIDER_STRATEGY_ID",
-    "agent-only helper",
-    "Never import the helper",
-    "reproduce its write logic",
-    "shell pipeline, redirect",
-    "environment or shell variable",
-    "temporary file",
-    "direct `.env` edit",
-    "without requesting another approval",
-    "never recover it from `.env`",
-    "runtime cannot pass it as one safely quoted argument",
-    "return to the user-edit workflow",
-    "Do not improvise another write path",
-    "`--remove NAME` receives no value and is also agent-only",
-    "Generated `README.md` files must preserve user editing",
-    "never show the helper command",
-    "Generated `AGENTS.md` files must point at the installed skill",
-}
-REMOVED_LIVE_INPUT_CREDENTIAL_GUIDANCE = {
-    "interactive terminal",
-    "live process-input",
-    "live-input workflow",
-    "non-echoing prompt",
-    "process-input channel",
-    "readiness prompt",
-}
-REMOVED_CREDENTIAL_CWD_GUIDANCE = {
-    "From the project root, launch",
-    "from the project root and report",
-    "Run project commands and helpers from the project root",
-}
-REQUIRED_STRATEGY_API_PERMISSIONS = (
-    "getUserInfo",
-    "getStrategies",
-    "getStrategyValues",
-    "getUserStrategies",
-    "getStrategyPerformance",
-    "getRecommendedStrategies",
-    "searchStrategies",
-    "newStrategy",
-    "updateStrategy",
-    "deleteStrategy",
-    "getStrategySubscriptions",
-    "getStrategyCalculation",
-    "getAccountSubscription",
-    "getTimelines",
-    "getStrategyTimelines",
-    "newPost",
-    "previewPost",
-    "deletePost",
-    "getPositions",
-    "getOrders",
-    "getMaxOrderSize",
-    "newOrder",
-    "newOrderAllocations",
-    "deleteOrder",
-    "wsStockPrice",
-    "wsStrategyValue",
-    "wsOrders",
-    "wsPositions",
-    "wsTimelines",
+REQUIRED_INTERVIEW_PHASE_ORDER = (
+    "## Stage 1: High-level strategy",
+    "## Stage 2: Backtest choice and results",
+    "## Stage 3: AlphaInsider and automation",
+    "## Completion",
 )
-REQUIRED_PROVISIONING_GUIDANCE = {
-    "https://alphainsider.com/settings/developers",
-    "selecting the **AI Agent** preset",
-    "`verifyToken` has no selectable permission",
-    "stock REST lookup endpoints require no API-key permission",
-    "`like` and `unlike` are not required",
-    "subscription permissions are read-only",
-    "account-subscription changes, payments, withdrawals, bots, webhooks",
-    "`updateStrategyPrice`",
-    "list only the missing permission names",
-    "pause AlphaInsider target setup and every remote action",
-    "use the verified token's `user_id` with `getUserStrategies`",
-    "Never pick the first result or create a duplicate silently",
-    "Persist the user's selection",
-    "Compare the owned strategy count with `limits.max_strategies`",
-    "stop if either eligibility check fails",
-    "`getAccountSubscription.level > 0`",
-    "`getUserInfo.verified` is true",
-    "record public access without an extra access question",
-    "Never offer paid stock creation",
-    "$10 through $1000",
-    "public to `private: false, price: 0`",
-    "private to `private: true, price: 0`",
-    "Do not ask for separate creation approval",
-    "Changing a core field before confirmation updates the draft",
-    "changing one after confirmation returns the plan to `draft`",
-    "Do not call `newStrategy` before complete plan confirmation",
-    "one to three plain-language sentences",
-    "write it only to `ALPHAINSIDER_STRATEGY_ID`",
-    "report it once",
-    "retain the created target and saved ID",
-    "Never request another skill-level approval",
-    "Only after deletion succeeds",
-    "Never remove a default that now refers to another strategy",
-    "send the current name and owner `input_value` unchanged",
-    "If synchronization fails, leave the plan `confirmed`",
+REQUIRED_STRATEGY_SKILL_GUIDANCE = {
+    "`plan.md` is the project's readable source of truth",
+    "one strict `stock` or `cryptocurrency` type",
+    "Use only the platform's native AI automation or scheduler",
+    "Poor performance never makes a plan-conforming run unhealthy",
+    "Use only create, resume, update, and explicit deletion paths",
+    "Select the safest persistent location without asking the user",
+    "Build and pass offline, order-free checks before creating a new target",
+    "When `alphainsider-api` is installed, read its `SKILL.md`",
+    "Do not preload every reference",
 }
-REQUIRED_CLEANUP_GUIDANCE = {
-    "The active or replacement plan is the sole place",
-    "Before setting `implemented`",
-    "exact project-relative managed-artifact inventory",
-    "retain and detach",
-    "selected existing owned targets",
-    "Disable future cycles",
-    "safe cycle boundary",
-    "preventing another internal cycle",
-    "releasing its runtime marker",
-    "never force-kill an uncertain process",
-    "getStrategySubscriptions",
-    "open orders",
-    "nonzero positions",
-    "does not state whether or how those resources cascade",
-    "never calls `newOrder`",
-    "never calls `deleteOrder`",
-    "verify that the target no longer resolves",
-    "Never recursively delete the project root",
-    "`.env`, `.gitignore`",
-    "`status: retired`",
-    "If the replacement target is local-only",
-    "allow its confirmed future activation with a prominent pending-cleanup warning",
-    "never retry it during unrelated work",
-    "pending outgoing strategy ID",
+REQUIRED_STRATEGY_CONTRACT_GUIDANCE = {
+    "ASD-STE100-style technical English",
+    "Do not invoke another grilling or interview skill",
+    "Never leave the user to ask what happens next",
+    "👉 **Action — Short title:**",
+    "`⚠️ Warning — No Action Required`",
+    "`🛠️ Self-Healed — No Action Required`",
+    "`🚨 Error — Action Required`",
+    "The location must outlive this chat",
+    "`runtime/runbook.md`",
+    "is not a health criterion",
+    "`$100,000`",
+    "supports up to `2×`",
+    "Recommend `1×`",
+    "scheduler **Run now**",
+    "A dry run is available only through an explicit chat request",
+    "Missed runs do not catch up",
+    "Stop when no meaningful progress remains",
+    "30 minutes have elapsed",
+    "A notification failure never pauses trading by itself",
+    "Use only create, resume, update, and explicit deletion paths",
+    "For full deletion, remove the entire selected project and leave no tombstone",
+    "https://alphainsider.com/resources#automating-trades",
 }
-REQUIRED_SINGLE_CONFIRMATION_GUIDANCE = {
-    "Complete plan confirmation is the only skill-level execution approval",
-    "authorizes every exact planned create, modify, overwrite, delete, stop, pause, disable, activation, promotion, provisioning, ID-persistence, synchronization, build, native-operation, and agent-task action",
-    "never request another approval for a confirmed action",
-    "If any required action, identity, or path was absent or changes afterward, return the plan to `draft`",
-    "exact action, and ask once for final confirmation",
-    "Never request a one-off approval against a confirmed plan",
-    "sole authorization for `newStrategy`",
-    "sole authorization to call `newStrategy` and persist the returned strategy ID",
-    "do not ask again",
-    "must not prompt for confirmation before submitting planned paper orders",
-    "Running either generated operational command is the user's execution action",
-    "Never manually run a one-cycle command, start a persistent process, or trigger a scheduled task during build or verification",
-    "An explicit later chat request may run",
+REQUIRED_CORE_LAYOUT = {
+    "plan.md",
+    ".env",
+    ".env.example",
+    ".gitignore",
+    "README.md",
+    "AGENTS.md",
+    "strategy/",
+    "backtest/",
+    "runtime/",
+    "tests/",
 }
-REQUIRED_LOCAL_ONLY_TARGET_GUIDANCE = {
-    "after strategy, backtesting, implementation-contract, and operation-and-scheduling planning as the final AlphaInsider forward-test setup phase before confirmation",
-    "offer a compatible owned target or a new target",
-    "target readiness",
-    "`ready` or `local-only`",
-    "preserve every completed earlier planning decision",
-    "continue to plan confirmation",
-    "complete local build",
-    "Make no remote calls",
-    "mark them unavailable until target readiness is resolved",
-    "keep the plan `confirmed`",
-    "never `implemented`",
-    "return the plan to `draft`",
-    "reconfirm the complete plan",
-    "return to target setup before confirmation",
+OBSOLETE_STRATEGY_PATHS = {
+    "references/cleanup.md",
+    "references/operation-and-scheduling.md",
+    "references/release.md",
+    "docs/replacement-plan.md",
 }
-REQUIRED_OPERATION_GUIDANCE = {
-    "Separate how long the strategy operates from how long one process lives",
-    "a `single run` executes one decision cycle",
-    "a `persistent process` stays visible or managed and performs cycles itself",
-    "a `recurring schedule` invokes the finite one-cycle command at each planned interval",
-    "Always present `foreground`",
-    "Linux systemd and macOS launchd may run a persistent process or recurring finite cycles",
-    "Windows Task Scheduler supports only recurring finite cycles",
-    "Recommend a compatible `background process` runner before an `agent scheduler`",
-    "Never omit a family",
-    "Inspect those tools",
-    "worst-case cycle duration is shorter than the interval",
-    "require the user's acceptance",
-    "Recurring one-cycle execution cannot overlap",
-    "fail-closed process-lifetime lock",
-    "Scheduler-level retries and task-level restart-on-failure are disabled",
-    "default agent-task notifications to failures only",
-    "Never put credentials",
-    "Never overwrite an active unrelated resource",
-    "allow an active cycle to reach a safe completion",
-    "~/.config/systemd/user/<identifier>.service",
-    "~/.config/systemd/user/<identifier>.timer",
-    "`Type=oneshot` with `Restart=no`",
-    "`StartCalendarInterval`",
-    "`MultipleInstancesPolicy`",
-    "Do not require a named agent product, proprietary task schema, or vendor-specific conversation type",
-    "does not mean skip this agent's own scheduler or automation tools",
-    "Prefer the confirmed persistent project rather than an ephemeral or isolated copy",
-    "already available durable runtime",
-    "Do not provision cloud infrastructure",
-    "recorded limitations, not reasons to hide the family",
-    "create the task even when project access, runtime, or durability is missing",
-    "run the exact confirmed one-cycle invocation once",
-    "Never manually trigger a run during creation or validation",
-    "recommend active",
-    "Ask Initial activation and autostart",
-    "create no native definition or agent task",
-    "not an immediate test run",
-    "explicit later chat request",
-}
-REMOVED_CURRENT_OPERATION_GUIDANCE = {
-    "Offer tmux only when it is installed",
-    "a one-cycle command always remains foreground-only",
-    "tmux is manual-only",
-    "offer only usable runners",
-    "Offer `agent scheduled task` only when",
-    "native user-system",
-    "independent recurring scheduled task whose saved instruction and lifecycle do not depend on the planning conversation",
-}
-FORBIDDEN_AGENT_SCHEDULER_VENDOR_TERMS = {
-    "ChatGPT",
-    "Codex",
-    "OpenAI",
-    "RRULE",
-    "automation_update",
-    "thread-attached heartbeat",
+EXPECTED_SETUP_OPERATIONS = {
+    "/verifyToken",
+    "/getUserInfo",
+    "/getStrategies",
+    "/getUserStrategies",
+    "/newStrategy",
+    "/updateStrategy",
+    "/deleteStrategy",
+    "/getStrategySubscriptions",
+    "/getAccountSubscription",
+    "/getPositions",
+    "/getOrders",
+    "/getStocks",
+    "/searchStocks",
+    "/getExchangeStatus",
 }
 REQUIRED_ALPHA_CREDENTIAL_GUIDANCE = {
     "never return the API key or arbitrary environment contents",
@@ -632,44 +342,7 @@ REQUIRED_ALPHA_DOC_AUDIT_GUIDANCE = {
     "https://api.alphainsider.com/asyncapi.yaml",
     "Reconcile every discrepancy in the same change",
 }
-REQUIRED_STARTUP_GUIDANCE = {
-    "a short `## Start` section",
-    "ordered, copy-paste commands",
-    "dependency installation and `.env` preparation",
-    "a single cycle, persistent operation when available, and recurring scheduling equally",
-    "Match the selected language",
-    "`source .venv/bin/activate` immediately before the execution commands",
-    "the project's exact package-manager and runtime commands",
-}
-REQUIRED_EXPOSURE_GUIDANCE = {
-    "100% is 1× portfolio value",
-    "up to 200% (2×)",
-    "platform ceiling, not a default",
-    "do not assume 100% is the platform maximum",
-    "Record the user's chosen cap",
-    "`getMaxOrderSize`",
-}
-REQUIRED_MARKET_DATA_GUIDANCE = {
-    "Prefer AlphaInsider's applicable stock REST endpoints and `wsStockPrice`",
-    "supported current instrument metadata, exchange status, and bid, ask, or last prices",
-    "Use an external provider when AlphaInsider does not supply the required live",
-    "For historical inputs used by live operation",
-    "compare AlphaInsider and external sources case by case",
-    "Never use AlphaInsider's `getStockPriceHistory` for a backtest",
-    "Require a credible external historical source",
-    "mark backtesting unavailable",
-    "same decision-logic input contract",
-    "timestamp, symbol, price-adjustment, and coverage differences",
-}
-REQUIRED_WEBSOCKET_STRATEGY_GUIDANCE = {
-    "explicitly choose continuous reconnect and re-subscribe or stop on a stream error",
-    "an unresolved choice keeps the plan `draft`",
-    "Pass `reconnect=True` to `stream_events` when the plan requires continuous reconnection and re-subscription",
-    "retain the default one-session behavior when the plan requires the strategy to stop on a stream error",
-    "re-subscribes after a recoverable disconnect",
-    "stop mode exits without reconnecting",
-}
-README_MAX_WORDS = 550
+README_MAX_WORDS = 650
 REQUIRED_README_SECTIONS = {
     "# AlphaInsider Skills",
     "## Overview",
@@ -685,29 +358,21 @@ REQUIRED_README_OVERVIEW_GUIDANCE = {
     "/alphainsider",
     "use the alphainsider skill",
     "npx skills@latest add",
-    "`docs/plan.md`",
+    "root `plan.md`",
+    "native AI scheduler",
     "paper-trading",
-    "Credentials remain",
-    "agent-only",
-    "offline tests",
-    "language-specific `Start` section",
-    "sole approval for every exact planned implementation or update action",
-    "without another approval",
-    "never submits AlphaInsider orders",
-    "prefer it for supported current market data",
-    "Backtests require credible external history",
-    "verifies its required API-key permissions",
-    "**AI Agent** preset",
-    "discovers owned strategies",
-    "syncs the confirmed description",
-    "Operation and scheduling",
-    "user-level systemd or launchd",
-    "Windows Task Scheduler",
-    "or an agent scheduler",
-    "default active",
-    "retain and detach",
-    "retired audit plan",
-    "never cancels orders, liquidates positions",
+    "code-led, agent-led, or hybrid",
+    "backtest",
+    "Performance",
+    "**AI Agent**",
+    "`$100,000`",
+    "`1×`",
+    "`2×`",
+    "self-healing",
+    "30 minutes",
+    "chat dry run",
+    "Explicit deletion",
+    "resources#automating-trades",
 }
 
 
@@ -751,7 +416,7 @@ def validate() -> list[str]:
             f"expected skills {sorted(EXPECTED_SKILLS)}, found {sorted(discovered)}"
         )
 
-    all_skill_files = list(ROOT.rglob("SKILL.md"))
+    all_skill_files = list(SKILLS_DIR.glob("*/SKILL.md"))
     if len(all_skill_files) != len(EXPECTED_SKILLS):
         errors.append(
             f"expected exactly {len(EXPECTED_SKILLS)} SKILL.md files, "
@@ -875,18 +540,19 @@ def validate() -> list[str]:
             "strategy-creator references must be exactly "
             f"{sorted(EXPECTED_STRATEGY_REFERENCES)}"
         )
-    strategy_reference_directories = {
+    nested_strategy_reference_dirs = {
         path.name for path in strategy_references.iterdir() if path.is_dir()
     }
-    if strategy_reference_directories:
+    if nested_strategy_reference_dirs:
         errors.append(
             "strategy-creator references must not contain nested directories "
-            f"{sorted(strategy_reference_directories)}"
+            f"{sorted(nested_strategy_reference_dirs)}"
         )
 
+    strategy_scripts_dir = strategy / "scripts"
     strategy_scripts = {
-        path.relative_to(strategy / "scripts").as_posix()
-        for path in (strategy / "scripts").rglob("*")
+        path.relative_to(strategy_scripts_dir).as_posix()
+        for path in strategy_scripts_dir.rglob("*")
         if path.is_file() and "__pycache__" not in path.parts
     }
     if strategy_scripts != EXPECTED_STRATEGY_SCRIPTS:
@@ -895,104 +561,25 @@ def validate() -> list[str]:
             f"{sorted(EXPECTED_STRATEGY_SCRIPTS)}"
         )
 
-    plan_template = strategy / "references" / "plan-template.md"
-
-    if plan_template.is_file():
-        plan_text = plan_template.read_text(encoding="utf-8")
-        try:
-            plan_fields = frontmatter(plan_template)
-        except ValueError as exc:
-            errors.append(str(exc))
-        else:
-            if plan_fields.get("status") != "draft":
-                errors.append("strategy plan template must start in draft status")
-            if set(plan_fields) != {"status"}:
-                errors.append(
-                    "strategy plan template must declare only lifecycle status"
-                )
-        missing_sections = REQUIRED_PLAN_SECTIONS - set(plan_text.splitlines())
-        if missing_sections:
-            errors.append(
-                "strategy plan template is missing sections "
-                f"{sorted(missing_sections)}"
-            )
-        actual_plan_section_order = tuple(
-            line
-            for line in plan_text.splitlines()
-            if line in REQUIRED_PLAN_SECTIONS
-        )
-        if actual_plan_section_order != REQUIRED_PLAN_SECTION_ORDER:
-            errors.append(
-                "strategy plan template sections must use order "
-                f"{list(REQUIRED_PLAN_SECTION_ORDER)}"
-            )
-        plan_lines = {line.partition(" _")[0] for line in plan_text.splitlines()}
-        missing_fields = REQUIRED_PLAIN_LANGUAGE_PLAN_FIELDS - plan_lines
-        if missing_fields:
-            errors.append(
-                "strategy plan template is missing plain-language fields "
-                f"{sorted(missing_fields)}"
-            )
-        missing_target_fields = REQUIRED_TARGET_PLAN_FIELDS - plan_lines
-        if missing_target_fields:
-            errors.append(
-                "strategy plan template is missing AlphaInsider target fields "
-                f"{sorted(missing_target_fields)}"
-            )
-        missing_operation_fields = REQUIRED_OPERATION_PLAN_FIELDS - plan_lines
-        if missing_operation_fields:
-            errors.append(
-                "strategy plan template is missing operation-and-scheduling fields "
-                f"{sorted(missing_operation_fields)}"
-            )
-        obsolete_fields = {
-            field for field in REMOVED_PLAN_FIELDS if field in plan_text
-        }
-        if obsolete_fields:
-            errors.append(
-                "strategy plan template contains removed fields "
-                f"{sorted(obsolete_fields)}"
-            )
-        obsolete_sections = REMOVED_PLAN_SECTIONS & set(plan_text.splitlines())
-        if obsolete_sections:
-            errors.append(
-                "strategy plan template contains removed sections "
-                f"{sorted(obsolete_sections)}"
-            )
-
     strategy_text = (strategy / "SKILL.md").read_text(encoding="utf-8")
     reference_texts = {
         name: (strategy_references / name).read_text(encoding="utf-8")
         for name in EXPECTED_STRATEGY_REFERENCES
     }
-    strategy_id_field_references = {
-        name
-        for name, text in reference_texts.items()
-        if "\n- AlphaInsider strategy ID:" in text
-    }
-    if strategy_id_field_references != {"plan-template.md"}:
-        errors.append(
-            "only the strategy plan template may define an AlphaInsider strategy ID field"
-        )
-    long_references_without_contents = {
-        name
-        for name, text in reference_texts.items()
-        if len(text.splitlines()) > 100 and "## Contents" not in text
-    }
-    if long_references_without_contents:
-        errors.append(
-            "strategy-creator long references must include contents navigation "
-            f"{sorted(long_references_without_contents)}"
-        )
-    target_text = reference_texts["alphainsider-target.md"]
-    cleanup_text = reference_texts["cleanup.md"]
-    operation_text = reference_texts["operation-and-scheduling.md"]
+    all_reference_text = "\n".join(
+        reference_texts[name] for name in sorted(reference_texts)
+    )
     normalized_strategy_text = " ".join(strategy_text.split())
+    normalized_contract_text = " ".join(
+        f"{strategy_text}\n{all_reference_text}".split()
+    )
+
     if len(strategy_text.split()) > STRATEGY_SKILL_MAX_WORDS:
         errors.append(
             "strategy-creator SKILL.md exceeds compact-word limit "
             f"{STRATEGY_SKILL_MAX_WORDS}"
         )
+
     missing_reference_routes = {
         name
         for name in EXPECTED_STRATEGY_REFERENCES
@@ -1003,48 +590,85 @@ def validate() -> list[str]:
             "strategy-creator SKILL.md is missing direct reference routes "
             f"{sorted(missing_reference_routes)}"
         )
-    missing_progressive_disclosure = {
-        guidance
-        for guidance in REQUIRED_PROGRESSIVE_DISCLOSURE_GUIDANCE
-        if guidance not in normalized_strategy_text
+
+    missing_skill_guidance = {
+        item
+        for item in REQUIRED_STRATEGY_SKILL_GUIDANCE
+        if item not in normalized_strategy_text
     }
-    if missing_progressive_disclosure:
+    if missing_skill_guidance:
         errors.append(
-            "strategy-creator SKILL.md is missing progressive-disclosure guidance "
-            f"{sorted(missing_progressive_disclosure)}"
+            "strategy-creator SKILL.md is missing core guidance "
+            f"{sorted(missing_skill_guidance)}"
         )
-    permission_block = re.search(
-        r"## API-key permission gate.*?```text\n(.*?)\n```",
-        target_text,
-        re.DOTALL,
-    )
-    documented_permissions = (
-        tuple(permission_block.group(1).splitlines()) if permission_block else ()
-    )
-    if documented_permissions != REQUIRED_STRATEGY_API_PERMISSIONS:
-        errors.append(
-            "strategy-creator API-key permission bundle must exactly match "
-            f"{list(REQUIRED_STRATEGY_API_PERMISSIONS)}"
-        )
-    missing_states = {
-        state for state in EXPECTED_PLAN_STATES if f"`{state}`" not in strategy_text
+
+    missing_contract_guidance = {
+        item
+        for item in REQUIRED_STRATEGY_CONTRACT_GUIDANCE
+        if item not in normalized_contract_text
     }
-    if missing_states:
+    if missing_contract_guidance:
         errors.append(
-            "strategy-creator is missing plan states " f"{sorted(missing_states)}"
+            "strategy-creator references are missing agreed behavior "
+            f"{sorted(missing_contract_guidance)}"
+        )
+
+    stale_routes = {
+        route for route in OBSOLETE_STRATEGY_PATHS if route in strategy_text
+    }
+    if stale_routes:
+        errors.append(
+            "strategy-creator SKILL.md routes to obsolete lifecycle material "
+            f"{sorted(stale_routes)}"
+        )
+
+    plan_template = strategy_references / "plan-template.md"
+    plan_text = reference_texts["plan-template.md"]
+    if plan_text.startswith("---"):
+        errors.append("strategy plan template must not use lifecycle frontmatter")
+
+    plan_headings = tuple(
+        line
+        for line in plan_text.splitlines()
+        if line in set(REQUIRED_PLAN_SECTION_ORDER)
+    )
+    if plan_headings != REQUIRED_PLAN_SECTION_ORDER:
+        errors.append(
+            "strategy plan template sections must use order "
+            f"{list(REQUIRED_PLAN_SECTION_ORDER)}"
+        )
+
+    missing_plan_fields = {
+        field
+        for field in REQUIRED_PLAN_FIELDS
+        if not any(line.startswith(field) for line in plan_text.splitlines())
+    }
+    if missing_plan_fields:
+        errors.append(
+            "strategy plan template is missing fields "
+            f"{sorted(missing_plan_fields)}"
+        )
+
+    missing_status_values = {
+        value for value in REQUIRED_STATUS_VALUES if value not in plan_text
+    }
+    if missing_status_values:
+        errors.append(
+            "strategy plan template is missing status choices "
+            f"{sorted(missing_status_values)}"
+        )
+
+    strategy_id_field_references = {
+        name
+        for name, text_value in reference_texts.items()
+        if "\n- AlphaInsider strategy ID:" in text_value
+    }
+    if strategy_id_field_references != {"plan-template.md"}:
+        errors.append(
+            "only plan-template.md may define the AlphaInsider strategy ID field"
         )
 
     interview_text = reference_texts["interview.md"]
-    obsolete_questions = {
-        question
-        for question in REMOVED_INTERVIEW_QUESTIONS
-        if question in interview_text
-    }
-    if obsolete_questions:
-        errors.append(
-            "strategy interview contains removed evaluation questions "
-            f"{sorted(obsolete_questions)}"
-        )
     interview_phase_positions = [
         interview_text.find(phase) for phase in REQUIRED_INTERVIEW_PHASE_ORDER
     ]
@@ -1055,321 +679,65 @@ def validate() -> list[str]:
             "strategy interview phases must use order "
             f"{list(REQUIRED_INTERVIEW_PHASE_ORDER)}"
         )
-    obsolete_interview_phases = {
-        phase for phase in REMOVED_INTERVIEW_PHASES if phase in interview_text
+
+    project_root_text = reference_texts["project-root.md"]
+    missing_layout_entries = {
+        entry for entry in REQUIRED_CORE_LAYOUT if entry not in project_root_text
     }
-    if obsolete_interview_phases:
+    if missing_layout_entries:
         errors.append(
-            "strategy interview contains removed phases "
-            f"{sorted(obsolete_interview_phases)}"
+            "strategy project contract is missing core layout entries "
+            f"{sorted(missing_layout_entries)}"
         )
-    all_reference_text = "\n".join(
-        reference_texts[name] for name in sorted(reference_texts)
+
+    lifecycle_frontmatter = re.findall(
+        r"^status:\s*(draft|confirmed|implemented|retired)\s*$",
+        all_reference_text,
+        re.MULTILINE,
     )
-    manual_text = " ".join(f"{strategy_text}\n{all_reference_text}".split())
-    current_contract_text = " ".join(
-        (f"{strategy_text}\n{all_reference_text}").split()
-    )
-    stale_operation_guidance = {
-        guidance
-        for guidance in REMOVED_CURRENT_OPERATION_GUIDANCE
-        if guidance in current_contract_text
-    }
-    if stale_operation_guidance:
+    if lifecycle_frontmatter:
         errors.append(
-            "strategy-creator contains obsolete operation guidance "
-            f"{sorted(stale_operation_guidance)}"
-        )
-    missing_independence_guidance = {
-        guidance
-        for guidance in REQUIRED_INDEPENDENCE_GUIDANCE
-        if guidance not in current_contract_text
-    }
-    if missing_independence_guidance:
-        errors.append(
-            "strategy-creator is missing independence guidance "
-            f"{sorted(missing_independence_guidance)}"
-        )
-    stale_sibling_dependency = {
-        guidance
-        for guidance in REMOVED_SIBLING_DEPENDENCY_GUIDANCE
-        if guidance in current_contract_text
-    }
-    if stale_sibling_dependency:
-        errors.append(
-            "strategy-creator still requires the sibling API skill "
-            f"{sorted(stale_sibling_dependency)}"
-        )
-    vendor_specific_agent_guidance = {
-        term
-        for term in FORBIDDEN_AGENT_SCHEDULER_VENDOR_TERMS
-        if term in f"{operation_text}\n{cleanup_text}"
-    }
-    if vendor_specific_agent_guidance:
-        errors.append(
-            "strategy-creator agent scheduling must remain vendor-neutral "
-            f"{sorted(vendor_specific_agent_guidance)}"
-        )
-    stale_target_order_guidance = {
-        guidance
-        for guidance in REMOVED_TARGET_ORDER_GUIDANCE
-        if guidance in manual_text
-    }
-    if stale_target_order_guidance:
-        errors.append(
-            "strategy-creator contains obsolete target ordering guidance "
-            f"{sorted(stale_target_order_guidance)}"
-        )
-    stale_separate_confirmation_guidance = {
-        guidance
-        for guidance in REMOVED_SEPARATE_CONFIRMATION_GUIDANCE
-        if guidance in manual_text
-    }
-    if stale_separate_confirmation_guidance:
-        errors.append(
-            "strategy-creator contains obsolete creation-confirmation guidance "
-            f"{sorted(stale_separate_confirmation_guidance)}"
-        )
-    stale_post_confirmation_approval_guidance = {
-        guidance
-        for guidance in REMOVED_POST_CONFIRMATION_APPROVAL_GUIDANCE
-        if guidance in manual_text
-    }
-    if stale_post_confirmation_approval_guidance:
-        errors.append(
-            "strategy-creator contains obsolete post-confirmation approval guidance "
-            f"{sorted(stale_post_confirmation_approval_guidance)}"
-        )
-    stale_target_deletion_guidance = {
-        guidance
-        for guidance in REMOVED_TARGET_DELETION_GUIDANCE
-        if guidance in current_contract_text
-    }
-    if stale_target_deletion_guidance:
-        errors.append(
-            "strategy-creator contains obsolete target-deletion guidance "
-            f"{sorted(stale_target_deletion_guidance)}"
-        )
-    missing_replacement_guidance = {
-        guidance
-        for guidance in REQUIRED_REPLACEMENT_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_replacement_guidance:
-        errors.append(
-            "strategy-creator is missing replacement guidance "
-            f"{sorted(missing_replacement_guidance)}"
+            "strategy references must not define legacy lifecycle status "
+            f"{sorted(set(lifecycle_frontmatter))}"
         )
 
-    missing_cleanup_guidance = {
-        guidance
-        for guidance in REQUIRED_CLEANUP_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_cleanup_guidance:
-        errors.append(
-            "strategy-creator is missing cleanup and retirement guidance "
-            f"{sorted(missing_cleanup_guidance)}"
-        )
-
-    missing_credential_guidance = {
-        guidance
-        for guidance in REQUIRED_CREDENTIAL_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_credential_guidance:
-        errors.append(
-            "strategy-creator is missing credential setup guidance "
-            f"{sorted(missing_credential_guidance)}"
-        )
-    current_credential_text = " ".join(
-        reference_texts[name]
-        for name in (
-            "alphainsider-target.md",
-            "credentials.md",
-            "implementation.md",
-            "interview.md",
-        )
-    )
-    stale_live_input_guidance = {
-        guidance
-        for guidance in REMOVED_LIVE_INPUT_CREDENTIAL_GUIDANCE
-        if guidance in current_credential_text
-    }
-    if stale_live_input_guidance:
-        errors.append(
-            "strategy-creator contains obsolete live-input credential guidance "
-            f"{sorted(stale_live_input_guidance)}"
-        )
-    stale_credential_cwd_guidance = {
-        guidance
-        for guidance in REMOVED_CREDENTIAL_CWD_GUIDANCE
-        if guidance in manual_text
-    }
-    if stale_credential_cwd_guidance:
-        errors.append(
-            "strategy-creator still launches .env helpers from session cwd "
-            f"{sorted(stale_credential_cwd_guidance)}"
-        )
-
-    missing_provisioning_guidance = {
-        guidance
-        for guidance in REQUIRED_PROVISIONING_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_provisioning_guidance:
-        errors.append(
-            "strategy-creator is missing AlphaInsider provisioning guidance "
-            f"{sorted(missing_provisioning_guidance)}"
-        )
-
-    missing_single_confirmation_guidance = {
-        guidance
-        for guidance in REQUIRED_SINGLE_CONFIRMATION_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_single_confirmation_guidance:
-        errors.append(
-            "strategy-creator is missing single-confirmation guidance "
-            f"{sorted(missing_single_confirmation_guidance)}"
-        )
-
-    missing_local_only_target_guidance = {
-        guidance
-        for guidance in REQUIRED_LOCAL_ONLY_TARGET_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_local_only_target_guidance:
-        errors.append(
-            "strategy-creator is missing local-only-target guidance "
-            f"{sorted(missing_local_only_target_guidance)}"
-        )
-
-    missing_grill_protocol_guidance = {
-        guidance
-        for guidance in REQUIRED_GRILL_PROTOCOL_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_grill_protocol_guidance:
-        errors.append(
-            "strategy-creator is missing grill-interview protocol guidance "
-            f"{sorted(missing_grill_protocol_guidance)}"
-        )
-
-    missing_project_root_guidance = {
-        guidance
-        for guidance in REQUIRED_PROJECT_ROOT_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_project_root_guidance:
-        errors.append(
-            "strategy-creator is missing project-root placement guidance "
-            f"{sorted(missing_project_root_guidance)}"
-        )
-    stale_project_root_guidance = {
-        guidance
-        for guidance in REMOVED_PROJECT_ROOT_GUIDANCE
-        if guidance in manual_text
-    }
-    if stale_project_root_guidance:
-        errors.append(
-            "strategy-creator still asks for a project location "
-            f"{sorted(stale_project_root_guidance)}"
-        )
-
-    missing_operation_guidance = {
-        guidance
-        for guidance in REQUIRED_OPERATION_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_operation_guidance:
-        errors.append(
-            "strategy-creator is missing operation-and-scheduling guidance "
-            f"{sorted(missing_operation_guidance)}"
-        )
-
-    missing_startup_guidance = {
-        guidance
-        for guidance in REQUIRED_STARTUP_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_startup_guidance:
-        errors.append(
-            "strategy-creator is missing generated README startup guidance "
-            f"{sorted(missing_startup_guidance)}"
-        )
-
-    missing_exposure_guidance = {
-        guidance
-        for guidance in REQUIRED_EXPOSURE_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_exposure_guidance:
-        errors.append(
-            "strategy-creator is missing portfolio exposure guidance "
-            f"{sorted(missing_exposure_guidance)}"
-        )
-
-    missing_market_data_guidance = {
-        guidance
-        for guidance in REQUIRED_MARKET_DATA_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_market_data_guidance:
-        errors.append(
-            "strategy-creator is missing market-data source guidance "
-            f"{sorted(missing_market_data_guidance)}"
-        )
-
-    missing_websocket_strategy_guidance = {
-        guidance
-        for guidance in REQUIRED_WEBSOCKET_STRATEGY_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_websocket_strategy_guidance:
-        errors.append(
-            "strategy-creator is missing WebSocket recovery guidance "
-            f"{sorted(missing_websocket_strategy_guidance)}"
-        )
-
-    env_helper = strategy / "scripts" / "set_env_value.py"
+    env_helper = strategy_scripts_dir / "set_env_value.py"
     if env_helper.is_file():
         helper_source = env_helper.read_text(encoding="utf-8")
-        required_helper_source = {
-            '"--remove",',
-            '"--project-root",',
-            'parser.add_argument("value", nargs="?"',
+        required_helper_markers = {
             'if __name__ != "__main__":',
             "set_env_value.py is CLI-only",
-            "Agent-only update or removal",
-            "def _remove_env(",
-            "def _removed_contents(",
-            "def _update_env(",
-            "if args.value is not None:",
-            "if args.value is None:",
-            "_update_env(env_path, args.name, args.value)",
-            'action = "Removed" if args.remove else "Updated"',
-            "docs/plan.md",
-            "Path.cwd()",
-            "if args.project_root else Path.cwd()",
+            '"--project-root",',
+            '"--remove",',
+            "getpass.getpass",
+            "sys.stdin.buffer.read",
+            '_validate_project_root(chosen_root)',
+            'resolved_root / "plan.md"',
+            "env_path.is_symlink()",
+            "os.replace(",
+            "0o600",
+            "_MAX_VALUE_BYTES",
+            "_MAX_ENV_BYTES",
         }
-        missing_helper_source = {
-            marker for marker in required_helper_source if marker not in helper_source
+        missing_helper_markers = {
+            item for item in required_helper_markers if item not in helper_source
         }
-        if missing_helper_source:
+        if missing_helper_markers:
             errors.append(
-                "strategy environment helper is missing CLI-only safeguards "
-                f"{sorted(missing_helper_source)}"
+                "strategy environment helper is missing safeguards "
+                f"{sorted(missing_helper_markers)}"
             )
-        obsolete_helper_source = {
-            marker
-            for marker in ("getpass", "sys.stdin", "Ready for", "live process-input")
-            if marker in helper_source
+        forbidden_helper_markers = {
+            'parser.add_argument("value"',
+            'resolved_root / "docs"',
         }
-        if obsolete_helper_source:
+        present_forbidden_helper_markers = {
+            item for item in forbidden_helper_markers if item in helper_source
+        }
+        if present_forbidden_helper_markers:
             errors.append(
-                "strategy environment helper contains obsolete live-input behavior "
-                f"{sorted(obsolete_helper_source)}"
+                "strategy environment helper contains obsolete input or plan paths "
+                f"{sorted(present_forbidden_helper_markers)}"
             )
         public_helper_functions = re.findall(
             r"^def ([A-Za-z][A-Za-z0-9_]*)\(", helper_source, re.MULTILINE
@@ -1379,48 +747,66 @@ def validate() -> list[str]:
                 "strategy environment helper exposes public Python functions "
                 f"{sorted(public_helper_functions)}"
             )
-        import_guard_position = helper_source.find('if __name__ != "__main__":')
-        first_function_position = helper_source.find("\ndef ")
-        if (
-            import_guard_position == -1
-            or first_function_position == -1
-            or import_guard_position > first_function_position
-        ):
-            errors.append(
-                "strategy environment helper must reject imports before defining functions"
-            )
 
-    setup_wrapper = strategy / "scripts" / "alphainsider_setup_request.py"
+    setup_wrapper = strategy_scripts_dir / "alphainsider_setup_request.py"
     if setup_wrapper.is_file():
         wrapper_source = setup_wrapper.read_text(encoding="utf-8")
-        required_wrapper_source = {
+        required_wrapper_markers = {
             'if __name__ != "__main__":',
             "alphainsider_setup_request.py is CLI-only",
-            "--print-config",
             '"--project-root",',
-            'ALPHAINSIDER_STRATEGY_ID"',
-            "_PRINTABLE_CONFIG = \"ALPHAINSIDER_STRATEGY_ID\"",
-            "headers[\"Authorization\"] = api_key",
-            "def _print_config(",
-            "def _send_request(",
-            "docs/plan.md",
-            "if args.project_root else Path.cwd()",
+            "--print-config",
+            "--json-stdin",
+            'resolved_root / "plan.md"',
+            "_NoRedirectHandler",
+            "_ALLOWED_OPERATIONS",
+            "MAX_RESPONSE_BYTES",
+            "MAX_REQUEST_BODY_BYTES",
+            "MAX_ENV_BYTES",
+            "_validated_api_key",
+            "_credential_values",
+            "path.is_symlink()",
         }
-        missing_wrapper_source = {
-            marker for marker in required_wrapper_source if marker not in wrapper_source
+        missing_wrapper_markers = {
+            item for item in required_wrapper_markers if item not in wrapper_source
         }
-        if missing_wrapper_source:
+        if missing_wrapper_markers:
             errors.append(
-                "strategy setup wrapper is missing CLI-only safeguards "
-                f"{sorted(missing_wrapper_source)}"
+                "strategy setup wrapper is missing safeguards "
+                f"{sorted(missing_wrapper_markers)}"
             )
-        if "STRATEGY_QUERY_PATHS" in wrapper_source or "STRATEGY_BODY_PATHS" in wrapper_source:
+
+        operation_block = re.search(
+            r"_ALLOWED_OPERATIONS = \{(.*?)\n\}",
+            wrapper_source,
+            re.DOTALL,
+        )
+        setup_operations = (
+            set(re.findall(r'"(/[^"]+)":', operation_block.group(1)))
+            if operation_block
+            else set()
+        )
+        if setup_operations != EXPECTED_SETUP_OPERATIONS:
             errors.append(
-                "strategy setup wrapper must not inject default strategy IDs"
+                "strategy setup wrapper operation allowlist must be exactly "
+                f"{sorted(EXPECTED_SETUP_OPERATIONS)}"
             )
-        if "os.getcwd()" in wrapper_source:
+
+        forbidden_wrapper_markers = {
+            '"--base-url"',
+            "urllib.request.urlopen(",
+            'resolved_root / "docs"',
+            '"/newOrder"',
+            '"/newOrderAllocations"',
+            '"/deleteOrder"',
+        }
+        present_forbidden_wrapper_markers = {
+            item for item in forbidden_wrapper_markers if item in wrapper_source
+        }
+        if present_forbidden_wrapper_markers:
             errors.append(
-                "strategy setup wrapper must not read .env from os.getcwd()"
+                "strategy setup wrapper exposes unsafe or obsolete behavior "
+                f"{sorted(present_forbidden_wrapper_markers)}"
             )
         public_wrapper_functions = re.findall(
             r"^def ([A-Za-z][A-Za-z0-9_]*)\(", wrapper_source, re.MULTILINE
@@ -1429,16 +815,6 @@ def validate() -> list[str]:
             errors.append(
                 "strategy setup wrapper exposes public Python functions "
                 f"{sorted(public_wrapper_functions)}"
-            )
-        import_guard_position = wrapper_source.find('if __name__ != "__main__":')
-        first_function_position = wrapper_source.find("\ndef ")
-        if (
-            import_guard_position == -1
-            or first_function_position == -1
-            or import_guard_position > first_function_position
-        ):
-            errors.append(
-                "strategy setup wrapper must reject imports before defining functions"
             )
 
     readme_text = (ROOT / "README.md").read_text(encoding="utf-8")

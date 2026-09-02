@@ -2,17 +2,17 @@
 
 ## Overview
 
-Skills for AlphaInsider API integration and paper-trading strategy projects.
+Reusable, vendor-neutral skills for AlphaInsider API work and automated
+paper-trading strategy projects.
 
 ## Skills
 
 - `alphainsider` routes an explicit request to a published specialist.
-  Specialists stay independently installable.
-- `alphainsider-api` documents the AlphaInsider API and includes REST and
-  WebSocket helpers plus normalized-value calculations.
-- `alphainsider-strategy-creator` interviews the user, researches data sources,
-  maintains a confirmed strategy plan, and generates or updates one automated
-  stock or cryptocurrency strategy.
+- `alphainsider-api` provides current REST, WebSocket, authentication, sizing,
+  and order guidance.
+- `alphainsider-strategy-creator` interviews the user, maintains a strategy
+  agreement, builds and backtests the project, and configures native AI
+  automation.
 
 ## Install
 
@@ -23,17 +23,17 @@ npx skills@latest add https://github.com/AlphaInsider/skills \
   --skill alphainsider
 ```
 
-Invoke with `/alphainsider`, "use the alphainsider skill", "route this with
-alphainsider", or "which AlphaInsider skill".
+Invoke it with `/alphainsider`, “use the alphainsider skill,” “route this with
+alphainsider,” or “which AlphaInsider skill.”
 
-Install AlphaInsider API:
+Install the API specialist:
 
 ```bash
 npx skills@latest add https://github.com/AlphaInsider/skills \
   --skill alphainsider-api
 ```
 
-Install Strategy Creator and AlphaInsider API:
+Install Strategy Creator with the API specialist:
 
 ```bash
 npx skills@latest add https://github.com/AlphaInsider/skills \
@@ -41,55 +41,60 @@ npx skills@latest add https://github.com/AlphaInsider/skills \
   --skill alphainsider-strategy-creator
 ```
 
-Strategy Creator does not require `alphainsider-api`.
+Strategy Creator remains self-contained when `alphainsider-api` is absent.
 
 ## How it works
 
-Use `alphainsider-strategy-creator` to maintain `docs/plan.md`. A new strategy is
-created as a dedicated child folder of the session working directory. It plans
-Objective, Market and instruments, Strategy behavior, Data and resources,
-Execution and risk, Backtesting, and Implementation before Operation and
-scheduling and final AlphaInsider target setup. Confirmation builds offline
-tests and is the sole approval for every exact planned implementation or
-update action.
+Strategy Creator selects the safest persistent workspace without asking for a
+path. Each strategy gets one dedicated project with a root `plan.md`,
+`strategy/`, `backtest/`, `runtime/`, and `tests/`. The plan separately records
+the current phase, Draft or Agreed plan state, highest completed outcome, and
+automation state. Another chat or scheduled agent can resume from its current
+status.
 
-Strategies use AlphaInsider as their only paper-trading order
-destination and prefer it for supported current market data. Backtests require
-credible external history. User-run commands may submit orders without a
-second prompt; offline verification never submits AlphaInsider orders.
+The built-in grill interview uses simple technical English, multiple-choice
+questions, recommended answers, clear action blocks, and an explicit next
+step. A project can be code-led, agent-led, or hybrid. Stock and cryptocurrency
+projects remain strictly separate.
 
-Operation and scheduling distinguishes a single run, a persistent process, and
-a recurring finite cycle across foreground, a background process using
-user-level systemd or launchd or Windows Task Scheduler, or an agent
-scheduler.
-Managed resources default active on a first-session ready target.
+After the strategy is Agreed, the skill offers and recommends a credible
+backtest. Results include suitable charts, a benchmark, metrics, assumptions,
+and data limits. Performance is information, not a runtime success condition.
+Poor results never cause automatic strategy changes.
 
-Credentials remain in project `.env` files; agent-only chat entry is never
-printed. Generated READMEs omit the helper and include a
-language-specific `Start` section. Strategy Creator verifies its required
-API-key permissions, discovers owned strategies, and syncs the confirmed
-description. AlphaInsider's **AI Agent** preset selects the full bundle.
+After results are settled, the skill offers AlphaInsider paper forward testing.
+API-key entry is chat-first, with direct `.env` editing as an alternative.
+The **AI Agent** permission preset is recommended. New targets are recommended
+while compatible owned public and private targets remain selectable. The
+fallback paper starting balance is `$100,000`. The fallback maximum leverage is
+`1×`, and the skill explains AlphaInsider's `2×` ceiling.
 
-Local-only plans allow a mocked local build but make no remote calls or
-operation resources and remain confirmed until target setup and
-reconfirmation.
+The implementation and order-free tests finish before a new AlphaInsider target
+is created. The setup helper cannot submit or cancel orders. The project then
+uses only the platform's native AI scheduler. It never installs a host cron,
+service, or background runner.
 
-Existing Strategy Creator projects can be updated or replaced. Replacement is
-planned separately and confirmed once for attributable cleanup, promotion, and
-implementation without another approval. A local-only replacement leaves the
-current strategy untouched.
+Each automation occurrence runs one finite cycle. Scheduler **Run now** and a
+chat normal run use the same order-capable path. A chat dry run blocks orders
+and canonical state changes. One durable lock prevents overlap, and missed runs
+do not catch up.
 
-An implemented strategy can also be retired through one confirmed
-`docs/plan.md`. Strategy Creator first disables and removes only its
-attributable operation resources, then lets the user retain and detach or
-delete any exactly verified owned AlphaInsider target. It preserves `.env`,
-`.gitignore`, historical data, unrelated files, and a retired audit plan.
-Deletion warns about live state and undocumented cascades but never cancels
-orders, liquidates positions, or submits a trade.
+On a trading error, the strategy blocks orders and pauses future automation.
+Enabled self-healing can repair only plan-preserving implementation problems.
+It uses snapshots, order-free checks, rollback, and a maximum of 30 minutes
+while progress continues. Profitability never triggers repair.
 
-Strategy Creator recognizes an existing `docs/plan.md` by its Strategy Plan
-title and lifecycle status. It audits recognized plans against the current
-fields and returns missing decisions to the interview before making changes.
+Healthy runs stay quiet. Optional notifications use clear Warning,
+Self-Healed, and Error labels. Notification failure does not pause trading.
+
+Updates preserve the agreed plan while affected decisions are reviewed and
+tested. Explicit deletion inventories the scheduler, AlphaInsider target,
+project data, history, secrets, and API-key revocation separately. Cleanup
+never cancels orders or liquidates positions.
+
+After successful automation, the handoff links to
+[AlphaInsider broker automation resources](https://alphainsider.com/resources#automating-trades).
+The skill never handles broker credentials or creates a broker connection.
 
 ## Development
 
