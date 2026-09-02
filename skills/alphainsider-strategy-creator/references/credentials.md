@@ -1,8 +1,8 @@
 # Credentials and Configuration
 
-Read this file only when a required value is missing. Never inspect, print, or
-summarize an existing API key, complete `.env`, process environment, or hosted
-secret store.
+Read this file as soon as the user chooses AlphaInsider forward testing. Never
+inspect, print, or summarize an existing API key, complete `.env`, process
+environment, or hosted secret store.
 
 Require this skill's `scripts/set_env_value.py` and
 `scripts/alphainsider_setup_request.py` before project-file credential or
@@ -10,13 +10,26 @@ target setup. If either is missing, stop only that phase and reinstall Strategy
 Creator. Do not improvise another secret-write or setup-request path.
 
 Do not request `ALPHAINSIDER_API_KEY` before the user chooses AlphaInsider
-forward testing. Link to
+forward testing. After that choice, supplying a missing key is the first action
+the user must complete. Do not ask an AlphaInsider, target, implementation,
+self-heal, notification, or automation question first. Link to
 [AlphaInsider developer settings](https://alphainsider.com/settings/developers).
 Recommend the **AI Agent** permission preset because future plan changes can
-need additional AlphaInsider functions. A narrower key is acceptable when its
-current permissions cover every planned setup and runtime operation.
+need additional AlphaInsider functions. Initially, a narrower key is acceptable
+when it supports token verification and the required read-only discovery.
 
 ## Choose secret storage
+
+Before reading or requesting a value, inspect persistent-project and non-prompt
+secret access for the current platform's scheduled runtime. This is a read-only
+capability check, not an interview question or user action. If no safe location
+will be readable by both the active and scheduled agents, do not request a key.
+Record the blocker and give the required platform action instead.
+
+For a resumed project, after this check, use the setup helper to verify a
+configured key privately. Do not request it again when verification succeeds.
+If it is missing, inaccessible, invalid, or insufficient, give the standalone
+action below as the next user-facing step.
 
 Use the project `.env` when both the current agent and scheduled runtime can
 load it. Use the platform's secure non-prompt secret storage when a hosted
@@ -26,9 +39,14 @@ instruction, plan, source file, example, test, log, or notification.
 `ALPHAINSIDER_STRATEGY_ID` is public configuration, but store it through the
 same helper or the selected hosted configuration facility.
 
+Treat notification tokens, webhook URLs, and private destination values as
+protected configuration. Store them through the same safe workflow. Record
+only their configuration names and safe labels in project documents.
+
 ## Chat-first setup
 
-For project `.env` storage, use one standalone action:
+For project `.env` storage, use one standalone action. Do not put a Q&A round in
+the same message:
 
 ```markdown
 👉 **Action — Add AlphaInsider API key:** Paste the API key in this chat.
@@ -79,12 +97,17 @@ Use request bodies through protected standard input when they contain a private
 value. Report only the redacted result. Never use this setup helper for an
 order, allocation, cancellation, or another trading action.
 
-Verify `GET /verifyToken` and require an API token with the plan's needed
-permissions. List only missing permission names. Accept extra permissions
-without requiring replacement or rotation. Deliberate chat entry is not by
-itself a reason to rotate the key.
+At the initial access gate, verify `GET /verifyToken` and only the permissions
+needed for read-only account and target discovery. After the target and
+implementation are settled, derive the exact setup and runtime operations,
+record their required permissions in `plan.md`, and reverify the key. List only
+missing permission names. Accept sufficient extra permissions without requiring
+replacement or rotation. Deliberate chat entry is not by itself a reason to
+rotate the key.
 
-If a value is no longer available to the active chat, ask for it again or use
-the direct-edit method. Never recover it by reading `.env`. A hosted secret
-facility remains user-managed; give exact platform steps and wait for the
-completion signal when the agent cannot write it safely.
+If a missing or replacement value still needs initial storage and is no longer
+available to the active chat, ask for it again or use the direct-edit method.
+Do not request a successfully configured key only because its value is hidden;
+use the setup helper privately. Never recover it by reading `.env`. A hosted
+secret facility remains user-managed; give exact platform steps and wait for
+the completion signal when the agent cannot write it safely.

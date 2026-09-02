@@ -11,7 +11,9 @@ mode.
 3. Run static checks and mocked or offline tests.
 4. Set **Phase** to Configuring automation, then create or bind the
    AlphaInsider target only after those checks pass.
-5. Validate the target and synchronize its description.
+5. Validate the target. For a new target, synchronize the agreed generated
+   description. For an existing target, preserve its description or apply only
+   an explicitly agreed description update.
 6. Create and activate the native AI schedule for its next normal occurrence.
 
 If an unplanned path, permission, target mutation, or high-level behavior
@@ -139,8 +141,10 @@ applicable cases:
 - the shared AlphaInsider compatibility preflight at both checkpoints,
   including supported and unsupported cases, endpoint side effects, and every
   order-capable entry path;
-- scheduler pause and durable-block behavior;
-- notification labels and failure handling;
+- every run error pausing the scheduler and durable-block behavior;
+- resume only after successful self-heal or verified user-directed recovery;
+- notification labels, event policy, quiet-success behavior, failure handling,
+  and notification-only non-pause behavior;
 - self-heal scope, snapshots, repeated dry checks, rollback, and time limit;
   and
 - backtest logic and protection from future information.

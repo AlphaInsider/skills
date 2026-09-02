@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import ast
 import re
 import sys
 from pathlib import Path
@@ -211,10 +212,20 @@ REQUIRED_PLAN_FIELDS = {
     "- Benchmark:",
     "- Metrics and charts:",
     "- Plan-conformance checks:",
+    "- AlphaInsider target choice and source:",
+    "- Existing-target reuse confirmation:",
+    "- AlphaInsider strategy name:",
+    "- AlphaInsider paper starting scale:",
+    "- AlphaInsider public or private setting:",
+    "- AlphaInsider paid setting and launch price:",
     "- AlphaInsider strategy ID:",
+    "- AlphaInsider strategy URL:",
+    "- Generated AlphaInsider description:",
     "- Native AI scheduler provider and task identity:",
     "- Self-healing:",
     "- Notifications:",
+    "- AlphaInsider discovery, setup, and runtime permissions:",
+    "- Notification channels, safe destination references, and event policy:",
     "- Future plan-conforming paper-order authority:",
     "- Phase:",
     "- Plan agreement:",
@@ -250,6 +261,12 @@ REQUIRED_INTERVIEW_PHASE_ORDER = (
     "## Stage 3: AlphaInsider and automation",
     "## Completion",
 )
+REQUIRED_FORWARD_TEST_SECTION_ORDER = (
+    "### Access gate",
+    "### Target choice",
+    "### Implementation and automation choices",
+    "### Implementation agreement",
+)
 REQUIRED_STRATEGY_SKILL_GUIDANCE = {
     "`plan.md` is the project's readable source of truth",
     "one strict `stock` or `cryptocurrency` type",
@@ -278,6 +295,12 @@ REQUIRED_STRATEGY_CONTRACT_GUIDANCE = {
     "scheduler **Run now**",
     "A dry run is available only through an explicit chat request",
     "Missed runs do not catch up",
+    "agreed self-healing without this installed skill",
+    "At the initial access gate",
+    "After the target and implementation are settled",
+    "For every error that prevents a safe plan-conforming run",
+    "notification-only failure are not run errors",
+    "verified user-directed recovery",
     "Stop when no meaningful progress remains",
     "30 minutes have elapsed",
     "A notification failure never pauses trading by itself",
@@ -318,6 +341,12 @@ EXPECTED_SETUP_OPERATIONS = {
     "/getStocks",
     "/searchStocks",
     "/getExchangeStatus",
+}
+REQUIRED_NEW_STRATEGY_SETUP_FIELDS = {
+    "type",
+    "name",
+    "input_value",
+    "private",
 }
 REQUIRED_ALPHA_CREDENTIAL_GUIDANCE = {
     "never return the API key or arbitrary environment contents",
@@ -403,6 +432,64 @@ def section_link(label: str, reference: str, heading: str) -> str:
 def catalog_specialists(text: str) -> list[str]:
     """Return routable specialist names from catalog headings."""
     return CATALOG_HEADING_PATTERN.findall(text)
+
+
+def literal_string_collection(
+    tree: ast.Module, assignment_name: str
+) -> set[str] | None:
+    """Read a literal string collection from a module assignment."""
+    value_node: ast.expr | None = None
+    for node in tree.body:
+        if isinstance(node, ast.Assign) and any(
+            isinstance(target, ast.Name) and target.id == assignment_name
+            for target in node.targets
+        ):
+            value_node = node.value
+            break
+        if (
+            isinstance(node, ast.AnnAssign)
+            and isinstance(node.target, ast.Name)
+            and node.target.id == assignment_name
+        ):
+            value_node = node.value
+            break
+    if value_node is None:
+        return None
+    if (
+        isinstance(value_node, ast.Call)
+        and isinstance(value_node.func, ast.Name)
+        and value_node.func.id == "frozenset"
+        and len(value_node.args) == 1
+        and not value_node.keywords
+    ):
+        value_node = value_node.args[0]
+    try:
+        values = ast.literal_eval(value_node)
+    except (TypeError, ValueError):
+        return None
+    if not isinstance(values, (set, frozenset, list, tuple)) or not all(
+        isinstance(value, str) for value in values
+    ):
+        return None
+    return set(values)
+
+
+def function_calls(tree: ast.Module, function_name: str, called_name: str) -> bool:
+    """Return whether one module function calls a named function."""
+    function = next(
+        (
+            node
+            for node in tree.body
+            if isinstance(node, ast.FunctionDef) and node.name == function_name
+        ),
+        None,
+    )
+    return function is not None and any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == called_name
+        for node in ast.walk(function)
+    )
 
 
 def validate() -> list[str]:
@@ -680,6 +767,47 @@ def validate() -> list[str]:
             f"{list(REQUIRED_INTERVIEW_PHASE_ORDER)}"
         )
 
+    forward_test_section_positions = [
+        interview_text.find(section)
+        for section in REQUIRED_FORWARD_TEST_SECTION_ORDER
+    ]
+    if (
+        -1 in forward_test_section_positions
+        or forward_test_section_positions
+        != sorted(forward_test_section_positions)
+        or any(
+            interview_text.splitlines().count(section) != 1
+            for section in REQUIRED_FORWARD_TEST_SECTION_ORDER
+        )
+    ):
+        errors.append(
+            "strategy forward-test interview must use section order "
+            f"{list(REQUIRED_FORWARD_TEST_SECTION_ORDER)}"
+        )
+    else:
+        access_start, target_start, implementation_start, agreement_start = (
+            forward_test_section_positions
+        )
+        forward_test_routes = {
+            "credentials.md": interview_text[access_start:target_start],
+            "alphainsider-target.md": interview_text[
+                target_start:implementation_start
+            ],
+            "automation.md": interview_text[
+                implementation_start:agreement_start
+            ],
+        }
+        missing_forward_test_routes = {
+            route
+            for route, section in forward_test_routes.items()
+            if route not in section
+        }
+        if missing_forward_test_routes:
+            errors.append(
+                "strategy forward-test sections are missing routes "
+                f"{sorted(missing_forward_test_routes)}"
+            )
+
     implementation_text = reference_texts["implementation.md"]
     if implementation_text.splitlines().count(
         "## AlphaInsider compatibility"
@@ -799,6 +927,32 @@ def validate() -> list[str]:
             errors.append(
                 "strategy setup wrapper operation allowlist must be exactly "
                 f"{sorted(EXPECTED_SETUP_OPERATIONS)}"
+            )
+
+        try:
+            wrapper_tree = ast.parse(wrapper_source)
+        except SyntaxError:
+            wrapper_tree = None
+
+        new_strategy_fields = (
+            literal_string_collection(
+                wrapper_tree, "_NEW_STRATEGY_REQUIRED_FIELDS"
+            )
+            if wrapper_tree is not None
+            else None
+        )
+        if new_strategy_fields != REQUIRED_NEW_STRATEGY_SETUP_FIELDS:
+            errors.append(
+                "strategy setup wrapper newStrategy fields must be exactly "
+                f"{sorted(REQUIRED_NEW_STRATEGY_SETUP_FIELDS)}"
+            )
+
+        guard_is_called = wrapper_tree is not None and function_calls(
+            wrapper_tree, "_build_request", "_validate_setup_body"
+        )
+        if not guard_is_called:
+            errors.append(
+                "strategy setup wrapper must enforce its newStrategy body guard"
             )
 
         forbidden_wrapper_markers = {

@@ -63,14 +63,13 @@ unrelated task.
 Save a short instruction that gives the persistent project identity and tells
 each scheduled AI instance to:
 
-1. read the installed Strategy Creator skill;
-2. read project `plan.md` and `runtime/runbook.md`;
-3. perform exactly one normal occurrence under `scheduled-runs.md`;
-4. use the project lock and current scheduled-for time;
-5. make only plan-conforming AlphaInsider paper actions;
-6. apply the recorded evaluation, self-heal, and notification rules;
-7. update project status and history without exposing secrets; and
-8. finish without creating another schedule.
+1. read project `plan.md` and `runtime/runbook.md`;
+2. perform exactly one normal occurrence as defined there;
+3. use the project lock and current scheduled-for time;
+4. make only plan-conforming AlphaInsider paper actions;
+5. apply the recorded evaluation, self-heal, and notification rules;
+6. update project status and history without exposing secrets; and
+7. finish without creating another schedule.
 
 Do not put an API key, secret, broker detail, or unnecessary private data in
 the task prompt or metadata. A public strategy ID can remain in `plan.md` and
@@ -92,11 +91,25 @@ overlap, the first lock owner continues and the other records a skip.
 
 ## Notifications
 
-When notifications are enabled, discover available native or already
-authorized channels and record the exact non-secret destination. Attempt a
-non-trading delivery check before activation when supported. Provider
-acceptance without an immediate error is sufficient; do not require the user
-to confirm receipt.
+Discover available native or already authorized channels before asking the
+notification question. Ask enabled or disabled first and recommend enabled.
+When enabled, use the next dependent round to ask:
+
+- **Essential** event policy — recommended; notify on an Error and a completed
+  Self-Heal;
+- **Expanded** event policy — also notify on an unexpected Warning; and
+- one or more currently supported channels, with the simplest native in-app
+  channel recommended first.
+
+Ask for an exact non-secret destination only when a selected channel requires
+one. Store a private address, token, or webhook through `credentials.md` and
+record only its safe label and configuration name in project documents. Never
+silently select email or every available channel. Healthy runs and expected
+no-action results remain quiet under both event policies.
+
+Attempt a non-trading delivery check before activation when supported. Provider
+acceptance without an immediate error is sufficient; do not require the user to
+confirm receipt.
 
 When no outbound channel exists, explain the limitation and ask whether task
 history is acceptable. Never create an account, connector, or secret outside
@@ -104,15 +117,16 @@ the user's agreed setup.
 
 ## Activation and lifecycle
 
-Activate only after the target, description, implementation, runbook, offline
-tests, durable state, lock, and notification check are ready. Record the exact
-task identity and next normal occurrence. Do not trigger an order-capable run
-for activation verification.
+Activate only after the target, description, final runtime permissions,
+implementation, runbook, offline tests, durable state, lock, and notification
+check are ready. Record the exact task identity and next normal occurrence. Do
+not trigger an order-capable run for activation verification.
 
 The project must distinguish:
 
 - a user pause, which only the user or an explicit user request clears;
-- an error pause, which successful plan-conforming recovery can clear;
+- an error pause, which only successful self-healing or verified user-directed
+  recovery can clear;
 - an update pause, which clears after the agreed update passes; and
 - a deletion block, which never clears automatically.
 

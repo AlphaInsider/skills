@@ -14,13 +14,14 @@ Write a concise README with:
 - data sources, timing, risk, maximum leverage, and known limits;
 - backtest command, report locations, results summary, and limitations;
 - environment variable names and secret location, never values;
-- AlphaInsider public strategy ID and working strategy link;
+- AlphaInsider target source, name, paper starting scale, public or private
+  state, conditional paid setting, public strategy ID, and working link;
 - native AI scheduler provider, task name, cadence, timezone, daylight-saving
   behavior, next run, pause state, and history location;
 - how the user asks an AI chat for a normal run or dry run;
 - the fact that scheduler **Run now** and chat normal runs can submit
   AlphaInsider paper orders without another prompt;
-- self-heal and notification settings;
+- self-heal settings and notification event policy and channels;
 - recovery, update, and explicit deletion requests; and
 - the stable broker-automation resource link.
 
@@ -37,14 +38,16 @@ does not stop a plan-conforming strategy.
 Generated `AGENTS.md` must:
 
 - make `plan.md` authoritative;
-- require the installed Strategy Creator skill before changing, scheduling,
-  repairing, running, or deleting the strategy;
+- require the installed Strategy Creator skill for creation, updates, deletion,
+  target changes, and automation reconfiguration;
+- let normal runs and agreed self-healing follow the project and runbook without
+  requiring the installed skill;
 - list exact project test, backtest, and finite-cycle commands;
 - list the native task identity and relevant environment-variable names;
 - explain the shared lock and durable trading block;
 - forbid exposing secrets or opening complete `.env` files;
 - forbid orders during build, tests, backtests, and dry runs;
-- protect plan semantics, `pending-update.md`, target identity, cadence,
+- protect plan semantics, `pending-update.md`, target identity and settings, cadence,
   credentials, canonical trading history, lock code, repair evidence, and
   protected tests from self-heal changes; and
 - tell scheduled agents to read `runtime/runbook.md`.
@@ -55,21 +58,22 @@ procedures.
 ## Runtime runbook
 
 `runtime/runbook.md` must be sufficient for a new scheduled AI instance with no
-chat history. Include:
+chat history or installed Strategy Creator skill. Include:
 
 - exact project identity and current task purpose;
 - normal and dry-run entry behavior;
 - code-led, agent-led, or hybrid decision steps;
-- approved input sources and decision boundaries;
+- agreed input sources and decision boundaries;
 - exact test and finite-cycle commands;
 - lock, scheduled-for-time, missed-run, and overlap rules;
 - applicable AlphaInsider compatibility preflight checks and safe no-action
   behavior;
 - target validation, reconciliation, risk, and duplicate checks;
 - structured result fields;
-- evaluation, error pause, durable block, self-heal, rollback, and resume
-  rules;
-- notification labels, channel, destination, and quiet-success policy; and
+- evaluation, mandatory run-error pause, the notification-only exception,
+  durable block, self-heal, rollback, and verified user-directed recovery rules;
+- notification labels, event policy, channels, safe destination configuration
+  names, and quiet-success policy; and
 - paths for state, history, journal, snapshots, and reports.
 
 Do not put a secret or mutable copy of the strategy agreement in the runbook.
@@ -80,6 +84,8 @@ Point to `plan.md` for all high-level behavior.
 After completion, give a clear **Strategy created successfully** message. Show:
 
 - strategy name and strict asset type;
+- public or private state and paper starting scale;
+- paid state and launch price when applicable;
 - working AlphaInsider strategy link;
 - schedule, timezone, next occurrence, and task name;
 - self-heal and notification state;

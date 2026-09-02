@@ -131,32 +131,57 @@ message.
 ## Stage 3: AlphaInsider and automation
 
 Enter this stage only after the user chooses AlphaInsider forward testing.
-Change **Phase** to Building implementation and **Plan agreement** to Draft
-while new high-level implementation decisions remain.
+Set **Phase** to Interviewing and change **Plan agreement** to Draft while
+Stage 3 decisions remain open.
 
-Follow this order:
+### Access gate
 
-1. Recheck persistent project access from scheduled runs.
-2. Follow `automation.md` to verify native scheduler capabilities.
-3. Define code-led, agent-led, or hybrid runtime responsibilities.
-4. Ask whether self-healing is enabled. Recommend enabled when the project has
-   a safe plan-preserving repair scope.
-5. Ask whether notifications are enabled. Recommend enabled. If enabled,
-   discover supported channels and ask for the exact destination.
-6. Follow `credentials.md` for the API key.
-7. Follow `alphainsider-target.md` to show compatible owned targets and the
-   recommended new-target option.
-8. Record the exact offline build, target, description, scheduler, notification
-   check, and activation actions.
+Follow `credentials.md`. First inspect persistent-project and non-prompt secret
+access without asking a question. If no safe scheduled-runtime location exists,
+record the blocker and do not collect a key. Otherwise, privately verify a
+configured key or make a missing key the first standalone user action.
 
-When complete, show one normalized implementation summary. State clearly that
-an active schedule and later user-triggered normal runs can submit
-plan-conforming AlphaInsider paper orders without another prompt. Ask whether
-to agree and build, create or bind the target, and activate the listed native
-AI schedule. Offer revise or stop as alternatives.
+After access is available, verify the token, user ID, read-only discovery
+permissions, account limits, eligible settings, and compatible owned targets.
+Do not ask the user to approve these lookups. Give one exact credential action
+when initial access is insufficient.
 
-That agreement authorizes only the listed local and external actions. Build and
-pass all offline, order-free checks before `newStrategy`. If a new path,
+### Target choice
+
+Follow `alphainsider-target.md`. Ask only the recommended new target versus the
+actual compatible owned targets in the first round. Then settle the selected
+branch's settings in dependent rounds. Do not ask hypothetical new-target
+settings, silently change an existing target, or combine paid behavior with the
+public/private decision.
+
+### Implementation and automation choices
+
+Follow `automation.md`. Recheck scheduled-project access and scheduler
+capabilities, then map the agreed decision mode, cadence, timezone, and market
+rules. Ask only about unresolved material behavior, cost, or permission choices.
+
+When the design is settled, derive and verify the key's exact setup and runtime
+permissions. Resolve missing access before agreement. Then ask self-healing and
+notification questions in their dependency order, with enabled recommended for
+both. Store private notification destinations through `credentials.md` and put
+only safe configuration references in project documents.
+
+Record the exact offline build, target creation or binding, any target update,
+description, scheduler, notification check, and activation actions. Summarize
+the fixed missed-run, overlap, normal-run, dry-run, market-availability, and
+quiet-success safeguards without presenting them as project choices.
+
+### Implementation agreement
+
+Show one normalized summary of the target and its settings, implementation,
+schedule, self-healing, notifications, every planned remote change, and future
+paper-order authority. State clearly that an active schedule and later
+user-triggered normal runs can submit plan-conforming AlphaInsider paper orders
+without another prompt. Offer **Agree and build**, **Revise**, or **Stop**.
+
+Agreement authorizes only the listed local and external actions. On agreement,
+set **Plan agreement** to Agreed and **Phase** to Building implementation. Build
+and pass all offline, order-free checks before `newStrategy`. If a new path,
 permission, target action, or schedule identity becomes necessary, return the
 affected plan to Draft and resolve it.
 
@@ -168,7 +193,8 @@ strategy only after:
 - the implementation and docs conform to `plan.md`;
 - offline plan-conformance tests pass;
 - the AlphaInsider target and saved public ID validate;
-- its description is current;
+- a new target has the agreed generated description, or an existing target's
+  description is preserved unless an explicitly agreed update was applied;
 - the scheduler is active for the next normal occurrence; and
 - notification delivery has been attempted when enabled.
 

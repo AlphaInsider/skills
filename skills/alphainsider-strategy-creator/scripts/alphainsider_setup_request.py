@@ -8,6 +8,7 @@ if __name__ != "__main__":
 
 import argparse
 import json
+import math
 import os
 import sys
 import urllib.error
@@ -42,6 +43,10 @@ _ALLOWED_OPERATIONS = {
     "/searchStocks": frozenset({"POST"}),
     "/getExchangeStatus": frozenset({"GET"}),
 }
+_NEW_STRATEGY_REQUIRED_FIELDS = frozenset(
+    {"type", "name", "input_value", "private"}
+)
+_NEW_STRATEGY_TYPES = frozenset({"stock", "cryptocurrency"})
 
 
 class _SetupRequestError(ValueError):
@@ -169,6 +174,43 @@ def _query_items(query: list[tuple[str, str]] | None) -> list[tuple[str, str]]:
     return list(query or ())
 
 
+def _validate_setup_body(method: str, path: str, body: object) -> None:
+    if method != "POST" or path != "/newStrategy":
+        return
+    if not isinstance(body, dict):
+        raise _SetupRequestError("newStrategy requires a complete JSON object")
+
+    missing = _NEW_STRATEGY_REQUIRED_FIELDS - set(body)
+    if missing:
+        raise _SetupRequestError(
+            "newStrategy is missing explicit fields: " + ", ".join(sorted(missing))
+        )
+    strategy_type = body["type"]
+    if not isinstance(strategy_type, str) or strategy_type not in _NEW_STRATEGY_TYPES:
+        raise _SetupRequestError("newStrategy type must be stock or cryptocurrency")
+    if not isinstance(body["name"], str):
+        raise _SetupRequestError("newStrategy name must be a string")
+    input_value = body["input_value"]
+    if (
+        isinstance(input_value, bool)
+        or not isinstance(input_value, (int, float))
+        or (isinstance(input_value, float) and not math.isfinite(input_value))
+    ):
+        raise _SetupRequestError("newStrategy input_value must be a finite number")
+    if not isinstance(body["private"], bool):
+        raise _SetupRequestError("newStrategy private must be an explicit boolean")
+    if "description" in body and not isinstance(body["description"], str):
+        raise _SetupRequestError("newStrategy description must be a string")
+    if "price" in body:
+        price = body["price"]
+        if (
+            isinstance(price, bool)
+            or not isinstance(price, (int, float))
+            or (isinstance(price, float) and not math.isfinite(price))
+        ):
+            raise _SetupRequestError("newStrategy price must be a finite number")
+
+
 def _is_credential_key(key: object) -> bool:
     normalized = str(key).lower().removesuffix("[]").replace("-", "_")
     return normalized in {
@@ -249,6 +291,7 @@ def _build_request(
     normalized_method = _validate_operation(method, normalized_path)
     query_items = _query_items(query)
     prepared_body = dict(body) if isinstance(body, dict) else body
+    _validate_setup_body(normalized_method, normalized_path, prepared_body)
     url = f"{BASE_URL}{normalized_path}"
     if query_items:
         url = f"{url}?{urllib.parse.urlencode(query_items)}"

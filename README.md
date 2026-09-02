@@ -62,17 +62,20 @@ backtest. Results include suitable charts, a benchmark, metrics, assumptions,
 and data limits. Performance is information, not a runtime success condition.
 Poor results never cause automatic strategy changes.
 
-After results are settled, the skill offers AlphaInsider paper forward testing.
-API-key entry is chat-first, with direct `.env` editing as an alternative.
-The **AI Agent** permission preset is recommended. New targets are recommended
-while compatible owned public and private targets remain selectable. The
-fallback paper starting balance is `$100,000`. The fallback maximum leverage is
-`1×`, and the skill explains AlphaInsider's `2×` ceiling.
+After backtest results, the skill recommends AlphaInsider paper forward testing.
+It verifies scheduled secret storage, then makes a missing API key the first
+user action. Chat entry and the **AI Agent** permission preset are recommended;
+direct `.env` editing is an alternative. It checks discovery permissions first
+and final permissions after implementation design. The verified account
+supplies target choices. It recommends a new public target with a `$100,000`
+starting scale; existing targets keep their settings and history. Leverage
+defaults to `1×` within AlphaInsider's `2×` limit.
 
 The implementation and order-free tests finish before a new AlphaInsider target
 is created. The setup helper cannot submit or cancel orders. The project then
 uses only the platform's native AI scheduler. It never installs a host cron,
-service, or background runner.
+service, or background runner. The generated plan and runbook are sufficient
+for normal runs and agreed self-healing without the installed skill.
 
 Each automation occurrence runs one finite cycle. Scheduler **Run now** and a
 chat normal run use the same order-capable path. A chat dry run blocks orders
@@ -83,13 +86,14 @@ Generated projects use one shared AlphaInsider compatibility check for every
 order-capable path, including verification that stock orders occur only during
 regular market hours.
 
-On a trading error, the strategy blocks orders and pauses future automation.
-Enabled self-healing can repair only plan-preserving implementation problems.
-It uses snapshots, order-free checks, rollback, and a maximum of 30 minutes
-while progress continues. Profitability never triggers repair.
+A true run error blocks orders and pauses automation. Only successful
+self-healing or verified user-directed recovery resumes it. Repair uses
+snapshots, order-free checks, rollback, and at most 30 minutes while progress
+continues. Profitability never triggers repair.
 
-Healthy runs stay quiet. Optional notifications use clear Warning,
-Self-Healed, and Error labels. Notification failure does not pause trading.
+Healthy runs stay quiet. Optional notifications ask for event policy and
+supported channels. Essential notifications send Error and Self-Healed events;
+Expanded also sends Warnings. A notification-only failure does not pause.
 
 Updates preserve the agreed plan while affected decisions are reviewed and
 tested. Explicit deletion inventories the scheduler, AlphaInsider target,

@@ -23,7 +23,11 @@ installed skill read-only. Create all user artifacts in one persistent project.
   complete `.env`. Values deliberately pasted in chat may be stored only with
   the non-echoing helper in `scripts/set_env_value.py`.
 - Use only the platform's native AI automation or scheduler. Never install
-  cron, a system service, a native task scheduler, or a background process.
+  cron, a system service, an operating-system task scheduler, or a background
+  process.
+- Make the generated `plan.md` and runbook sufficient for normal runs and
+  agreed self-healing without this installed skill. Require this skill for
+  creation, updates, deletion, and automation reconfiguration.
 - Treat profit and loss as information. Poor performance never makes a
   plan-conforming run unhealthy and never authorizes automatic strategy
   changes.
@@ -56,18 +60,27 @@ Follow this order and always lead the user to the next available step:
 3. Build the backtest, show clear charts and metrics, record limits, and settle
    any strategy changes with the user.
 4. Offer and recommend AlphaInsider forward testing.
-5. Discover the current platform's native scheduler capabilities and supported
-   cadence before asking scheduling questions.
-6. Plan the implementation, self-healing, and notifications.
-7. Follow [`references/credentials.md`](references/credentials.md), then
+5. When accepted, inspect persistent-project and non-prompt secret access
+   without asking a user question. Use that result to select safe credential
+   storage, then follow
+   [`references/credentials.md`](references/credentials.md). Request a missing
+   key as the first user action in one standalone message; privately verify an
+   existing configured key without requesting it again.
+6. Follow
    [`references/alphainsider-target.md`](references/alphainsider-target.md).
-   Recommend a new target while also showing compatible owned targets.
-8. Follow [`references/implementation.md`](references/implementation.md).
+   Discover the account and compatible owned targets, ask the target choice in
+   its own round, then settle only the selected target's settings.
+7. Complete the current platform's native scheduler capability check. Map the
+   agreed decision mode and schedule, then settle self-healing and notifications
+   in dependency order.
+8. Show the complete implementation agreement described in
+   [`references/interview.md`](references/interview.md).
+9. Follow [`references/implementation.md`](references/implementation.md).
    Build and pass offline, order-free checks before creating a new target.
-9. Create or bind the target, synchronize its description, and follow
+10. Create or bind the target, apply only agreed target changes, and follow
    [`references/automation.md`](references/automation.md) to activate one
    native AI schedule for the next normal occurrence.
-10. Mark the requested outcome complete and follow the success handoff in
+11. Mark the requested outcome complete and follow the success handoff in
     [`references/generated-project.md`](references/generated-project.md).
 
 If the user declines an optional stage, record that choice and continue to the
@@ -87,10 +100,12 @@ Use these independent status fields; do not collapse them into one lifecycle:
 
 Change **Plan agreement** to Draft while an open decision can change intended
 strategy behavior. Ask the user to agree to the normalized plan before building
-that stage. During an update, keep the current plan Agreed and mark
-`pending-update.md` Draft until the change is agreed. Agreement authorizes only
-its recorded actions. The agreed automation plan also authorizes future
-plan-conforming paper orders without per-order confirmation.
+that stage. Keep **Phase** at Interviewing while creation decisions remain open;
+set it to Building implementation only after the implementation plan is agreed.
+During an update, keep the current plan Agreed and mark `pending-update.md`
+Draft until the change is agreed. Agreement authorizes only its recorded
+actions. The agreed automation plan also authorizes future plan-conforming
+paper orders without per-order confirmation.
 
 If implementation or backtesting reveals that an agreed high-level decision
 must change, stop the affected work and return to the interview. Routine fixes

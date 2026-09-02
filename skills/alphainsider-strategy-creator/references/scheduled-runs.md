@@ -56,7 +56,7 @@ error.
 
 ## Error response
 
-For a trading-operation error:
+For every error that prevents a safe plan-conforming run:
 
 1. keep the current lock;
 2. set a durable trading block so another occurrence cannot trade;
@@ -67,6 +67,9 @@ For a trading-operation error:
 6. record every action and result.
 
 Set **Automation state** to Paused and record the exact error pause reason.
+
+Warnings, expected no-action results, routine overlap skips, and a
+notification-only failure are not run errors and do not start this pause flow.
 
 If native pause fails or needs a user-interface action, keep the durable block.
 Later occurrences must exit. Send the exact pause action when notifications
@@ -127,6 +130,12 @@ After a repair passes every protected check:
    can be duplicated; and
 5. resume future automation automatically unless the pause reason is User.
 
+An error pause never clears automatically for another reason. If the user
+supplies required input, fixes an external problem, or agrees to a plan change,
+keep the block and pause until reconciliation and all applicable order-free
+checks prove that the problem is resolved. Then complete the user-directed
+resume.
+
 When direct scheduler control is available, resume it and set **Automation
 state** to Active. Otherwise, keep the strategy safe and give the user the
 exact native resume action.
@@ -142,7 +151,7 @@ cycle.
 
 ## Notifications
 
-When enabled, use exactly:
+Classify notification events with exactly:
 
 - `⚠️ Warning — No Action Required` for a useful warning that needs no user
   action;
@@ -151,9 +160,14 @@ When enabled, use exactly:
 - `🚨 Error — Action Required` when the user must resolve an error or
   decision.
 
+When notifications are enabled, the Essential policy sends Error and
+Self-Healed events. The Expanded policy also sends Warning events. Always
+record classified events in project history even when the selected policy does
+not send them.
+
 Keep messages short and non-technical. State the project, occurrence, plain
 cause, automation state, action already taken, and exact next step. Do not
-notify for healthy runs or routine overlap skips.
+notify for healthy runs, expected no-action results, or routine overlap skips.
 
 A notification failure never pauses trading by itself. Record the failure and
 try bounded plan-compatible channel repair or an already agreed fallback.

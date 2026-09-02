@@ -44,9 +44,13 @@ are made. Never record an API key, secret value, or broker credential.
 - Finite-cycle or agent-decision flow: _not decided_
 - Persistent state, lock, run history, and retention: _not decided_
 - Environment variable names and secret location: _not decided_
-- AlphaInsider API permission plan: _not decided_
+- AlphaInsider discovery, setup, and runtime permissions: _not decided_
 - AlphaInsider target choice and source: _not decided_ <!-- create new | compatible owned target -->
-- AlphaInsider strategy name, access, and paper starting balance: _not decided_
+- Existing-target reuse confirmation: _not applicable unless an existing target is selected_ <!-- confirmed | unresolved -->
+- AlphaInsider strategy name: _not decided_
+- AlphaInsider paper starting scale: _not decided_
+- AlphaInsider public or private setting: _not decided_ <!-- public | private -->
+- AlphaInsider paid setting and launch price: _not applicable unless currently supported and selected_ <!-- free | paid with amount -->
 - AlphaInsider strategy ID: _not assigned_
 - AlphaInsider strategy URL: _not assigned_
 - Generated AlphaInsider description: _not decided_
@@ -56,7 +60,7 @@ are made. Never record an API key, secret value, or broker credential.
 - Self-healing: _not decided_ <!-- enabled | disabled -->
 - Repair scope, protected resources, rollback, and time limit: _not applicable until enabled_
 - Notifications: _not decided_ <!-- enabled | disabled -->
-- Notification channel, destination, and event policy: _not applicable until enabled_
+- Notification channels, safe destination references, and event policy: _not applicable until enabled_
 - Offline tests and expected evidence: _not decided_
 - Future plan-conforming paper-order authority: _not decided_
 - Managed files and external resources: _not decided_
