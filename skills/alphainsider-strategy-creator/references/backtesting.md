@@ -1,8 +1,9 @@
 # Backtesting
 
-Read this file after the high-level strategy is Agreed and before AlphaInsider
-target setup. A backtest evaluates the agreed idea with historical information.
-It never authorizes a strategy change or submits an AlphaInsider order.
+This file owns historical feasibility, replay design, execution, and results.
+Read **Feasibility** after strategy agreement and before asking whether to
+backtest. Read the remaining sections only after the user accepts a backtest.
+A backtest never authorizes a strategy change or submits an AlphaInsider order.
 
 ## Feasibility
 
@@ -24,8 +25,8 @@ discretion.
 Research current provider documentation. Use AlphaInsider price history only
 when its actual coverage and granularity fit the plan. Use a credible external
 source when required. If no defensible replay exists, mark the backtest
-unavailable and explain why. Then offer paper forward testing as a separate
-decision.
+unavailable and explain why. Return that result to the interview; it owns the
+next transition.
 
 ## Plan the replay
 
@@ -79,7 +80,5 @@ State whether the implementation followed `plan.md`. Separate that finding
 from profitability. Poor returns do not mean the implementation failed.
 
 Record the results in `plan.md` and store detailed reports under `backtest/`.
-Set **Highest completed outcome** to Backtest after a valid replay. Then ask
-whether to **Keep this strategy**, **Revise**, or **Stop**. Do not mention the
-next optional activity in this decision. After the user keeps the strategy,
-separately recommend AlphaInsider paper forward testing.
+Set **Highest completed outcome** to Backtest after a valid replay. Return the
+results to `interview.md`, which owns the result decision and next transition.

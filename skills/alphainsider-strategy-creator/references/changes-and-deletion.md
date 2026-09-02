@@ -1,8 +1,8 @@
 # Changes and Explicit Deletion
 
-Read this file for an update, detected user edit, scheduler or target drift, or
-an explicit deletion request. Use only create, resume, update, and explicit
-deletion paths.
+This file owns updates, reconciliation of user edits or external drift, and
+explicit deletion. Use only create, resume, update, and explicit deletion
+paths.
 
 ## Update an agreed strategy
 
@@ -16,7 +16,8 @@ For a behavior-changing update:
 1. set a durable trading block;
 2. pause future native automation;
 3. wait for the shared run or repair lock to become idle;
-4. interview only changed and dependent decisions;
+4. use the [strategy interview](interview.md) for only changed and dependent
+   decisions;
 5. show the normalized change and obtain agreement;
 6. run every affected credible backtest;
 7. update implementation, protected tests, docs, and runbook;
@@ -68,10 +69,12 @@ or used for this strategy:
 - project `.env` or hosted secrets; and
 - API key revocation, which may require a user action in AlphaInsider settings.
 
-Use the internal grill format to ask what to delete or retain. Include
-**Delete everything** as an allowed choice after a clear warning. Recommend a
-scope that matches the user's words; otherwise recommend retaining historical
-and backtest evidence until the user confirms it is no longer needed.
+Use the interview-round format in `user-communication.md` to ask what to delete
+or retain.
+Include **Delete everything** as an allowed choice after a clear warning.
+Recommend a scope that matches the user's words; otherwise recommend retaining
+historical and backtest evidence until the user confirms it is no longer
+needed.
 
 Before final confirmation, show exact paths, task identity, target ID, secret
 locations without values, retained items, irreversible effects, and any action

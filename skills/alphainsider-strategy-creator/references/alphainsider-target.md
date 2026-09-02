@@ -1,35 +1,23 @@
 # AlphaInsider Target
 
-Read this file after the user chooses AlphaInsider forward testing and the API
-key is available. Target discovery happens before final implementation
-agreement. Creation happens only after the agreed implementation passes every
-offline, order-free check.
+This file owns target discovery, selection, settings, binding, and provisioning.
+Read it after `credentials.md` verifies the access gate. Discovery happens
+before final implementation agreement. Creation happens only after the agreed
+implementation passes every offline, order-free check.
 
 Read the installed `alphainsider-api` skill for current endpoint behavior. If
 it is unavailable, read the live AlphaInsider documentation index and relevant
 OpenAPI sections. Do not copy a fixed API catalog into the project.
 
-## Verify access
-
-Use the setup wrapper from `credentials.md`. Verify the token type, user ID,
-and permissions needed for read-only account and target discovery without
-showing the key. Do not require permissions for setup or runtime operations
-that are not known yet. Recommend the **AI Agent** preset because it supports
-later plan changes. Accept a sufficient narrower or broader key.
-
-If required access is missing, list the missing permission names and give one
-clear setup action. Preserve all earlier work. Do not make a remote mutation or
-activate automation until the check passes.
-
 ## Choose a target
 
-After token verification, call `getUserStrategies` with the verified user ID.
-Verify ownership and show only targets whose type matches `plan.md`. For each
-one, display a concise set of useful facts: name, type, public or private state,
-price when relevant, public strategy ID, creation time, current owner starting
-scale when safely available, whether it has prior history or subscribers, and
-whether it is already bound to this project. Do not show a complete API
-response.
+Use the safe setup wrapper defined in `credentials.md`. Call
+`getUserStrategies` with the verified user ID. Verify ownership and show only
+targets whose type matches `plan.md`. For each one, display a concise set of
+useful facts: name, type, public or private state, price when relevant, public
+strategy ID, creation time, current owner starting scale when safely available,
+whether it has prior history or subscribers, and whether it is already bound
+to this project. Do not show a complete API response.
 
 In one target-choice round, ask the user to choose:
 
@@ -91,10 +79,6 @@ Price is separate from the public or private field. Offer paid behavior and ask
 its launch price only when current account and product rules independently
 confirm eligibility, supported combinations, units, and limits. Do not present
 public, private, and paid as one fixed three-choice API field.
-
-Explain maximum leverage separately in the strategy interview. AlphaInsider
-supports up to `2×`. Recommend `1×` unless the agreed strategy supports a
-different maximum. Never treat the maximum as a target exposure.
 
 Generate a concise remote description from `plan.md`. Include the universe,
 decision approach, entry and exit behavior, cadence, and important sizing or

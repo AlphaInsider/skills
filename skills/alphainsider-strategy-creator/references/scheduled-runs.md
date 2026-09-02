@@ -1,8 +1,10 @@
 # Scheduled and User-Triggered Runs
 
-Read this file for every scheduled occurrence, scheduler **Run now**, chat
-normal run, chat dry run, operational error, notification event, or self-heal
-attempt. `plan.md` and `runtime/runbook.md` remain authoritative.
+This file owns runtime entry modes, locking, health, error pauses, repair,
+recovery, and notifications. Read it for every scheduled occurrence, scheduler
+**Run now**, chat normal run, chat dry run, operational error, notification
+event, or self-heal attempt. `plan.md` and `runtime/runbook.md` remain
+authoritative.
 
 ## Entry modes and lock
 
@@ -18,16 +20,24 @@ dry runs.
 
 Every mode first acquires the same atomic project lock. The first trigger owns
 the run. Every overlap records a skip and exits before input collection,
-decision work, reconciliation, or orders. A user-triggered normal run should
-attempt execution even while future automation is error-paused, but it must
-first recheck the trading block and resolve the safety problem.
+decision work, reconciliation, or orders. An explicit scheduler **Run now** or
+chat normal run attempts recovery even while future automation is error-paused,
+but it must resolve the trading block before trading.
+
+Never remove a stale lock until liveness checks prove that its owner is not
+active. Record that evidence before removing the lock and acquiring a new one.
+
+Hold the lock through result evaluation and any repair attempted by that
+occurrence. Release it only after the result, repair state, and rollback state
+are durable. The trading block remains effective after lock release when an
+error is unresolved.
 
 ## Normal occurrence
 
-Follow the finite cycle in `implementation.md`. Read fresh files and state; do
-not reconstruct decisions from chat memory. Record scheduled time, actual start
-time, run source, input as-of time, decision, risk checks, order outcome, health
-result, and notification result without secrets.
+Follow the finite cycle in [strategy implementation](implementation.md). Read
+fresh files and state; do not reconstruct decisions from chat memory. Record
+scheduled time, actual start time, run source, input as-of time, decision, risk
+checks, order outcome, health result, and notification result without secrets.
 
 Missed runs do not catch up. A late stale occurrence exits. A healthy scheduled
 or user-triggered run creates normal project history but no success

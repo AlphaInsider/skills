@@ -1,8 +1,9 @@
 # Strategy Interview
 
-Use the communication rules in `user-communication.md`. This interview is
-dependency-aware: ask every available decision in the current round, record the
-answers, then open the next dependent round. Skip irrelevant branches.
+Use [user communication](user-communication.md). This file owns the creation
+sequence, agreements, status transitions, stop behavior, and completion gates.
+Ask every available decision in the current round, then open the next
+dependent round. Skip irrelevant branches.
 
 ## Protocol
 
@@ -13,15 +14,11 @@ answers, then open the next dependent round. Skip irrelevant branches.
   agreement** to Draft when an open decision can change intended behavior.
   For an active update, keep the current plan Agreed and mark
   `pending-update.md` Draft instead.
-- Use conservative agent defaults for routine technical choices. Record each
-  default, but do not make the user approve implementation trivia.
+- Use conservative defaults for routine technical choices. Record them without
+  asking the user to approve implementation trivia.
 - Ask one normalized agreement question before executing each new stage. Do
   not add action-by-action approvals for work already listed in that agreed
   stage.
-- Keep each user choice limited to its current subject. Introduce a later
-  optional activity only after the current decision is settled. Describe
-  transitions by the work the user understands, never by this file's headings
-  or stored status labels.
 - Do not code a strategy while its applicable plan is Draft.
 - If the user revises an earlier answer, keep unaffected decisions and reopen
   every dependent decision.
@@ -37,8 +34,8 @@ deletion from clear wording. Ask only when several projects or actions are
 plausible.
 
 For an update, use `changes-and-deletion.md`. If the new objective is a
-different strategy, create a separate project. For deletion, use that reference
-only after an explicit request.
+different strategy, create a separate project. Use its deletion flow only
+after an explicit request.
 
 ## Stop and resume creation
 
@@ -49,20 +46,16 @@ authorizes deletion.
 When the user stops, do not start another planned action. If an external action
 has already started and cannot be interrupted, allow only that action to
 resolve, verify its result, and then stop. Record status by the last valid
-outcome. Use `generated-project.md` for each named handoff:
+outcome. Use [generated project guidance](generated-project.md) and this mapping:
 
-- Before strategy agreement, set **Phase** to Complete, keep **Plan agreement**
-  Draft and **Highest completed outcome** at None, and use **Plan saved** while
-  stating that the plan remains a draft.
-- After strategy agreement but before a valid backtest, set **Phase** to
-  Complete, keep the plan Agreed and the highest outcome at Plan, and use
-  **Plan saved**.
-- After a valid backtest but before implementation agreement, set **Phase** to
-  Complete, keep the plan Agreed and the highest outcome at Backtest, and use
-  **Backtest complete**.
-- After implementation agreement but before automated completion, set
-  **Phase** to Complete, keep the plan Agreed, preserve the Plan or Backtest
-  outcome, set **Automation state reason** to User, and use **Setup stopped**.
+| Stop point | Phase | Agreement | Highest outcome | Handoff |
+| --- | --- | --- | --- | --- |
+| Before strategy agreement | Complete | Draft | None | **Plan saved**; say it remains a draft |
+| After strategy agreement | Complete | Agreed | Plan | **Plan saved** |
+| After a valid backtest | Complete | Agreed | Backtest | **Backtest complete** |
+| After implementation agreement | Complete | Agreed | Preserve Plan or Backtest | **Setup stopped** |
+
+For the last row, set **Automation state reason** to User.
 
 If the AlphaInsider interview made the plan Draft and the user stops before
 implementation agreement, record forward testing as not configured and restore
@@ -157,11 +150,11 @@ On agreement:
 ## Stage 2: Backtest choice and results
 
 After strategy agreement, determine historical feasibility before the next
-user question. Follow `backtesting.md`. When a credible replay is possible,
-briefly explain its important constraints and ask whether to **Backtest this
-strategy**, **Skip the backtest**, or **Stop**. Recommend the backtest. Do not
-preview this choice in the strategy-agreement block. When a credible replay is
-not possible, explain the missing history or reconstruction problem, record
+user question. Follow [backtesting](backtesting.md). When a credible replay is
+possible, briefly explain its important constraints and ask whether to
+**Backtest this strategy**, **Skip the backtest**, or **Stop**. Recommend the
+backtest. Do not preview this choice in the strategy-agreement block. When a
+credible replay is not possible, explain the reconstruction problem, record
 Backtesting as unavailable, and do not offer an unavailable choice.
 
 If accepted, settle replay choices and show the normalized replay plan. Ask
@@ -189,35 +182,38 @@ Stage 3 decisions remain open.
 
 ### Access gate
 
-Follow `credentials.md`. First inspect persistent-project and non-prompt secret
-access without asking a question. If no safe scheduled-runtime location exists,
-record the blocker and do not collect a key. Otherwise, privately verify a
-configured key or make a missing key the first standalone user action.
+Follow [credentials and configuration](credentials.md). First inspect
+persistent-project and non-prompt secret access without asking a question. If
+no safe scheduled-runtime location exists, record the blocker and do not
+collect a key. Otherwise, privately verify a configured key or make a missing
+key the first standalone user action.
 
-After access is available, verify the token, user ID, read-only discovery
-permissions, account limits, eligible settings, and compatible owned targets.
-Do not ask the user to approve these lookups. Give one exact credential action
-when initial access is insufficient.
+After access is available, verify the token, user ID, and read-only discovery
+permissions. Do not ask the user to approve these checks. Give one exact
+credential action when access is insufficient; target discovery starts only
+after this gate passes.
 
 ### Target choice
 
-Follow `alphainsider-target.md`. Ask only the recommended new target versus the
-actual compatible owned targets in the first round. Then settle the selected
-branch's settings in dependent rounds. Do not ask hypothetical new-target
-settings, silently change an existing target, or combine paid behavior with the
-public/private decision.
+Follow [AlphaInsider target](alphainsider-target.md). Ask only the recommended
+new target versus the actual compatible owned targets in the first round. Then
+settle the selected branch's settings in dependent rounds. Do not ask
+hypothetical new-target settings, silently change an existing target, or
+combine paid behavior with the public/private decision.
 
 ### Implementation and automation choices
 
-Follow `automation.md`. Recheck scheduled-project access and scheduler
-capabilities, then map the agreed decision mode, cadence, timezone, and market
-rules. Ask only about unresolved material behavior, cost, or permission choices.
+Follow [native AI automation](automation.md). Recheck scheduled-project access
+and scheduler capabilities, then map the agreed decision mode, cadence,
+timezone, and market rules. Ask only about unresolved material behavior, cost,
+or permission choices.
 
 When the design is settled, derive and verify the key's exact setup and runtime
 permissions. Resolve missing access before agreement. Then ask self-healing and
 notification questions in their dependency order, with enabled recommended for
-both. Store private notification destinations through `credentials.md` and put
-only safe configuration references in project documents.
+both. Store private notification destinations through
+[credentials and configuration](credentials.md) and put only safe
+configuration references in project documents.
 
 Record the exact offline build, target creation or binding, any target update,
 description, scheduler, notification check, and activation actions. Summarize
@@ -234,11 +230,19 @@ without another prompt. Offer **Agree to this implementation plan**,
 **Revise**, or **Stop**. State that agreement authorizes the listed local and
 external actions; do not put those later actions in the option label.
 
-Agreement authorizes only the listed local and external actions. On agreement,
-set **Plan agreement** to Agreed and **Phase** to Building implementation. Build
-and pass all offline, order-free checks before `newStrategy`. If a new path,
-permission, target action, or schedule identity becomes necessary, return the
-affected plan to Draft and resolve it.
+Agreement authorizes only the listed local and external actions. On agreement:
+
+1. Set **Plan agreement** to Agreed and **Phase** to Building implementation.
+2. Follow [strategy implementation](implementation.md) and pass all offline,
+   order-free checks against the
+   [scheduled-run contract](scheduled-runs.md).
+3. Follow [AlphaInsider target](alphainsider-target.md) to create or bind and
+   validate the agreed target.
+4. Set **Phase** to Configuring automation and follow
+   [native AI automation](automation.md) to activate the agreed schedule.
+
+If a new path, permission, target action, schedule identity, or behavior becomes
+necessary, return the affected plan to Draft and resolve it before continuing.
 
 ## Completion
 
@@ -254,6 +258,6 @@ strategy only after:
 - notification delivery has been attempted when enabled.
 
 Keep **Plan agreement** Agreed and **Automation state** Active. Follow the
-success handoff in `generated-project.md`. If any gate remains open, record the
-highest completed outcome, blocker, and exact next step instead of claiming
-success.
+success handoff in [generated project guidance](generated-project.md). If any
+gate remains open, record the highest completed outcome, blocker, and exact
+next step instead of claiming success.

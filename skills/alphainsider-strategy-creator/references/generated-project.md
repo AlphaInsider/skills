@@ -1,124 +1,95 @@
 # Generated Project Guidance
 
-Read this file when creating or updating `README.md`, `AGENTS.md`,
-`runtime/runbook.md`, or the final handoff. Keep project-specific facts in the
-project. Do not copy this skill's full procedures.
+This file owns generated `README.md`, `AGENTS.md`, `runtime/runbook.md`, and
+outcome handoffs. Keep them project-specific. Do not copy the skill's interview
+or generic procedures.
 
 ## Human README
 
-Write a concise README with:
+Write a concise README that covers:
 
-- purpose, strict asset type, instrument universe, and strategy summary;
-- the fact that `plan.md` is authoritative;
+- the strategy purpose, strict asset type, universe, rules, data, timing, risk,
+  leverage, known limits, and that `plan.md` is authoritative;
 - code-led, agent-led, or hybrid responsibilities;
-- data sources, timing, risk, maximum leverage, and known limits;
-- backtest command, report locations, results summary, and limitations;
-- environment variable names and secret location, never values;
-- AlphaInsider target source, name, paper starting scale, public or private
-  state, conditional paid setting, public strategy ID, and working link;
-- native AI scheduler provider, task name, cadence, timezone, daylight-saving
-  behavior, next run, pause state, and history location;
-- how the user asks an AI chat for a normal run or dry run;
-- the fact that scheduler **Run now** and chat normal runs can submit
-  AlphaInsider paper orders without another prompt;
-- self-heal settings and notification event policy and channels;
-- recovery, update, and explicit deletion requests; and
+- the backtest command, report paths, result summary, and limitations;
+- safe configuration names and location, never values;
+- target source, name, starting scale, access and paid settings, public ID, and
+  working link;
+- native task identity, cadence, timezone, daylight-saving behavior, next run,
+  state, and history path;
+- chat normal-run and dry-run controls, including that scheduler **Run now**
+  and chat normal runs can submit paper orders without another prompt;
+- self-heal and notification settings, recovery, update, and explicit deletion
+  requests; and
 - the stable broker-automation resource link.
 
-Do not tell the user to run the strategy program directly in a terminal as the
-normal manual control. Internal commands can remain documented for agents and
-development. For project `.env`, recommend active-chat entry first and direct
-editing second. Never expose the credential helper command.
+Do not present direct terminal execution as the user's normal control. For a
+project `.env`, recommend active-chat entry first and direct editing second.
+Never expose the credential helper command.
 
-State plainly that strategy performance is not guaranteed. Poor performance
-does not stop a plan-conforming strategy.
+State that performance is not guaranteed. Poor performance does not stop a
+plan-conforming strategy.
 
 ## Project agent guide
 
 Generated `AGENTS.md` must:
 
-- make `plan.md` authoritative;
-- require the installed Strategy Creator skill for creation, updates, deletion,
-  target changes, and automation reconfiguration;
-- let normal runs and agreed self-healing follow the project and runbook without
-  requiring the installed skill;
-- list exact project test, backtest, and finite-cycle commands;
-- list the native task identity and relevant environment-variable names;
-- explain the shared lock and durable trading block;
-- forbid exposing secrets or opening complete `.env` files;
-- forbid orders during build, tests, backtests, and dry runs;
-- protect plan semantics, `pending-update.md`, target identity and settings, cadence,
-  credentials, canonical trading history, lock code, repair evidence, and
-  protected tests from self-heal changes; and
-- tell scheduled agents to read `runtime/runbook.md`.
-
-Keep project-specific facts only. Do not copy interview or credential
-procedures.
+- make `plan.md` authoritative and route scheduled agents to
+  `runtime/runbook.md`;
+- require Strategy Creator for creation, updates, deletion, target changes, and
+  scheduler reconfiguration, but not for normal runs or agreed self-healing;
+- list exact project test, backtest, finite-cycle commands, native task
+  identity, and configuration names;
+- explain the shared lock and durable trading block; and
+- forbid secret exposure, opening or inspecting the complete `.env`, and orders
+  during builds, tests, backtests, or dry runs. Protect plan semantics,
+  `pending-update.md`, target identity and settings, scheduler identity and
+  cadence, credentials, canonical trading history, lock code, repair evidence,
+  and protected tests from self-healing.
 
 ## Runtime runbook
 
-`runtime/runbook.md` must be sufficient for a new scheduled AI instance with no
-chat history or installed Strategy Creator skill. Include:
+The runbook must let a new scheduled AI instance operate without chat history
+or this installed skill. Materialize the project-specific contracts from
+`implementation.md` and `scheduled-runs.md`, including:
 
-- exact project identity and current task purpose;
-- normal and dry-run entry behavior;
-- code-led, agent-led, or hybrid decision steps;
-- agreed input sources and decision boundaries;
-- exact test and finite-cycle commands;
-- lock, scheduled-for-time, missed-run, and overlap rules;
-- applicable AlphaInsider compatibility preflight checks and safe no-action
-  behavior;
-- target validation, reconciliation, risk, and duplicate checks;
-- structured result fields;
-- evaluation, mandatory run-error pause, the notification-only exception,
-  durable block, self-heal, rollback, and verified user-directed recovery rules;
-- notification labels, event policy, channels, safe destination configuration
-  names, and quiet-success policy; and
-- paths for state, history, journal, snapshots, and reports.
+- project identity; normal and dry-run entry behavior; decision mode; allowed
+  inputs and judgments; exact commands; and hard risk limits;
+- the lock, scheduled time, missed-run, overlap, compatibility, target,
+  reconciliation, duplicate, and structured-result rules;
+- mandatory error pause, the notification-only exception, durable block,
+  repair limit, protected resources, snapshots, rollback, and verified
+  recovery; and
+- notification labels, event policy, channels, safe destination names, and all
+  state, history, journal, snapshot, and report paths.
 
-Do not put a secret or mutable copy of the strategy agreement in the runbook.
-Point to `plan.md` for all high-level behavior.
+Do not put a secret or a mutable copy of strategy behavior in the runbook.
+Point to `plan.md` for the agreement.
 
 ## Outcome handoffs
 
-Use one heading that matches the completed work:
+Use the heading selected by `interview.md`:
 
-- **Plan saved** when the user ends before a valid backtest. State plainly
-  whether the strategy rules were agreed or remain a draft. Show the strategy
-  name, strict asset type, project and plan locations, important open
-  limitations, and how to ask an AI to resume later.
-- **Backtest complete** after the user ends with a valid backtest. Show the
-  strategy name, strict asset type, concise result and limitations, report and
-  project locations, and how to ask an AI to resume later.
-- **Setup stopped** when the user stops after implementation agreement but
-  before automated completion. Show all created local and external resources,
-  AlphaInsider target and link when present, scheduled task name and pause
-  state, whether paper orders are blocked, project location, last completed
-  action, and where setup will resume. Explain how to request resume or
-  explicit deletion.
+- **Plan saved:** State whether the rules are agreed or Draft. Show the
+  strategy, asset type, project and plan locations, important open limits, and
+  how to resume.
+- **Backtest complete:** Show the strategy, asset type, concise results and
+  limits, report and project locations, and how to resume.
+- **Setup stopped:** Inventory local and external resources, target and link,
+  task and pause state, trading block, project location, last action, and
+  resume point. Explain how to request resume or explicit deletion.
 
-For these non-automated handoffs, do not show the broker resource or ask
-another question. The resume instruction is sufficient.
+Do not show the broker resource or ask another question in these partial
+handoffs. A resume instruction is sufficient.
 
-After successful automation, give the **Strategy created successfully**
-message. Show:
+After successful automation, give a **Strategy created successfully** message
+with the strategy and asset type, target settings and link, schedule and task,
+self-heal and notification state, project location, and backtest report when
+present.
 
-- strategy name and strict asset type;
-- public or private state and paper starting scale;
-- paid state and launch price when applicable;
-- working AlphaInsider strategy link;
-- schedule, timezone, next occurrence, and task name;
-- self-heal and notification state;
-- project location; and
-- backtest report link when one exists.
-
-Then present connecting the AlphaInsider strategy to a broker as an optional
-recommended next step. Embed the current broker-automation video when the
-interface supports it. Otherwise, link:
-
-[AlphaInsider broker automation resources](https://alphainsider.com/resources#automating-trades)
-
-State that live broker mode can use real funds. Do not recommend paper or live
-broker mode. Do not request broker credentials or create the connection. End
-the guided creation journey after this handoff without another next-step
-question.
+Then offer broker connection as an optional recommended next step. Embed the
+current video when supported; otherwise link
+[AlphaInsider broker automation resources](https://alphainsider.com/resources#automating-trades).
+State that live broker mode can use real funds. Do not choose paper or live
+broker mode, request broker credentials, create the connection, or ask another
+guided-creation question.

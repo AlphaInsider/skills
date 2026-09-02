@@ -41,6 +41,8 @@ REQUIRED_WRAPPER_GUIDANCE = {
 CATALOG_HEADING_PATTERN = re.compile(
     r"^## ([a-z0-9]+(?:-[a-z0-9]+)*)$", re.MULTILINE
 )
+MARKDOWN_LINK_PATTERN = re.compile(r"\[[^\]]*\]\(([^)\s]+)")
+URI_SCHEME_PATTERN = re.compile(r"^[a-z][a-z0-9+.-]*:", re.IGNORECASE)
 EXPECTED_ALPHA_SCRIPTS = {
     "alphainsider_request.py",
     "alphainsider_stream.py",
@@ -195,7 +197,7 @@ EXPECTED_STRATEGY_SCRIPTS = {
     "alphainsider_setup_request.py",
     "set_env_value.py",
 }
-STRATEGY_SKILL_MAX_WORDS = 1100
+STRATEGY_SKILL_MAX_WORDS = 700
 REQUIRED_PLAN_SECTION_ORDER = (
     "# Strategy Plan",
     "## Strategy plan",
@@ -267,54 +269,133 @@ REQUIRED_FORWARD_TEST_SECTION_ORDER = (
     "### Implementation and automation choices",
     "### Implementation agreement",
 )
-REQUIRED_STRATEGY_SKILL_GUIDANCE = {
-    "`plan.md` is the project's readable source of truth",
-    "one strict `stock` or `cryptocurrency` type",
-    "Use only the platform's native AI automation or scheduler",
-    "Poor performance never makes a plan-conforming run unhealthy",
-    "Use only create, resume, update, and explicit deletion paths",
-    "Select the safest persistent location without asking the user",
-    "Build and pass offline, order-free checks before creating a new target",
-    "When `alphainsider-api` is installed, read its `SKILL.md`",
-    "Do not preload every reference",
+# Stable user-facing labels, paths, limits, and links are intentional literals.
+# Behavioral rules use flexible patterns below so validation does not freeze
+# incidental sentence wording.
+REQUIRED_STRATEGY_LITERALS = {
+    "references/user-communication.md": {
+        "ASD-STE100-style technical English",
+        "👉 **Action — Short title:**",
+        "`⚠️ Warning — No Action Required`",
+        "`🛠️ Self-Healed — No Action Required`",
+        "`🚨 Error — Action Required`",
+    },
+    "references/interview.md": {
+        "Plan saved",
+        "Backtest complete",
+        "Setup stopped",
+        "`2×`",
+        "`1×`",
+    },
+    "references/credentials.md": {
+        "scripts/set_env_value.py",
+    },
+    "references/alphainsider-target.md": {
+        "`$100,000`",
+    },
+    "references/automation.md": {
+        "scheduler **Run now**",
+    },
+    "references/scheduled-runs.md": {
+        "30 minutes",
+    },
+    "references/generated-project.md": {
+        "Strategy created successfully",
+        "https://alphainsider.com/resources#automating-trades",
+    },
 }
-REQUIRED_STRATEGY_CONTRACT_GUIDANCE = {
-    "ASD-STE100-style technical English",
-    "Do not invoke another grilling or interview skill",
-    "Each question and option must decide only its current subject",
-    "Do not use them as user-facing journey labels",
-    "A stop never authorizes deletion",
-    "recorded safe checkpoint",
-    "Plan saved",
-    "Backtest complete",
-    "Setup stopped",
-    "Strategy created successfully",
-    "Never leave the user to ask what happens next",
-    "👉 **Action — Short title:**",
-    "`⚠️ Warning — No Action Required`",
-    "`🛠️ Self-Healed — No Action Required`",
-    "`🚨 Error — Action Required`",
-    "The location must outlive this chat",
-    "`runtime/runbook.md`",
-    "is not a health criterion",
-    "`$100,000`",
-    "supports up to `2×`",
-    "Recommend `1×`",
-    "scheduler **Run now**",
-    "A dry run is available only through an explicit chat request",
-    "Missed runs do not catch up",
-    "agreed self-healing without this installed skill",
-    "At the initial access gate",
-    "After the target and implementation are settled",
-    "For every error that prevents a safe plan-conforming run",
-    "notification-only failure are not run errors",
-    "verified user-directed recovery",
-    "Stop when no meaningful progress remains",
-    "30 minutes have elapsed",
-    "A notification failure never pauses trading by itself",
-    "Use only create, resume, update, and explicit deletion paths",
-    "For full deletion, remove the entire selected project and leave no tombstone",
-    "https://alphainsider.com/resources#automating-trades",
+REQUIRED_STRATEGY_BEHAVIORS = {
+    "SKILL.md": {
+        "plan.md authority": (
+            r"`plan\.md`.{0,120}\b(?:source of truth|authoritative)\b"
+        ),
+        "one strict asset type": (
+            r"\bone project\b.{0,100}\bone strategy\b.{0,100}"
+            r"`stock`.{0,40}`cryptocurrency`"
+        ),
+        "native AI scheduler only": (
+            r"\buse only\b.{0,100}\bnative AI\b.{0,100}"
+            r"\b(?:automation|scheduler)\b"
+        ),
+        "Draft permits safe discovery": (
+            r"\bDraft\b.{0,80}\bpermits?\b.{0,160}\bfeasibility\b"
+            r".{0,100}\bread-only\b"
+        ),
+        "Agreed gates execution": (
+            r"\bAgreed\b.{0,80}\bbefore\b.{0,180}\bremote mutation\b"
+            r".{0,100}\border-capable run\b.{0,100}\bscheduler activation\b"
+        ),
+    },
+    "references/credentials.md": {
+        "missing API key is the first action": (
+            r"\bmissing key\b.{0,100}\bfirst user action\b"
+        ),
+    },
+    "references/backtesting.md": {
+        "feasibility precedes the backtest choice": (
+            r"\bFeasibility\b.{0,100}\bafter strategy agreement\b"
+            r".{0,100}\bbefore asking\b.{0,80}\bbacktest\b"
+        ),
+        "accepted backtest gates replay work": (
+            r"\bremaining sections\b.{0,80}\bonly after\b.{0,80}"
+            r"\baccepts?\b.{0,40}\bbacktest\b"
+        ),
+    },
+    "references/implementation.md": {
+        "stock orders use regular market hours": (
+            r"\bstock orders\b.{0,120}\bregular market hours\b"
+        ),
+        "tests cannot place or cancel orders": (
+            r"\btests\b.{0,80}\bmust not\b.{0,80}\bsubmit\b"
+            r".{0,30}\bcancel\b.{0,100}\border\b"
+        ),
+    },
+    "references/automation.md": {
+        "cron is prohibited": r"\bnever\b.{0,80}\bcron\b",
+        "unsupported cadence requires user selection": (
+            r"\brequested cadence\b.{0,100}\bunavailable\b.{0,140}"
+            r"\bask\b.{0,80}\buser\b.{0,40}\bselect\b"
+        ),
+        "description is ready before activation": (
+            r"\bactivate only after\b.{0,120}\bdescription\b"
+        ),
+    },
+    "references/scheduled-runs.md": {
+        "dry runs require an explicit chat request": (
+            r"\bdry run\b.{0,80}\bonly\b.{0,80}"
+            r"\bexplicit chat request\b"
+        ),
+        "performance is not run health": (
+            r"\b(?:profit|loss|return|win rate)\b.{0,180}"
+            r"\bnot a health criterion\b"
+        ),
+        "every run error pauses automation": (
+            r"\bfor every error\b.{0,500}\bpause future native automation\b"
+        ),
+        "stale-lock removal requires liveness proof": (
+            r"\bnever remove a stale lock\b.{0,120}\bliveness checks\b"
+            r".{0,100}\bowner\b.{0,40}\bnot active\b"
+        ),
+        "notification failure does not pause trading": (
+            r"\bnotification failure\b.{0,80}\bnever pauses trading\b"
+        ),
+    },
+    "references/changes-and-deletion.md": {
+        "full deletion leaves no tombstone": (
+            r"\bfull deletion\b.{0,100}\bremove\b.{0,80}"
+            r"\bentire selected project\b.{0,80}\bno tombstone\b"
+        ),
+    },
+    "references/generated-project.md": {
+        "generated guide forbids complete env inspection": (
+            r"\bforbid\b.{0,120}\b(?:opening|inspecting)\b.{0,80}"
+            r"\bcomplete `\.env`"
+        ),
+        "generated guide protects update and remote settings": (
+            r"`pending-update\.md`.{0,120}\btarget identity and settings\b"
+            r".{0,120}\bscheduler identity and cadence\b"
+        ),
+    },
 }
 REQUIRED_CORE_LAYOUT = {
     "plan.md",
@@ -327,12 +408,6 @@ REQUIRED_CORE_LAYOUT = {
     "backtest/",
     "runtime/",
     "tests/",
-}
-OBSOLETE_STRATEGY_PATHS = {
-    "references/cleanup.md",
-    "references/operation-and-scheduling.md",
-    "references/release.md",
-    "docs/replacement-plan.md",
 }
 EXPECTED_SETUP_OPERATIONS = {
     "/verifyToken",
@@ -379,7 +454,7 @@ REQUIRED_ALPHA_DOC_AUDIT_GUIDANCE = {
     "https://api.alphainsider.com/asyncapi.yaml",
     "Reconcile every discrepancy in the same change",
 }
-README_MAX_WORDS = 650
+README_MAX_WORDS = 500
 REQUIRED_README_SECTIONS = {
     "# AlphaInsider Skills",
     "## Overview",
@@ -399,18 +474,8 @@ REQUIRED_README_OVERVIEW_GUIDANCE = {
     "native AI scheduler",
     "paper-trading",
     "code-led, agent-led, or hybrid",
-    "Each choice covers only its current decision",
-    "without internal stage names",
-    "Stopped setup pauses automation",
     "backtest",
-    "Performance",
-    "**AI Agent**",
-    "`$100,000`",
-    "`1×`",
-    "`2×`",
     "self-healing",
-    "30 minutes",
-    "chat dry run",
     "Explicit deletion",
     "resources#automating-trades",
 }
@@ -438,6 +503,39 @@ def markdown_anchor(heading: str) -> str:
 
 def section_link(label: str, reference: str, heading: str) -> str:
     return f"[`{label}`]({reference}#{markdown_anchor(heading)})"
+
+
+def local_link_targets(
+    source: Path, text: str, root: Path
+) -> tuple[set[Path], set[str]]:
+    """Return valid in-root links and invalid local targets from Markdown."""
+    targets: set[Path] = set()
+    invalid: set[str] = set()
+    resolved_root = root.resolve()
+
+    for match in MARKDOWN_LINK_PATTERN.finditer(text):
+        raw_target = match.group(1).strip("<>")
+        path_text = raw_target.split("#", 1)[0]
+        if not path_text:
+            continue
+        if URI_SCHEME_PATTERN.match(path_text):
+            continue
+        if path_text.startswith("/"):
+            invalid.add(raw_target)
+            continue
+
+        target = (source.parent / path_text).resolve()
+        try:
+            target.relative_to(resolved_root)
+        except ValueError:
+            invalid.add(raw_target)
+            continue
+        if not target.is_file():
+            invalid.add(raw_target)
+            continue
+        targets.add(target)
+
+    return targets, invalid
 
 
 def catalog_specialists(text: str) -> list[str]:
@@ -667,10 +765,6 @@ def validate() -> list[str]:
     all_reference_text = "\n".join(
         reference_texts[name] for name in sorted(reference_texts)
     )
-    normalized_strategy_text = " ".join(strategy_text.split())
-    normalized_contract_text = " ".join(
-        f"{strategy_text}\n{all_reference_text}".split()
-    )
 
     if len(strategy_text.split()) > STRATEGY_SKILL_MAX_WORDS:
         errors.append(
@@ -678,47 +772,83 @@ def validate() -> list[str]:
             f"{STRATEGY_SKILL_MAX_WORDS}"
         )
 
+    strategy_sources = {"SKILL.md": strategy / "SKILL.md"}
+    strategy_sources.update(
+        {
+            f"references/{name}": strategy_references / name
+            for name in EXPECTED_STRATEGY_REFERENCES
+        }
+    )
+    strategy_source_texts = {"SKILL.md": strategy_text}
+    strategy_source_texts.update(
+        {
+            f"references/{name}": text_value
+            for name, text_value in reference_texts.items()
+        }
+    )
+    reference_graph: dict[str, set[str]] = {}
+    broken_strategy_links: set[str] = set()
+    for source_name, source_path in strategy_sources.items():
+        targets, invalid = local_link_targets(
+            source_path, strategy_source_texts[source_name], strategy
+        )
+        routed_targets = {
+            target.relative_to(strategy).as_posix() for target in targets
+        }
+        reference_graph[source_name] = routed_targets & set(strategy_sources)
+        broken_strategy_links.update(
+            f"{source_name} -> {target}" for target in invalid
+        )
+
+    if broken_strategy_links:
+        errors.append(
+            "strategy-creator has invalid local links "
+            f"{sorted(broken_strategy_links)}"
+        )
+
+    reachable_strategy_files = {"SKILL.md"}
+    frontier = ["SKILL.md"]
+    while frontier:
+        source_name = frontier.pop()
+        for target_name in reference_graph.get(source_name, set()):
+            if target_name not in reachable_strategy_files:
+                reachable_strategy_files.add(target_name)
+                frontier.append(target_name)
+
     missing_reference_routes = {
         name
         for name in EXPECTED_STRATEGY_REFERENCES
-        if f"references/{name}" not in strategy_text
+        if f"references/{name}" not in reachable_strategy_files
     }
     if missing_reference_routes:
         errors.append(
-            "strategy-creator SKILL.md is missing direct reference routes "
+            "strategy-creator references are not reachable from SKILL.md "
             f"{sorted(missing_reference_routes)}"
         )
 
-    missing_skill_guidance = {
-        item
-        for item in REQUIRED_STRATEGY_SKILL_GUIDANCE
-        if item not in normalized_strategy_text
-    }
-    if missing_skill_guidance:
-        errors.append(
-            "strategy-creator SKILL.md is missing core guidance "
-            f"{sorted(missing_skill_guidance)}"
-        )
+    for owner, literals in REQUIRED_STRATEGY_LITERALS.items():
+        owner_text = " ".join(strategy_source_texts[owner].split())
+        missing_literals = {
+            item for item in literals if item not in owner_text
+        }
+        if missing_literals:
+            errors.append(
+                f"strategy-creator {owner} is missing stable contract values "
+                f"{sorted(missing_literals)}"
+            )
 
-    missing_contract_guidance = {
-        item
-        for item in REQUIRED_STRATEGY_CONTRACT_GUIDANCE
-        if item not in normalized_contract_text
-    }
-    if missing_contract_guidance:
-        errors.append(
-            "strategy-creator references are missing agreed behavior "
-            f"{sorted(missing_contract_guidance)}"
-        )
-
-    stale_routes = {
-        route for route in OBSOLETE_STRATEGY_PATHS if route in strategy_text
-    }
-    if stale_routes:
-        errors.append(
-            "strategy-creator SKILL.md routes to obsolete lifecycle material "
-            f"{sorted(stale_routes)}"
-        )
+    for owner, behaviors in REQUIRED_STRATEGY_BEHAVIORS.items():
+        owner_text = " ".join(strategy_source_texts[owner].split())
+        missing_behaviors = {
+            name
+            for name, pattern in behaviors.items()
+            if re.search(pattern, owner_text, re.IGNORECASE) is None
+        }
+        if missing_behaviors:
+            errors.append(
+                f"strategy-creator {owner} is missing behavioral contracts "
+                f"{sorted(missing_behaviors)}"
+            )
 
     plan_template = strategy_references / "plan-template.md"
     plan_text = reference_texts["plan-template.md"]
@@ -736,15 +866,39 @@ def validate() -> list[str]:
             f"{list(REQUIRED_PLAN_SECTION_ORDER)}"
         )
 
-    missing_plan_fields = {
-        field
+    plan_lines = plan_text.splitlines()
+    plan_field_lines = {
+        field: [line for line in plan_lines if line.startswith(field)]
         for field in REQUIRED_PLAN_FIELDS
-        if not any(line.startswith(field) for line in plan_text.splitlines())
+    }
+    missing_plan_fields = {
+        field for field, lines in plan_field_lines.items() if not lines
     }
     if missing_plan_fields:
         errors.append(
             "strategy plan template is missing fields "
             f"{sorted(missing_plan_fields)}"
+        )
+
+    duplicate_plan_fields = {
+        field for field, lines in plan_field_lines.items() if len(lines) > 1
+    }
+    if duplicate_plan_fields:
+        errors.append(
+            "strategy plan template repeats fields "
+            f"{sorted(duplicate_plan_fields)}"
+        )
+
+    fields_without_inline_values = {
+        field
+        for field, lines in plan_field_lines.items()
+        if lines
+        and not lines[0][len(field) :].split("<!--", 1)[0].strip()
+    }
+    if fields_without_inline_values:
+        errors.append(
+            "strategy plan template fields need values on their field lines "
+            f"{sorted(fields_without_inline_values)}"
         )
 
     missing_status_values = {

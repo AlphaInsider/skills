@@ -1,169 +1,127 @@
 # Strategy Implementation
 
-Read this file after the applicable plan is Agreed. Build the smallest project
-that follows `plan.md` and supports the selected code-led, agent-led, or hybrid
-mode.
+Read this file after the applicable plan is Agreed. It owns the project build,
+one finite strategy cycle, AlphaInsider compatibility checks, and order-free
+verification. `interview.md` owns phase transitions; `automation.md` owns
+scheduler setup; and `scheduled-runs.md` owns entry modes, locks, health,
+recovery, and runtime notifications.
 
-## Build order and boundaries
+## Build scope
 
-1. Recheck all planned paths and existing user changes.
-2. Build source, state, docs, the runbook, and tests.
+1. Recheck the agreed plan, planned paths, and existing user changes.
+2. Build the smallest source, state, documentation, runbook, and test set that
+   follows the plan.
 3. Run static checks and mocked or offline tests.
-4. Set **Phase** to Configuring automation, then create or bind the
-   AlphaInsider target only after those checks pass.
-5. Validate the target. For a new target, synchronize the agreed generated
-   description. For an existing target, preserve its description or apply only
-   an explicitly agreed description update.
-6. Create and activate the native AI schedule for its next normal occurrence.
+4. Return the evidence and any blocker to the interview. Do not provision a
+   target or scheduler from this build procedure.
 
-If an unplanned path, permission, target mutation, or high-level behavior
-change becomes necessary, stop and return the affected decision to Draft.
-Routine plan-preserving implementation fixes need no new interview.
+If the build needs an unplanned path, permission, remote mutation, or behavior
+change, stop and return the affected decision to Draft. A plan-preserving
+implementation fix needs no new interview.
 
-For an explicit user stop during incomplete creation, follow the centralized
-stop and resume mapping in `interview.md`. Do not treat the request as deletion.
+Never run an order-capable cycle during build or verification. Setup calls can
+inspect or configure the agreed target only in the later target workflow. They
+must not submit or cancel an order.
 
-Never run an order-capable cycle during build or verification. AlphaInsider
-setup calls can create or configure the agreed target, but must not submit or
-cancel an order.
-
-## Project structure
-
-Use the core layout in `project-root.md`. Default to Python when no ecosystem
-requirement favors another language. Add only needed dependency files. Keep
-paths project-relative.
-
-- `strategy/` contains reusable decision, data, risk, reconciliation, and
-  AlphaInsider runtime code.
-- `backtest/` contains historical replay code, data manifests, charts, and
-  reports.
-- `runtime/runbook.md` contains one finite AI-occurrence procedure.
-- `runtime/` contains structured state, the shared lock, health, run history,
-  repair journal, and snapshots.
-- `tests/` contains order-free plan-conformance tests.
-
-Put names and safe examples in `.env.example`. Ignore `.env`, caches, temporary
-files, repair snapshots, and generated secrets. Keep `plan.md`, source, tests,
-docs, and safe result summaries ready for source control.
+Use the layout in [persistent project](project-root.md). Default to Python when
+no ecosystem requirement favors another language. Add only needed dependencies
+and keep paths project-relative. Put safe variable names and examples in
+`.env.example`; ignore secrets, caches, temporary files, and repair snapshots.
 
 ## Decision modes
 
 ### Code-led
 
-Implement deterministic rules in project code. The scheduled AI reads the plan
-and runbook, invokes one finite cycle, evaluates its structured result, and
-handles the agreed error policy.
+Implement deterministic rules in project code. The scheduled AI invokes one
+finite cycle, evaluates its structured result, and applies the runtime policy.
 
 ### Agent-led
 
-The scheduled AI reads the plan, obtains the agreed inputs, makes the bounded
-decision itself, applies risk checks, and uses project helpers for safe state
-and AlphaInsider actions. It can use the calling AI model. Do not require a
-separate model API key unless `plan.md` explicitly selects an external model.
+The scheduled AI obtains the agreed inputs, makes the bounded decision, applies
+risk checks, and uses project helpers for state and AlphaInsider actions. It
+can use the calling model. Require a separate model API key only when `plan.md`
+selects an external model service.
 
 ### Hybrid
 
 Programs gather or calculate inputs and enforce mechanical limits. The
-scheduled AI makes only the judgments that `plan.md` assigns to it.
+scheduled AI makes only the judgments assigned to it in `plan.md`.
 
-For agent-led and hybrid projects, the runbook must state the allowed evidence,
+For agent-led and hybrid projects, the runbook must define allowed evidence,
 decision space, output shape, uncertainty behavior, hard risk limits, and
-prohibited changes. Keep any decision-affecting prompt or rubric aligned with
-`plan.md`.
+prohibited changes. Keep every decision prompt or rubric aligned with the plan.
 
-## One finite normal cycle
+## Finite strategy cycle
 
-Every scheduled occurrence, scheduler **Run now**, and chat normal run uses the
-same logical cycle:
+The runtime controller in `scheduled-runs.md` owns admission, the shared lock,
+dry-run isolation, and post-cycle health handling. After it admits a normal
+run, execute this cycle:
 
-1. acquire the project-wide atomic run lock before external work;
-2. read `plan.md` and `runtime/runbook.md`;
-3. verify Plan agreement, target identity, strict asset type, automation state,
-   pause reason, and durable trading block;
-4. reconcile relevant positions, open orders, and prior uncertain actions;
-5. run the shared AlphaInsider compatibility preflight for cycle availability;
-6. obtain fresh inputs with the agreed as-of and missing-data rules;
-7. calculate or make the agreed decision;
-8. enforce instrument, sizing, leverage, exposure, loss, timing, and duplicate
-   protections;
-9. rerun that preflight for the planned action and mutable constraints;
-10. submit only the planned AlphaInsider paper action when normal trading is
-   allowed; and
-11. persist a structured result and release the lock.
-
-Update **Current status** with the last completed step, next step, open error,
-and UTC time without changing the agreed strategy.
+1. Read `plan.md` and `runtime/runbook.md` from disk.
+2. Validate Plan agreement, target identity, strict asset type, automation
+   state, pause reason, and durable trading block.
+3. Reconcile relevant positions, open orders, and uncertain prior actions.
+4. Run the shared AlphaInsider compatibility preflight for cycle availability.
+5. Obtain fresh inputs under the agreed as-of and missing-data rules.
+6. Calculate or make the agreed decision.
+7. Enforce instrument, sizing, leverage, exposure, loss, timing, and duplicate
+   protections.
+8. Rerun compatibility checks for the planned action and mutable constraints.
+9. Submit only the planned AlphaInsider paper action when normal trading is
+   allowed, then persist a structured result.
 
 The result must distinguish no-order success, confirmed order response,
 confirmed pre-order failure, ambiguous possible order, warning, and skipped
-overlap. Do not store credentials or unnecessary private response data.
-
-Use one lock across every local or hosted runtime. The first occurrence runs.
-Any overlapping occurrence records a skip and exits before data, decision, or
-order work. Never remove a stale lock until liveness checks prove its owner is
-not active.
+overlap. Record no credential or unnecessary private response data.
 
 ## AlphaInsider compatibility
 
-When `alphainsider-api` is installed, read its current instructions and only
-the endpoint sections needed by this project. Otherwise, verify against current
-AlphaInsider documentation.
+When `alphainsider-api` is installed, use its current instructions and only the
+endpoint sections needed by the project. Otherwise, verify current AlphaInsider
+documentation.
 
-Use one shared compatibility preflight for every order-capable entry path. Run
-it before input and decision work for constraints that determine whether the
-cycle can proceed. Immediately before an external action, rerun it with that
-action's side effects and constraints that can change. If a required fact
-cannot be verified, do not perform the action. Return a safe no-action result
-only for an expected unavailable state; otherwise use error handling.
+Implement one shared preflight for every order-capable path. Run it before input
+and decision work for constraints that can stop the cycle. Immediately before
+an external action, rerun it for that action's side effects and mutable
+constraints. If a required fact cannot be verified, do not act. Return a safe
+no-action result only for an expected unavailable state; otherwise return an
+error.
 
-AlphaInsider stock orders are limited to regular market hours. Submit only when
-the current status confirms that the regular market is open; otherwise use the
-safe no-action or error result above.
+The preflight must cover every applicable current AlphaInsider constraint,
+including:
 
-- Resolve unknown instruments without guessing. Validate each result and its
-  `security` type. Dynamic candidates must stay inside the planned asset type.
-- Reconcile before deciding. Treat an uncertain prior submission as an error
-  that blocks another possible duplicate.
-- Never assume a missing `input_multiplier` is `1`.
-- Use current AlphaInsider sizing and allocation rules. Enforce both the
-  user's maximum leverage and the platform's `2×` ceiling.
-- Use bounded in-cycle backoff for planned transient failures. Keep retries
-  duplicate-safe.
+- market and operation availability; stock orders are accepted only during
+  regular market hours;
+- resolved instruments and strict `security` type compatibility;
+- target ownership, type, and current settings;
+- positions, open orders, and uncertain prior submissions;
+- sizing and allocation rules, the planned leverage maximum, and the platform
+  `2×` ceiling; and
+- current endpoint permissions, limits, and side effects.
+
+Never assume a missing `input_multiplier` is `1`. Use bounded, duplicate-safe
+in-cycle backoff only for planned transient failures.
 
 ## Verification
 
-Test observable plan conformance, not profitability or speed. Include the
-applicable cases:
+Test observable plan conformance, not profitability or speed. Cover the
+applicable strategy decisions, timestamps, freshness, type boundary, sizing,
+risk limits, reconciliation, order mapping, and protection from future
+information.
 
-- signal or agent-decision contract;
-- timestamps, freshness, missing data, and strict asset type;
-- sizing, leverage, exposure, and order mapping;
-- positions, open orders, uncertain submissions, and reconciliation;
-- overlapping normal and dry runs;
-- dry-run prevention of orders and canonical state changes;
-- the shared AlphaInsider compatibility preflight at both checkpoints,
-  including supported and unsupported cases, endpoint side effects, and every
-  order-capable entry path;
-- every run error pausing the scheduler and durable-block behavior;
-- resume only after successful self-heal or verified user-directed recovery;
-- notification labels, event policy, quiet-success behavior, failure handling,
-  and notification-only non-pause behavior;
-- self-heal scope, snapshots, repeated dry checks, rollback, and time limit;
-  and
-- backtest logic and protection from future information.
+Test the compatibility preflight at both checkpoints and on every
+order-capable path, including supported, unavailable, invalid, and mutable
+cases. Also test the complete operational contract in `scheduled-runs.md`,
+including overlap, dry-run isolation, mandatory error pause, repair and
+rollback, recovery, quiet success, and notification-only failure.
 
 Mock external services. Tests must not submit or cancel an AlphaInsider paper
-order. Performance differences from the backtest can prompt a correctness
-review, but they fail verification only when evidence shows plan
-nonconformance.
+order. A performance difference from the backtest can start a correctness
+review, but fails verification only when evidence proves plan nonconformance.
 
-## Documentation and completion
+## Build handoff
 
-Follow `generated-project.md` for `README.md`, `AGENTS.md`, and the runbook.
-Record the exact managed files, task identity, public target ID, checks, and
-current next step in `plan.md`.
-
-An incomplete target or scheduler gate does not discard the build. Preserve
-the project, set the appropriate highest completed outcome, and identify the
-next action. Set Automated strategy only after every completion condition in
-`interview.md` passes.
+Use [generated project guidance](generated-project.md) for `README.md`,
+`AGENTS.md`, and `runtime/runbook.md`. Record managed files, checks, and the
+current next step in `plan.md`. Return passed evidence or the exact blocker to
+`interview.md`; it owns target provisioning, automation, and completion.

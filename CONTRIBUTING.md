@@ -3,6 +3,8 @@
 Add each public skill under `skills/<skill-name>/` with a valid `SKILL.md`.
 Keep supporting references one level below the skill and include scripts only
 when deterministic behavior is valuable.
+Give each rule one canonical owner. Link every reference from `SKILL.md` or a
+reachable reference, and explain when to read it instead of repeating it.
 Keep public skills and documentation agent-vendor agnostic; do not require
 vendor-specific metadata or behavior.
 

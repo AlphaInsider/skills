@@ -30,11 +30,12 @@ that blocker and the exact next step in `plan.md`.
 
 ## Find or create the project
 
-Recognize a project by a root `plan.md` that has exactly one
-`# Strategy Plan` title and one `## Current status` section with the documented
-Phase, Plan agreement, Highest completed outcome, and Automation state fields.
-Do not require YAML frontmatter. Before any run, require each status value to
-match the choices in `plan-template.md`; stop and reconcile an invalid value.
+Recognize a project by a root `plan.md` that follows the
+[plan template](plan-template.md): exactly one `# Strategy Plan` title and one
+`## Current status` section with the documented Phase, Plan agreement, Highest
+completed outcome, and Automation state fields. Do not require YAML
+frontmatter. Before any run, require each status value to match the template;
+stop and reconcile an invalid value.
 
 Search in this order:
 

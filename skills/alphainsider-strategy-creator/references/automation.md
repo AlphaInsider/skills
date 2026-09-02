@@ -1,139 +1,108 @@
 # Native AI Automation
 
-Read this file after the user chooses AlphaInsider forward testing. Use the
-current platform's native AI automation or scheduler only. Do not install or
-recommend cron, systemd, launchd, Windows Task Scheduler, a daemon, or a
-background process.
+This file owns native-scheduler capability discovery, schedule configuration,
+task instructions, notification setup, and activation. Use only the current
+platform's native AI automation or scheduler. Never install or recommend cron,
+systemd, launchd, Windows Task Scheduler, a daemon, or a background process.
 
 ## Discover capabilities
 
-Inspect current platform tools and current official documentation. Do not
-assume that a web app, desktop app, or command-line app has the same controls.
-Record:
+Inspect current platform tools and official documentation. Do not assume that
+a web, desktop, or command-line product has the same controls. Record:
 
 - create, inspect, edit, pause, resume, **Run now**, and delete support;
-- recurrence limits, minimum and maximum cadence, precision, timezone, and
-  daylight-saving-time behavior;
-- missed-run, scheduler-retry, overlap, history, and notification behavior;
-- maximum occurrence duration;
-- access to the persistent project and exact code revision;
-- durable read/write state and atomic lock support;
-- non-prompt secret access;
-- required network access; and
-- whether the agent or only the user can operate each lifecycle control.
+- recurrence limits, precision, timezone, daylight-saving, missed-run,
+  scheduler-retry, overlap, history, notification, and duration behavior;
+- access to the persistent project, exact code revision, durable state, and
+  atomic lock;
+- non-prompt secret and required network access; and
+- whether the agent or only the user can operate each control.
 
-Use provider-native user-interface instructions when a required control is not
-available as an agent tool. Never claim that a control exists without current
-evidence. Do not activate unless the native platform provides create, pause,
-resume, status, and removal controls, even when some controls are user-interface
-only. If future scheduled runs cannot read the same project, state, or secrets,
-do not activate automation. Preserve the implementation and record the specific
-blocker and next user action.
+Use native user-interface instructions when a required control is unavailable
+as an agent tool. Do not activate unless create, pause, resume, status, and
+removal controls exist, even when some are user-operated. Future runs must be
+able to read and write the same project, state, and secrets. Otherwise,
+preserve the implementation and record one exact blocker and user action.
 
 ## Plan the schedule
 
-Offer only cadences supported by the selected scheduler. If the desired cadence
-is unsupported, explain the nearest useful alternatives and ask the user to
-select one. Record the exact timezone and how daylight-saving changes affect
-local run times.
-
-For stocks, configure order-capable schedules only during AlphaInsider's
-regular market hours.
+Offer only supported cadences. If the requested cadence is unavailable,
+explain the nearest useful alternatives and ask the user to select one. Record
+the exact timezone and daylight-saving behavior. For stocks, configure
+order-capable schedules only during AlphaInsider's regular market hours.
 
 Use these defaults unless the plan needs another supported choice:
 
-- each occurrence is one finite normal run;
-- missed occurrences are skipped and never caught up;
-- scheduler-level automatic retries are disabled;
-- the project-wide lock rejects overlap;
-- healthy runs remain quiet; and
-- the schedule starts at its next normal occurrence, not with an
-  order-capable setup test.
+- one finite normal run per occurrence;
+- skip missed occurrences without catch-up;
+- disable scheduler-level automatic retries;
+- use the project lock to reject overlap;
+- keep healthy runs quiet; and
+- activate for the next normal occurrence without an order-capable setup run.
 
-If scheduler retries or catch-up cannot be disabled, require the project lock,
-scheduled-for-time check, and durable trading block to reject duplicates and
-stale occurrences. Record the provider limitation.
+If retries or catch-up cannot be disabled, record the limitation and require
+the project scheduled-time check, lock, and trading block to reject stale or
+duplicate work.
 
-Derive a unique, stable task name from the project name. Check for a collision
+Derive a unique stable task name from the project name. Check for collision
 without opening secret stores or arbitrary run output. Never overwrite an
 unrelated task.
 
 ## Task instruction
 
-Save a short instruction that gives the persistent project identity and tells
-each scheduled AI instance to:
+Save a short instruction with the persistent project identity. Tell each
+scheduled AI instance to:
 
 1. read project `plan.md` and `runtime/runbook.md`;
-2. perform exactly one normal occurrence as defined there;
-3. use the project lock and current scheduled-for time;
+2. perform exactly one normal occurrence;
+3. apply the project lock, current scheduled time, runtime evaluation, repair,
+   and notification rules;
 4. make only plan-conforming AlphaInsider paper actions;
-5. apply the recorded evaluation, self-heal, and notification rules;
-6. update project status and history without exposing secrets; and
-7. finish without creating another schedule.
+5. update safe project status and history; and
+6. finish without creating another schedule.
 
 Do not put an API key, secret, broker detail, or unnecessary private data in
-the task prompt or metadata. A public strategy ID can remain in `plan.md` and
-project configuration instead of the task prompt.
+the task prompt or metadata. Keep the public strategy ID in project
+configuration. Agent-led and hybrid occurrences can use the scheduled AI's
+reasoning directly.
 
-For agent-led or hybrid strategies, the occurrence can use the scheduled AI's
-reasoning directly. Project programs can collect inputs, enforce mechanical
-limits, and submit the final paper action.
+[Scheduled and user-triggered runs](scheduled-runs.md) defines **Run now**,
+chat normal runs, chat dry runs, locks, health, recovery, and runtime
+notifications. Configure scheduler **Run now** to enter that same normal-run
+path. Never schedule a dry run or present direct terminal execution as the
+user's normal control.
 
-## Run and dry-run controls
+## Configure notifications
 
-The scheduler's **Run now** control performs a normal order-capable occurrence.
-A user can also ask an AI chat to perform the same normal run. An explicit
-`dry run` request in chat performs the dry-run branch. Do not teach the user
-to invoke the strategy program manually in a terminal as the normal control.
+Discover native or already authorized channels before asking. Ask enabled or
+disabled first and recommend enabled. If enabled, ask in the next dependent
+round for:
 
-All entry paths share the same lock. If a scheduled and user-triggered run
-overlap, the first lock owner continues and the other records a skip.
+- **Essential** events, recommended: Error and completed Self-Heal;
+- **Expanded** events: Essential plus unexpected Warning; and
+- supported channels, recommending the simplest native in-app channel first.
 
-## Notifications
+Request a destination only when the channel needs one. Store private addresses,
+tokens, or webhooks through
+[credentials and configuration](credentials.md). Put only safe labels and
+configuration names in project documents. Never silently select email or every
+available channel.
 
-Discover available native or already authorized channels before asking the
-notification question. Ask enabled or disabled first and recommend enabled.
-When enabled, use the next dependent round to ask:
+Attempt a non-trading delivery check before activation when supported.
+Provider acceptance without an immediate error is sufficient; do not require
+the user to confirm receipt. If no outbound channel exists, ask whether native
+task history is acceptable. Do not create an unagreed account, connector, or
+secret.
 
-- **Essential** event policy — recommended; notify on an Error and a completed
-  Self-Heal;
-- **Expanded** event policy — also notify on an unexpected Warning; and
-- one or more currently supported channels, with the simplest native in-app
-  channel recommended first.
+## Activate
 
-Ask for an exact non-secret destination only when a selected channel requires
-one. Store a private address, token, or webhook through `credentials.md` and
-record only its safe label and configuration name in project documents. Never
-silently select email or every available channel. Healthy runs and expected
-no-action results remain quiet under both event policies.
+Activate only after the target, agreed description state, final runtime
+permissions, implementation, runbook, offline tests, durable state, lock, and
+notification check are ready. Record the task identity and next normal
+occurrence. Do not trigger an order-capable run to verify activation.
 
-Attempt a non-trading delivery check before activation when supported. Provider
-acceptance without an immediate error is sufficient; do not require the user to
-confirm receipt.
-
-When no outbound channel exists, explain the limitation and ask whether task
-history is acceptable. Never create an account, connector, or secret outside
-the user's agreed setup.
-
-## Activation and lifecycle
-
-Activate only after the target, description, final runtime permissions,
-implementation, runbook, offline tests, durable state, lock, and notification
-check are ready. Record the exact task identity and next normal occurrence. Do
-not trigger an order-capable run for activation verification.
-
-During incomplete creation, an explicit user stop is a user pause. Follow the
-centralized stop and resume mapping in `interview.md`; never remove resources
-unless the user separately requests deletion.
-
-The project must distinguish:
-
-- a user pause, which only the user or an explicit user request clears;
-- an error pause, which only successful self-healing or verified user-directed
-  recovery can clear;
-- an update pause, which clears after the agreed update passes; and
-- a deletion block, which never clears automatically.
-
-When automatic scheduler pause is unavailable, the durable trading block must
-make later occurrences exit before external trading work. Notify the user to
-pause the native task through its UI. Never substitute another scheduler.
+For a user stop during setup, return to `interview.md`. For runtime pause and
+resume behavior, use
+[scheduled and user-triggered runs](scheduled-runs.md). When the agent cannot
+operate a required native control, keep the durable trading block effective and
+give the exact user-interface action. Never substitute another scheduler.

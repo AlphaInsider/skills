@@ -5,139 +5,79 @@ description: Create, resume, backtest, implement, automate, update, or explicitl
 
 # AlphaInsider Strategy Creator
 
-Guide one strategy from idea to an active AlphaInsider paper strategy. Keep the
-installed skill read-only. Create all user artifacts in one persistent project.
+Guide one strategy from an idea to an automated AlphaInsider paper strategy.
+Keep this installed skill read-only. Put all user artifacts in one persistent
+project.
 
-## Boundaries
+## Core contract
 
-- `plan.md` is the project's readable source of truth. Code, backtests, the
+- `plan.md` is the project's readable source of truth. Backtests, code, the
   AlphaInsider target, and automation must conform to it.
 - One project contains one strategy with one strict `stock` or
   `cryptocurrency` type. Dynamic selection must stay inside that type.
-- Before offering, building, or performing an AlphaInsider action, check its
-  current applicable constraints and allow only supported behavior. Recheck
-  constraints that can change immediately before the action.
+- Check current applicable AlphaInsider constraints before proposing or
+  performing an AlphaInsider action. Recheck mutable constraints immediately
+  before the action.
 - Send orders only to AlphaInsider paper strategies. Never create a broker
   client, connect a broker, or request broker credentials.
 - Never inspect, print, or summarize an existing API key, secret store, or
-  complete `.env`. Values deliberately pasted in chat may be stored only with
-  the non-echoing helper in `scripts/set_env_value.py`.
-- Use only the platform's native AI automation or scheduler. Never install
-  cron, a system service, an operating-system task scheduler, or a background
-  process.
-- Make the generated `plan.md` and runbook sufficient for normal runs and
-  agreed self-healing without this installed skill. Require this skill for
-  creation, updates, deletion, and automation reconfiguration.
-- Treat profit and loss as information. Poor performance never makes a
-  plan-conforming run unhealthy and never authorizes automatic strategy
-  changes.
-- Use only create, resume, update, and explicit deletion paths. A materially
-  different strategy belongs in another project. Handle deletion only after an
-  explicit user request.
+  complete `.env`. Accept a value deliberately pasted in chat only through the
+  non-echoing credential workflow.
+- Use only the platform's native AI automation or scheduler. Never install a
+  host scheduler, service, daemon, or background process.
+- Make the generated plan and runbook sufficient for normal runs and agreed
+  self-healing without this installed skill. Use this skill for creation,
+  updates, deletion, and automation reconfiguration.
+- Treat performance as information. Poor performance never makes a
+  plan-conforming run unhealthy or authorizes a strategy change.
+- Build and pass offline, order-free checks before creating a new target.
+- Support create, resume, update, and explicit deletion. A different strategy
+  belongs in another project. Deletion requires an explicit user request.
 
-## Start or resume
+## Begin or resume
 
-1. Read [`references/user-communication.md`](references/user-communication.md)
-   and [`references/project-root.md`](references/project-root.md).
-2. Select the safest persistent location without asking the user. Resume the
-   matching project when one is clear. Otherwise, create one dedicated project
-   after its objective is known.
-3. Read [`references/plan-template.md`](references/plan-template.md) and
-   [`references/interview.md`](references/interview.md). Maintain `plan.md`
-   after each answer or completed action. Keep **Current status** sufficient
-   for another chat or scheduled agent to continue without this transcript.
-4. For an existing project, infer whether the user wants to resume, update,
-   run, dry-run, inspect, or delete it. Ask only when the intent or project is
-   ambiguous.
+1. Read [user communication](references/user-communication.md) before the first
+   user-facing message.
+2. Read [persistent project](references/project-root.md). Select the safest
+   persistent location without asking the user, unless the user already named
+   one. Resume a clear match; otherwise create one dedicated project after its
+   objective is known.
+3. Read `plan.md` and its **Current status** when a project exists. Never open
+   `.env` to discover configuration.
+4. Route the requested work:
+   - For creation or incomplete setup, read the
+     [strategy interview](references/interview.md). It owns the creation order,
+     agreements, transitions, stop behavior, and completion gates.
+   - For any scheduled occurrence, scheduler **Run now**, chat normal run,
+     chat dry run, operational error, notification, or repair, read
+     [scheduled and user-triggered runs](references/scheduled-runs.md).
+   - For an update, detected edit, external drift, or explicit deletion, read
+     [changes and explicit deletion](references/changes-and-deletion.md).
 
-## Creation flow
-
-Follow this order and always lead the user to the next available step:
-
-1. Interview for the high-level strategy and obtain agreement.
-2. Offer and recommend a credible backtest. Follow
-   [`references/backtesting.md`](references/backtesting.md) when accepted.
-3. Build the backtest, show clear charts and metrics, record limits, and settle
-   any strategy changes with the user.
-4. Offer and recommend AlphaInsider forward testing.
-5. When accepted, inspect persistent-project and non-prompt secret access
-   without asking a user question. Use that result to select safe credential
-   storage, then follow
-   [`references/credentials.md`](references/credentials.md). Request a missing
-   key as the first user action in one standalone message; privately verify an
-   existing configured key without requesting it again.
-6. Follow
-   [`references/alphainsider-target.md`](references/alphainsider-target.md).
-   Discover the account and compatible owned targets, ask the target choice in
-   its own round, then settle only the selected target's settings.
-7. Complete the current platform's native scheduler capability check. Map the
-   agreed decision mode and schedule, then settle self-healing and notifications
-   in dependency order.
-8. Show the complete implementation agreement described in
-   [`references/interview.md`](references/interview.md).
-9. Follow [`references/implementation.md`](references/implementation.md).
-   Build and pass offline, order-free checks before creating a new target.
-10. Create or bind the target, apply only agreed target changes, and follow
-   [`references/automation.md`](references/automation.md) to activate one
-   native AI schedule for the next normal occurrence.
-11. Mark the requested outcome complete and follow the matching outcome
-    handoff in
-    [`references/generated-project.md`](references/generated-project.md).
-
-If the user declines an optional stage, record that choice and continue to the
-next useful stage. If a prerequisite cannot be met, preserve completed work,
-record the exact blocker and next step, and do not claim completion beyond the
-highest completed outcome.
-
-If the user stops creation, follow the centralized mapping in `interview.md`.
-A stop never authorizes deletion. Preserve partial resources and make any
-active schedule safe.
+Do not preload every reference. Follow links from the selected workflow only
+when their stated phase or action begins.
 
 ## Agreement and authority
 
-Use these independent status fields; do not collapse them into one lifecycle:
+A Draft plan permits interviewing, feasibility research, read-only discovery,
+and planning. Require the applicable plan to be Agreed before a backtest or
+implementation build, remote mutation, order-capable run, or scheduler
+activation. Keep `plan.md` current after each answer, material finding,
+completed action, failure, or next-step change. Its status must let a new chat
+or scheduled agent continue without this chat history.
 
-- **Phase:** Interviewing, Building backtest, Reviewing results, Building
-  implementation, Configuring automation, or Complete.
-- **Plan agreement:** Draft or Agreed.
-- **Highest completed outcome:** None, Plan, Backtest, or Automated strategy.
-- **Automation state:** Not configured, Active, or Paused.
+If a backtest or implementation reveals that intended strategy behavior must
+change, stop the affected work and return to the interview. Plan-preserving
+mechanical fixes, such as compatible endpoint wiring or bounded rate-limit
+handling, do not need a new strategy decision.
 
-These are stored project values, not user-facing journey labels. Describe the
-actual work in plain language. Keep each user choice limited to its current
-decision, and introduce later optional work only after that decision is
-settled. Follow `references/user-communication.md` for transition wording.
+An agreed automation plan authorizes later plan-conforming AlphaInsider paper
+orders through its normal-run paths without per-order confirmation. It does not
+authorize an unlisted remote mutation, broker action, or strategy change.
 
-Change **Plan agreement** to Draft while an open decision can change intended
-strategy behavior. Ask the user to agree to the normalized plan before building
-that stage. Keep **Phase** at Interviewing while creation decisions remain open;
-set it to Building implementation only after the implementation plan is agreed.
-During an update, keep the current plan Agreed and mark `pending-update.md`
-Draft until the change is agreed. Agreement authorizes only its recorded
-actions. The agreed automation plan also authorizes future plan-conforming
-paper orders without per-order confirmation.
-
-If implementation or backtesting reveals that an agreed high-level decision
-must change, stop the affected work and return to the interview. Routine fixes
-such as compatible endpoint wiring, rate-limit handling, or other
-plan-preserving mechanics need no new strategy decision.
-
-## Conditional references
-
-Do not preload every reference. Read each relevant file in full when its phase
-or action begins:
-
-- [`references/scheduled-runs.md`](references/scheduled-runs.md) — every
-  scheduled run, scheduler Run now, chat normal run, chat dry run, error,
-  notification event, or self-heal attempt.
-- [`references/generated-project.md`](references/generated-project.md) —
-  project files, human README, agent guide, runbook, and final handoff.
-- [`references/changes-and-deletion.md`](references/changes-and-deletion.md) —
-  updates, user edits, drift, or explicit deletion.
+## AlphaInsider API behavior
 
 When `alphainsider-api` is installed, read its `SKILL.md` and only the API
 sections needed for the current action. Otherwise, use the current
-`https://api.alphainsider.com` index and contracts. For credential collection,
-follow `references/credentials.md`; use `alphainsider-api` for API behavior and
-retain its no-inspection and no-echo safeguards. Do not duplicate an API catalog
-in this skill.
+`https://api.alphainsider.com` index and contracts. Keep this skill
+self-contained, but do not duplicate an API catalog here.

@@ -1,18 +1,18 @@
 # Credentials and Configuration
 
-Read this file as soon as the user chooses AlphaInsider forward testing. Never
-inspect, print, or summarize an existing API key, complete `.env`, process
-environment, or hosted secret store.
+This file owns secret-storage selection, credential collection, private
+verification, and safe setup requests. Read it when `interview.md` records that
+the user wants AlphaInsider forward testing. Never inspect, print, or summarize
+an existing API key, complete `.env`, process environment, or hosted secret
+store.
 
 Require this skill's `scripts/set_env_value.py` and
 `scripts/alphainsider_setup_request.py` before project-file credential or
 target setup. If either is missing, stop only that phase and reinstall Strategy
 Creator. Do not improvise another secret-write or setup-request path.
 
-Do not request `ALPHAINSIDER_API_KEY` before the user chooses AlphaInsider
-forward testing. After that choice, supplying a missing key is the first action
-the user must complete. Do not ask an AlphaInsider, target, implementation,
-self-heal, notification, or automation question first. Link to
+Do not request `ALPHAINSIDER_API_KEY` before that choice. Afterward, supplying a
+missing key is the first user action; do not ask setup questions first. Link to
 [AlphaInsider developer settings](https://alphainsider.com/settings/developers).
 Recommend the **AI Agent** permission preset because future plan changes can
 need additional AlphaInsider functions. Initially, a narrower key is acceptable
