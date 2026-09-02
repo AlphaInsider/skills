@@ -63,6 +63,8 @@ chat history. Include:
 - approved input sources and decision boundaries;
 - exact test and finite-cycle commands;
 - lock, scheduled-for-time, missed-run, and overlap rules;
+- applicable AlphaInsider compatibility preflight checks and safe no-action
+  behavior;
 - target validation, reconciliation, risk, and duplicate checks;
 - structured result fields;
 - evaluation, error pause, durable block, self-heal, rollback, and resume

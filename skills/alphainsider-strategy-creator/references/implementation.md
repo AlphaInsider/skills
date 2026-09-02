@@ -76,13 +76,15 @@ same logical cycle:
 3. verify Plan agreement, target identity, strict asset type, automation state,
    pause reason, and durable trading block;
 4. reconcile relevant positions, open orders, and prior uncertain actions;
-5. obtain fresh inputs with the agreed as-of and missing-data rules;
-6. calculate or make the agreed decision;
-7. enforce instrument, sizing, leverage, exposure, loss, timing, and duplicate
+5. run the shared AlphaInsider compatibility preflight for cycle availability;
+6. obtain fresh inputs with the agreed as-of and missing-data rules;
+7. calculate or make the agreed decision;
+8. enforce instrument, sizing, leverage, exposure, loss, timing, and duplicate
    protections;
-8. submit only the planned AlphaInsider paper action when normal trading is
+9. rerun that preflight for the planned action and mutable constraints;
+10. submit only the planned AlphaInsider paper action when normal trading is
    allowed; and
-9. persist a structured result and release the lock.
+11. persist a structured result and release the lock.
 
 Update **Current status** with the last completed step, next step, open error,
 and UTC time without changing the agreed strategy.
@@ -96,11 +98,22 @@ Any overlapping occurrence records a skip and exits before data, decision, or
 order work. Never remove a stale lock until liveness checks prove its owner is
 not active.
 
-## AlphaInsider behavior
+## AlphaInsider compatibility
 
 When `alphainsider-api` is installed, read its current instructions and only
 the endpoint sections needed by this project. Otherwise, verify against current
 AlphaInsider documentation.
+
+Use one shared compatibility preflight for every order-capable entry path. Run
+it before input and decision work for constraints that determine whether the
+cycle can proceed. Immediately before an external action, rerun it with that
+action's side effects and constraints that can change. If a required fact
+cannot be verified, do not perform the action. Return a safe no-action result
+only for an expected unavailable state; otherwise use error handling.
+
+AlphaInsider stock orders are limited to regular market hours. Submit only when
+the current status confirms that the regular market is open; otherwise use the
+safe no-action or error result above.
 
 - Resolve unknown instruments without guessing. Validate each result and its
   `security` type. Dynamic candidates must stay inside the planned asset type.
@@ -123,6 +136,9 @@ applicable cases:
 - positions, open orders, uncertain submissions, and reconciliation;
 - overlapping normal and dry runs;
 - dry-run prevention of orders and canonical state changes;
+- the shared AlphaInsider compatibility preflight at both checkpoints,
+  including supported and unsupported cases, endpoint side effects, and every
+  order-capable entry path;
 - scheduler pause and durable-block behavior;
 - notification labels and failure handling;
 - self-heal scope, snapshots, repeated dry checks, rollback, and time limit;

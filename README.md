@@ -79,6 +79,10 @@ chat normal run use the same order-capable path. A chat dry run blocks orders
 and canonical state changes. One durable lock prevents overlap, and missed runs
 do not catch up.
 
+Generated projects use one shared AlphaInsider compatibility check for every
+order-capable path, including verification that stock orders occur only during
+regular market hours.
+
 On a trading error, the strategy blocks orders and pauses future automation.
 Enabled self-healing can repair only plan-preserving implementation problems.
 It uses snapshots, order-free checks, rollback, and a maximum of 30 minutes

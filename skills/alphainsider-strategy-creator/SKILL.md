@@ -14,6 +14,9 @@ installed skill read-only. Create all user artifacts in one persistent project.
   AlphaInsider target, and automation must conform to it.
 - One project contains one strategy with one strict `stock` or
   `cryptocurrency` type. Dynamic selection must stay inside that type.
+- Before offering, building, or performing an AlphaInsider action, check its
+  current applicable constraints and allow only supported behavior. Recheck
+  constraints that can change immediately before the action.
 - Send orders only to AlphaInsider paper strategies. Never create a broker
   client, connect a broker, or request broker credentials.
 - Never inspect, print, or summarize an existing API key, secret store, or
@@ -109,5 +112,7 @@ or action begins:
 
 When `alphainsider-api` is installed, read its `SKILL.md` and only the API
 sections needed for the current action. Otherwise, use the current
-`https://api.alphainsider.com` index and contracts. Do not duplicate an API
-catalog in this skill.
+`https://api.alphainsider.com` index and contracts. For credential collection,
+follow `references/credentials.md`; use `alphainsider-api` for API behavior and
+retain its no-inspection and no-echo safeguards. Do not duplicate an API catalog
+in this skill.

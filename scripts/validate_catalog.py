@@ -680,6 +680,15 @@ def validate() -> list[str]:
             f"{list(REQUIRED_INTERVIEW_PHASE_ORDER)}"
         )
 
+    implementation_text = reference_texts["implementation.md"]
+    if implementation_text.splitlines().count(
+        "## AlphaInsider compatibility"
+    ) != 1:
+        errors.append(
+            "strategy implementation must define one AlphaInsider "
+            "compatibility section"
+        )
+
     project_root_text = reference_texts["project-root.md"]
     missing_layout_entries = {
         entry for entry in REQUIRED_CORE_LAYOUT if entry not in project_root_text

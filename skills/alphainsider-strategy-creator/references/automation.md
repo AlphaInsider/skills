@@ -37,6 +37,9 @@ is unsupported, explain the nearest useful alternatives and ask the user to
 select one. Record the exact timezone and how daylight-saving changes affect
 local run times.
 
+For stocks, configure order-capable schedules only during AlphaInsider's
+regular market hours.
+
 Use these defaults unless the plan needs another supported choice:
 
 - each occurrence is one finite normal run;

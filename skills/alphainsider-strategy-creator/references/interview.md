@@ -6,9 +6,9 @@ answers, then open the next dependent round. Skip irrelevant branches.
 
 ## Protocol
 
-- Research project, market-data, AlphaInsider, storage, and scheduler facts.
-  Ask the user only for intent, user-held facts, material choices, or required
-  authority.
+- Research project, market-data, storage, scheduler, and current applicable
+  AlphaInsider constraints before offering choices. Ask the user only for
+  intent, user-held facts, material choices, or required authority.
 - Update `plan.md` after every answer and completed action. Set **Plan
   agreement** to Draft when an open decision can change intended behavior.
   For an active update, keep the current plan Agreed and mark
