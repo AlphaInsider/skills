@@ -122,6 +122,10 @@ implementation, runbook, offline tests, durable state, lock, and notification
 check are ready. Record the exact task identity and next normal occurrence. Do
 not trigger an order-capable run for activation verification.
 
+During incomplete creation, an explicit user stop is a user pause. Follow the
+centralized stop and resume mapping in `interview.md`; never remove resources
+unless the user separately requests deletion.
+
 The project must distinguish:
 
 - a user pause, which only the user or an explicit user request clears;

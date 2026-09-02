@@ -24,7 +24,8 @@ discretion.
 Research current provider documentation. Use AlphaInsider price history only
 when its actual coverage and granularity fit the plan. Use a credible external
 source when required. If no defensible replay exists, mark the backtest
-unavailable, explain why, and recommend paper forward testing.
+unavailable and explain why. Then offer paper forward testing as a separate
+decision.
 
 ## Plan the replay
 
@@ -79,5 +80,6 @@ from profitability. Poor returns do not mean the implementation failed.
 
 Record the results in `plan.md` and store detailed reports under `backtest/`.
 Set **Highest completed outcome** to Backtest after a valid replay. Then ask
-whether to keep the plan, revise it, or stop. Once settled, recommend
-AlphaInsider paper forward testing as the next step.
+whether to **Keep this strategy**, **Revise**, or **Stop**. Do not mention the
+next optional activity in this decision. After the user keeps the strategy,
+separately recommend AlphaInsider paper forward testing.

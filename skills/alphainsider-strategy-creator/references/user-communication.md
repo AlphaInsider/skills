@@ -14,6 +14,26 @@ Use active voice. Give each word one meaning. Define an unavoidable technical
 or trading term the first time. Prefer one main idea per sentence. Use short
 sentences, specific nouns, and vertical lists when they are easier to scan.
 
+## Decisions and transitions
+
+Keep internal headings, stage numbers, and exact `plan.md` status values in the
+project instructions. Do not use them as user-facing journey labels. Describe
+the actual work instead, such as testing the strategy with historical data or
+setting up scheduled paper trading. If the user asks for technical status,
+give the plain-language status first and the stored value only when useful.
+
+Each question and option must decide only its current subject. Do not name a
+later optional activity anywhere in its question block, including the choices
+or recommendation. Use labels such as **Agree to this strategy**, **Agree to
+this backtest plan**, or **Agree to this implementation plan**. Explain actions
+that the current agreement authorizes in the question body, not by adding them
+to the agreement label.
+
+After the user settles a decision, record it and introduce the next applicable
+activity separately. Lead with what completed, describe the next work in plain
+language, and give one clear question or action. Do not preview internal
+workflow titles.
+
 ## Internal grill interview
 
 Do not invoke another grilling or interview skill. Ask all currently available

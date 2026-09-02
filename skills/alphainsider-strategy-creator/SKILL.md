@@ -80,13 +80,18 @@ Follow this order and always lead the user to the next available step:
 10. Create or bind the target, apply only agreed target changes, and follow
    [`references/automation.md`](references/automation.md) to activate one
    native AI schedule for the next normal occurrence.
-11. Mark the requested outcome complete and follow the success handoff in
+11. Mark the requested outcome complete and follow the matching outcome
+    handoff in
     [`references/generated-project.md`](references/generated-project.md).
 
 If the user declines an optional stage, record that choice and continue to the
 next useful stage. If a prerequisite cannot be met, preserve completed work,
 record the exact blocker and next step, and do not claim completion beyond the
 highest completed outcome.
+
+If the user stops creation, follow the centralized mapping in `interview.md`.
+A stop never authorizes deletion. Preserve partial resources and make any
+active schedule safe.
 
 ## Agreement and authority
 
@@ -97,6 +102,11 @@ Use these independent status fields; do not collapse them into one lifecycle:
 - **Plan agreement:** Draft or Agreed.
 - **Highest completed outcome:** None, Plan, Backtest, or Automated strategy.
 - **Automation state:** Not configured, Active, or Paused.
+
+These are stored project values, not user-facing journey labels. Describe the
+actual work in plain language. Keep each user choice limited to its current
+decision, and introduce later optional work only after that decision is
+settled. Follow `references/user-communication.md` for transition wording.
 
 Change **Plan agreement** to Draft while an open decision can change intended
 strategy behavior. Ask the user to agree to the normalized plan before building

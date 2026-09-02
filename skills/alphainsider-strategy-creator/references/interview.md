@@ -18,6 +18,10 @@ answers, then open the next dependent round. Skip irrelevant branches.
 - Ask one normalized agreement question before executing each new stage. Do
   not add action-by-action approvals for work already listed in that agreed
   stage.
+- Keep each user choice limited to its current subject. Introduce a later
+  optional activity only after the current decision is settled. Describe
+  transitions by the work the user understands, never by this file's headings
+  or stored status labels.
 - Do not code a strategy while its applicable plan is Draft.
 - If the user revises an earlier answer, keep unaffected decisions and reopen
   every dependent decision.
@@ -35,6 +39,47 @@ plausible.
 For an update, use `changes-and-deletion.md`. If the new objective is a
 different strategy, create a separate project. For deletion, use that reference
 only after an explicit request.
+
+## Stop and resume creation
+
+**Skip** declines only the current optional activity and continues the
+creation flow. **Stop** ends the current creation request. A stop never
+authorizes deletion.
+
+When the user stops, do not start another planned action. If an external action
+has already started and cannot be interrupted, allow only that action to
+resolve, verify its result, and then stop. Record status by the last valid
+outcome. Use `generated-project.md` for each named handoff:
+
+- Before strategy agreement, set **Phase** to Complete, keep **Plan agreement**
+  Draft and **Highest completed outcome** at None, and use **Plan saved** while
+  stating that the plan remains a draft.
+- After strategy agreement but before a valid backtest, set **Phase** to
+  Complete, keep the plan Agreed and the highest outcome at Plan, and use
+  **Plan saved**.
+- After a valid backtest but before implementation agreement, set **Phase** to
+  Complete, keep the plan Agreed and the highest outcome at Backtest, and use
+  **Backtest complete**.
+- After implementation agreement but before automated completion, set
+  **Phase** to Complete, keep the plan Agreed, preserve the Plan or Backtest
+  outcome, set **Automation state reason** to User, and use **Setup stopped**.
+
+If the AlphaInsider interview made the plan Draft and the user stops before
+implementation agreement, record forward testing as not configured and restore
+the preserved strategy plan to Agreed.
+
+For a stopped partial setup, enable the durable trading block when an
+order-capable path exists. Pause any active native schedule and set
+**Automation state** to Paused. If no schedule exists, set it to Not
+configured. Retain and inventory every created local and external resource.
+Report any native pause action that only the user can complete. Do not show an
+automated-success or broker handoff.
+
+On a later explicit resume, set **Phase** to the activity being resumed and
+continue from the recorded safe checkpoint. First recheck current constraints,
+target identity, remote state, and scheduler state. Do not repeat a completed
+target or scheduler mutation unless its current result and idempotence are
+verified.
 
 ## Stage 1: High-level strategy
 
@@ -98,8 +143,9 @@ to select one.
 ### Strategy agreement
 
 Show one concise normalized summary of the complete high-level strategy. Ask
-whether to agree and continue, revise it, or stop with the plan. Recommend
-agreement when no contradiction remains.
+whether to **Agree to this strategy**, **Revise**, or **Stop**. Recommend
+agreement when no contradiction remains. Do not mention backtesting in this
+agreement question, its choices, or its recommendation.
 
 On agreement:
 
@@ -110,23 +156,30 @@ On agreement:
 
 ## Stage 2: Backtest choice and results
 
-Determine historical feasibility before asking. Follow `backtesting.md`.
-When a credible replay is possible, ask whether to backtest. Recommend yes.
-When it is not possible, explain the missing history or reconstruction problem
-and record Backtesting as unavailable.
+After strategy agreement, determine historical feasibility before the next
+user question. Follow `backtesting.md`. When a credible replay is possible,
+briefly explain its important constraints and ask whether to **Backtest this
+strategy**, **Skip the backtest**, or **Stop**. Recommend the backtest. Do not
+preview this choice in the strategy-agreement block. When a credible replay is
+not possible, explain the missing history or reconstruction problem, record
+Backtesting as unavailable, and do not offer an unavailable choice.
 
-If accepted, settle replay choices, ask agreement for the listed local build
-and data access, then build and run it. Set **Phase** to Building backtest and
-then Reviewing results. Show results and ask whether to keep the strategy,
-revise it, or stop with the backtest. Never make profitability a pass/fail
-gate. A plan-conforming strategy may continue with poor results.
+If accepted, settle replay choices and show the normalized replay plan. Ask
+whether to **Agree to this backtest plan**, **Revise**, or **Skip the
+backtest**. State that agreement authorizes the listed local build and data
+access. Then build and run it. Set **Phase** to Building backtest and then
+Reviewing results. Show results and ask whether to **Keep this strategy**,
+**Revise**, or **Stop**. Do not mention AlphaInsider in this question, its
+choices, or its recommendation. Never make profitability a pass/fail gate. A
+plan-conforming strategy may continue with poor results.
 
-After the results are settled, or after a declined/unavailable backtest, offer
-AlphaInsider forward testing as the recommended next step.
+After the user keeps the strategy, after either backtest **Skip** choice, or
+when a backtest is unavailable, separately offer AlphaInsider forward testing
+as the recommended next step. Describe what paper forward testing does; do not
+refer to a stage name.
 
 If the user declines forward testing, set **Phase** to Complete and preserve
-the Plan or Backtest outcome. Do not show the automated-strategy success
-message.
+the Plan or Backtest outcome. Use the applicable Stop handoff above.
 
 ## Stage 3: AlphaInsider and automation
 
@@ -177,7 +230,9 @@ Show one normalized summary of the target and its settings, implementation,
 schedule, self-healing, notifications, every planned remote change, and future
 paper-order authority. State clearly that an active schedule and later
 user-triggered normal runs can submit plan-conforming AlphaInsider paper orders
-without another prompt. Offer **Agree and build**, **Revise**, or **Stop**.
+without another prompt. Offer **Agree to this implementation plan**,
+**Revise**, or **Stop**. State that agreement authorizes the listed local and
+external actions; do not put those later actions in the option label.
 
 Agreement authorizes only the listed local and external actions. On agreement,
 set **Plan agreement** to Agreed and **Phase** to Building implementation. Build

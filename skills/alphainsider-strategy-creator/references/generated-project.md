@@ -79,9 +79,29 @@ chat history or installed Strategy Creator skill. Include:
 Do not put a secret or mutable copy of the strategy agreement in the runbook.
 Point to `plan.md` for all high-level behavior.
 
-## Final success handoff
+## Outcome handoffs
 
-After completion, give a clear **Strategy created successfully** message. Show:
+Use one heading that matches the completed work:
+
+- **Plan saved** when the user ends before a valid backtest. State plainly
+  whether the strategy rules were agreed or remain a draft. Show the strategy
+  name, strict asset type, project and plan locations, important open
+  limitations, and how to ask an AI to resume later.
+- **Backtest complete** after the user ends with a valid backtest. Show the
+  strategy name, strict asset type, concise result and limitations, report and
+  project locations, and how to ask an AI to resume later.
+- **Setup stopped** when the user stops after implementation agreement but
+  before automated completion. Show all created local and external resources,
+  AlphaInsider target and link when present, scheduled task name and pause
+  state, whether paper orders are blocked, project location, last completed
+  action, and where setup will resume. Explain how to request resume or
+  explicit deletion.
+
+For these non-automated handoffs, do not show the broker resource or ask
+another question. The resume instruction is sufficient.
+
+After successful automation, give the **Strategy created successfully**
+message. Show:
 
 - strategy name and strict asset type;
 - public or private state and paper starting scale;
@@ -92,9 +112,9 @@ After completion, give a clear **Strategy created successfully** message. Show:
 - project location; and
 - backtest report link when one exists.
 
-Then explain that the user can connect the AlphaInsider strategy to a broker.
-Embed the current broker-automation video when the interface supports it.
-Otherwise, link:
+Then present connecting the AlphaInsider strategy to a broker as an optional
+recommended next step. Embed the current broker-automation video when the
+interface supports it. Otherwise, link:
 
 [AlphaInsider broker automation resources](https://alphainsider.com/resources#automating-trades)
 

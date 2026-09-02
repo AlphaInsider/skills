@@ -52,10 +52,11 @@ the current phase, Draft or Agreed plan state, highest completed outcome, and
 automation state. Another chat or scheduled agent can resume from its current
 status.
 
-The built-in grill interview uses simple technical English, multiple-choice
-questions, recommended answers, clear action blocks, and an explicit next
-step. A project can be code-led, agent-led, or hybrid. Stock and cryptocurrency
-projects remain strictly separate.
+The grill interview uses simple technical English, multiple-choice questions,
+recommendations, clear actions, and an explicit next step. Each choice covers
+only its current decision. Later optional work is
+introduced separately without internal stage names. Projects can be code-led,
+agent-led, or hybrid. Stock and cryptocurrency projects remain separate.
 
 After the strategy is Agreed, the skill offers and recommends a credible
 backtest. Results include suitable charts, a benchmark, metrics, assumptions,
@@ -76,6 +77,9 @@ is created. The setup helper cannot submit or cancel orders. The project then
 uses only the platform's native AI scheduler. It never installs a host cron,
 service, or background runner. The generated plan and runbook are sufficient
 for normal runs and agreed self-healing without the installed skill.
+
+Stopped setup pauses automation, preserves resources, and records its resume
+point.
 
 Each automation occurrence runs one finite cycle. Scheduler **Run now** and a
 chat normal run use the same order-capable path. A chat dry run blocks orders
@@ -100,7 +104,8 @@ tested. Explicit deletion inventories the scheduler, AlphaInsider target,
 project data, history, secrets, and API-key revocation separately. Cleanup
 never cancels orders or liquidates positions.
 
-After successful automation, the handoff links to
+Earlier endings use matching headings. Automated success recommends optional
+broker connection through
 [AlphaInsider broker automation resources](https://alphainsider.com/resources#automating-trades).
 The skill never handles broker credentials or creates a broker connection.
 

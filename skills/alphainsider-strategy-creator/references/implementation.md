@@ -20,6 +20,9 @@ If an unplanned path, permission, target mutation, or high-level behavior
 change becomes necessary, stop and return the affected decision to Draft.
 Routine plan-preserving implementation fixes need no new interview.
 
+For an explicit user stop during incomplete creation, follow the centralized
+stop and resume mapping in `interview.md`. Do not treat the request as deletion.
+
 Never run an order-capable cycle during build or verification. AlphaInsider
 setup calls can create or configure the agreed target, but must not submit or
 cancel an order.
