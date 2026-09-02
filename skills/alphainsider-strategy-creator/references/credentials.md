@@ -2,14 +2,15 @@
 
 This file owns secret-storage selection, credential collection, private
 verification, and safe setup requests. Read it when `interview.md` records that
-the user wants AlphaInsider forward testing. Never inspect, print, or summarize
-an existing API key, complete `.env`, process environment, or hosted secret
-store.
+the user wants to set up the strategy on AlphaInsider. Never inspect, print, or
+summarize an existing API key, complete `.env`, process environment, or hosted
+secret store.
 
 Require this skill's `scripts/set_env_value.py` and
 `scripts/alphainsider_setup_request.py` before project-file credential or
-target setup. If either is missing, stop only that phase and reinstall Strategy
-Creator. Do not improvise another secret-write or setup-request path.
+AlphaInsider strategy setup. If either is missing, stop only that phase and
+reinstall Strategy Creator. Do not improvise another secret-write or
+setup-request path.
 
 Do not request `ALPHAINSIDER_API_KEY` before that choice. Afterward, supplying a
 missing key is the first user action; do not ask setup questions first. Link to
@@ -20,8 +21,8 @@ when it supports token verification and the required read-only discovery.
 
 ## Choose secret storage
 
-Before reading or requesting a value, inspect persistent-project and non-prompt
-secret access for the current platform's scheduled runtime. This is a read-only
+Before reading or requesting a value, inspect project access and secret access
+that does not require a person during each scheduled run. This is a read-only
 capability check, not an interview question or user action. If no safe location
 will be readable by both the active and scheduled agents, do not request a key.
 Record the blocker and give the required platform action instead.
@@ -31,13 +32,13 @@ configured key privately. Do not request it again when verification succeeds.
 If it is missing, inaccessible, invalid, or insufficient, give the standalone
 action below as the next user-facing step.
 
-Use the project `.env` when both the current agent and scheduled runtime can
-load it. Use the platform's secure non-prompt secret storage when a hosted
-runtime cannot access the project `.env`. Never place a secret in a scheduler
-instruction, plan, source file, example, test, log, or notification.
+Use the project `.env` when both the current agent and scheduled runs can load
+it. Use the platform's secure non-prompt secret storage when scheduled runs on
+a hosted platform cannot access the project `.env`. Never place a secret in a
+scheduler instruction, plan, source file, example, test, log, or notification.
 
-`ALPHAINSIDER_STRATEGY_ID` is public configuration, but store it through the
-same helper or the selected hosted configuration facility.
+`ALPHAINSIDER_STRATEGY_ID` is not a secret, but store it through the same
+helper or the selected hosted configuration facility.
 
 Treat notification tokens, webhook URLs, and private destination values as
 protected configuration. Store them through the same safe workflow. Record
@@ -91,19 +92,19 @@ helper's write logic.
 Use `scripts/alphainsider_setup_request.py` only for the setup operations
 allowed by that helper. Always pass the exact `--project-root`. It can load the
 API key privately from process injection or project `.env` and can print only
-the public `ALPHAINSIDER_STRATEGY_ID` configuration value.
+the non-secret `ALPHAINSIDER_STRATEGY_ID` configuration value.
 
 Use request bodies through protected standard input when they contain a private
 value. Report only the redacted result. Never use this setup helper for an
 order, allocation, cancellation, or another trading action.
 
 At the initial access gate, verify `GET /verifyToken` and only the permissions
-needed for read-only account and target discovery. After the target and
-implementation are settled, derive the exact setup and runtime operations,
-record their required permissions in `plan.md`, and reverify the key. List only
-missing permission names. Accept sufficient extra permissions without requiring
-replacement or rotation. Deliberate chat entry is not by itself a reason to
-rotate the key.
+needed for read-only account and AlphaInsider strategy discovery. After the
+AlphaInsider strategy and implementation are settled, derive the exact setup
+and strategy-run operations, record their required permissions in `plan.md`,
+and reverify the key. List only missing permission names. Accept sufficient
+extra permissions without requiring replacement or rotation. Deliberate chat
+entry is not by itself a reason to rotate the key.
 
 If a missing or replacement value still needs initial storage and is no longer
 available to the active chat, ask for it again or use the direct-edit method.

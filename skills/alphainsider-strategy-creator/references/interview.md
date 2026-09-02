@@ -7,8 +7,8 @@ dependent round. Skip irrelevant branches.
 
 ## Protocol
 
-- Research project, market-data, storage, scheduler, and current applicable
-  AlphaInsider constraints before offering choices. Ask the user only for
+- Research project, market-data, storage, scheduler, and current AlphaInsider
+  limits and requirements before offering choices. Ask the user only for
   intent, user-held facts, material choices, or required authority.
 - Update `plan.md` after every answer and completed action. Set **Plan
   agreement** to Draft when an open decision can change intended behavior.
@@ -16,9 +16,8 @@ dependent round. Skip irrelevant branches.
   `pending-update.md` Draft instead.
 - Use conservative defaults for routine technical choices. Record them without
   asking the user to approve implementation trivia.
-- Ask one normalized agreement question before executing each new stage. Do
-  not add action-by-action approvals for work already listed in that agreed
-  stage.
+- Ask one concise agreement question before executing each new stage. Do not
+  add action-by-action approvals for work already listed in that agreed stage.
 - Do not code a strategy while its applicable plan is Draft.
 - If the user revises an earlier answer, keep unaffected decisions and reopen
   every dependent decision.
@@ -29,7 +28,7 @@ dependent round. Skip irrelevant branches.
 ## Existing project
 
 Read **Current status** and continue at **Next step** unless the user asks for
-another supported action. Infer update, normal run, dry run, inspection, or
+another supported action. Infer update, chat run, dry run, inspection, or
 deletion from clear wording. Ask only when several projects or actions are
 plausible.
 
@@ -53,26 +52,26 @@ outcome. Use [generated project guidance](generated-project.md) and this mapping
 | Before strategy agreement | Complete | Draft | None | **Plan saved**; say it remains a draft |
 | After strategy agreement | Complete | Agreed | Plan | **Plan saved** |
 | After a valid backtest | Complete | Agreed | Backtest | **Backtest complete** |
-| After implementation agreement | Complete | Agreed | Preserve Plan or Backtest | **Setup stopped** |
+| After AlphaInsider setup agreement | Complete | Agreed | Preserve Plan or Backtest | **Setup stopped** |
 
 For the last row, set **Automation state reason** to User.
 
-If the AlphaInsider interview made the plan Draft and the user stops before
-implementation agreement, record forward testing as not configured and restore
-the preserved strategy plan to Agreed.
+If the AlphaInsider setup made the plan Draft and the user stops before its
+agreement, record AlphaInsider setup as not configured and restore the
+preserved strategy plan to Agreed.
 
-For a stopped partial setup, enable the durable trading block when an
-order-capable path exists. Pause any active native schedule and set
-**Automation state** to Paused. If no schedule exists, set it to Not
-configured. Retain and inventory every created local and external resource.
-Report any native pause action that only the user can complete. Do not show an
+For a stopped partial setup with an order-capable path, save in project state
+that new orders are paused. Pause any active native schedule and set
+**Automation state** to Paused. If no schedule exists, set it to Not configured.
+Retain and inventory every created local and external resource. Report any
+native pause action that only the user can complete. Do not show an
 automated-success or broker handoff.
 
 On a later explicit resume, set **Phase** to the activity being resumed and
-continue from the recorded safe checkpoint. First recheck current constraints,
-target identity, remote state, and scheduler state. Do not repeat a completed
-target or scheduler mutation unless its current result and idempotence are
-verified.
+continue from the recorded safe checkpoint. First recheck current AlphaInsider
+limits and requirements, strategy identity and settings, and scheduler state.
+Do not repeat a completed AlphaInsider or scheduler change unless its current
+result is verified and repeating it cannot create a duplicate.
 
 ## Stage 1: High-level strategy
 
@@ -82,27 +81,30 @@ Ask in this dependency order.
 
 1. What should the strategy do?
 2. Will it trade stocks or cryptocurrency?
-3. Which instruments can it select?
-4. Is selection fixed, dynamic, or constrained dynamic?
+3. Which assets can it trade?
+4. Will it always use the same assets, choose from an agreed list, or choose
+   any asset of the selected strategy type?
 
-Define a hard asset-type boundary. A cryptocurrency strategy cannot trade
-stocks, and a stock strategy cannot trade cryptocurrency.
+Make the stock-or-cryptocurrency limit explicit. A cryptocurrency strategy
+cannot trade stocks, and a stock strategy cannot trade cryptocurrency.
 
-### Behavior and decision mode
+### Behavior and how decisions are made
 
 Define inputs, transformations, signals, entries, exits, holding behavior,
-tie-breakers, and missing-data behavior. Ask whether the strategy is:
+what happens when values are equal, and what happens when data is unavailable
+or unreliable. Record the user-facing choice in `plan.md`. Map it internally
+to code-led, agent-led, or hybrid. Present the choices as:
 
-- **code-led:** code applies fully specified rules;
-- **agent-led:** each scheduled AI instance makes the decision; or
-- **hybrid:** programs collect or calculate inputs and the scheduled AI makes
-  a bounded decision.
+- **fixed code:** code applies the fully specified strategy;
+- **AI decision:** each scheduled AI instance decides within agreed limits; or
+- **code and AI:** programs collect or calculate inputs and the scheduled AI
+  makes a bounded decision.
 
 For agent-led or hybrid behavior, define:
 
 - the exact information the AI may use;
 - the judgments it may make and decisions it may output;
-- the allowed instrument set and risk limits;
+- the allowed assets and risk limits;
 - how it handles uncertainty, conflicting evidence, or invalid output; and
 - what is a strategy decision versus a repairable implementation detail.
 
@@ -111,34 +113,37 @@ key unless the agreed strategy explicitly calls an external model service.
 
 ### Data, timing, execution, and risk
 
-Research the smallest credible data stack. Resolve availability, timestamps,
-freshness, licensing, cost, rate limits, and failure behavior. Ask only when a
-cost, credential, scraping source, or material reliability tradeoff needs the
-user's choice.
+Research the smallest credible set of data sources and tools. Resolve
+availability, timestamps, freshness, licensing, cost, rate limits, and failure
+behavior. Ask only when a cost, credential, scraping source, or important
+reliability tradeoff needs the user's choice.
 
-Define order method, sizing, positions, open orders, duplicate prevention,
-reconciliation, loss controls, and maximum total exposure. Explain that
-AlphaInsider permits up to `2×` leverage:
+Define order type and size, positions, open orders, duplicate prevention,
+checks against saved position and order state, loss controls, and the maximum
+total value of positions. Explain that AlphaInsider permits up to `2×`
+leverage:
 
-- `1×` means total exposure can equal the paper strategy value.
-- `2×` means total exposure can be twice the paper strategy value.
-- The selected value is a maximum, not a target.
+- `1×` means the total value of positions can equal the simulated strategy
+  value.
+- `2×` means the total value of positions can be twice the simulated strategy
+  value.
+- The selected value is a maximum, not a goal.
 
 Recommend `1×` unless the strategy and risk design support more. Never infer
 `2×` from the platform limit.
 
-Before asking cadence, inspect the current native AI scheduler's actual
-interval, timezone, and market-hours options. Offer only supported schedules.
-Record the exact timezone and daylight-saving-time behavior. If the requested
-cadence is unsupported, explain the closest supported choices and ask the user
-to select one.
+Before asking schedule frequency, inspect the current native AI scheduler's
+actual interval, timezone, and market-hours options. Offer only supported
+schedules. Record the exact timezone and daylight-saving-time behavior. If the
+requested frequency is unsupported, explain the closest supported choices and
+ask the user to select one.
 
 ### Strategy agreement
 
-Show one concise normalized summary of the complete high-level strategy. Ask
-whether to **Agree to this strategy**, **Revise**, or **Stop**. Recommend
-agreement when no contradiction remains. Do not mention backtesting in this
-agreement question, its choices, or its recommendation.
+Show one concise summary of the complete high-level strategy. Ask whether to
+**Agree to this strategy**, **Revise**, or **Stop**. Recommend agreement when
+no contradiction remains. Do not mention backtesting in this agreement
+question, its choices, or its recommendation.
 
 On agreement:
 
@@ -149,100 +154,107 @@ On agreement:
 
 ## Stage 2: Backtest choice and results
 
-After strategy agreement, determine historical feasibility before the next
-user question. Follow [backtesting](backtesting.md). When a credible replay is
-possible, briefly explain its important constraints and ask whether to
-**Backtest this strategy**, **Skip the backtest**, or **Stop**. Recommend the
-backtest. Do not preview this choice in the strategy-agreement block. When a
-credible replay is not possible, explain the reconstruction problem, record
-Backtesting as unavailable, and do not offer an unavailable choice.
+After strategy agreement, determine whether the strategy can be backtested
+reliably before the next user question. Follow [backtesting](backtesting.md).
+When a credible backtest is possible, briefly explain its important limits and
+ask directly whether the user wants to **Backtest this strategy**, **Skip the
+backtest**, or **Stop**. Recommend the backtest. Do not preview this choice in
+the strategy-agreement block. When a credible backtest is not possible,
+explain why past decisions cannot be recreated reliably, record Backtesting as
+unavailable, and do not offer an unavailable choice.
 
-If accepted, settle replay choices and show the normalized replay plan. Ask
+If accepted, settle backtest choices and show the concise backtest plan. Ask
 whether to **Agree to this backtest plan**, **Revise**, or **Skip the
 backtest**. State that agreement authorizes the listed local build and data
 access. Then build and run it. Set **Phase** to Building backtest and then
 Reviewing results. Show results and ask whether to **Keep this strategy**,
 **Revise**, or **Stop**. Do not mention AlphaInsider in this question, its
 choices, or its recommendation. Never make profitability a pass/fail gate. A
-plan-conforming strategy may continue with poor results.
+strategy that follows the agreed plan may continue with poor results.
 
 After the user keeps the strategy, after either backtest **Skip** choice, or
-when a backtest is unavailable, separately offer AlphaInsider forward testing
-as the recommended next step. Describe what paper forward testing does; do not
-refer to a stage name.
+when a backtest is unavailable, separately ask whether to set up the strategy
+on AlphaInsider. Briefly explain that it will use current market information
+and simulated funds. Use only **Set up this strategy on AlphaInsider** and
+**Finish here** as choices, and recommend setup.
 
-If the user declines forward testing, set **Phase** to Complete and preserve
-the Plan or Backtest outcome. Use the applicable Stop handoff above.
+If the user finishes here, set **Phase** to Complete and preserve the Plan or
+Backtest outcome. Use the applicable Stop handoff above.
 
-## Stage 3: AlphaInsider and automation
+## Stage 3: AlphaInsider setup and automation
 
-Enter this stage only after the user chooses AlphaInsider forward testing.
-Set **Phase** to Interviewing and change **Plan agreement** to Draft while
-Stage 3 decisions remain open.
+Enter this stage only after the user chooses to set up the strategy on
+AlphaInsider. Set **Phase** to Interviewing and change **Plan agreement** to
+Draft while Stage 3 decisions remain open.
 
 ### Access gate
 
-Follow [credentials and configuration](credentials.md). First inspect
-persistent-project and non-prompt secret access without asking a question. If
-no safe scheduled-runtime location exists, record the blocker and do not
-collect a key. Otherwise, privately verify a configured key or make a missing
-key the first standalone user action.
+Follow [credentials and configuration](credentials.md). First inspect project
+access and secret access that does not require a person during each run. Do not
+ask an interview question for this check. If no safe location is available to
+scheduled runs, record the blocker and do not collect a key. Otherwise,
+privately verify a configured key or make a missing key the first standalone
+user action.
 
 After access is available, verify the token, user ID, and read-only discovery
 permissions. Do not ask the user to approve these checks. Give one exact
-credential action when access is insufficient; target discovery starts only
-after this gate passes.
+credential action when access is insufficient; AlphaInsider strategy discovery
+starts only after this gate passes.
 
-### Target choice
+### AlphaInsider strategy choice
 
-Follow [AlphaInsider target](alphainsider-target.md). Ask only the recommended
-new target versus the actual compatible owned targets in the first round. Then
-settle the selected branch's settings in dependent rounds. Do not ask
-hypothetical new-target settings, silently change an existing target, or
-combine paid behavior with the public/private decision.
+Follow [AlphaInsider strategy](alphainsider-strategy.md). Ask only the
+recommended new AlphaInsider strategy versus the actual compatible owned
+strategies in the first round. Then settle the selected branch's settings in
+dependent rounds. Do not ask hypothetical new-strategy settings, silently
+change an existing AlphaInsider strategy, or combine paid access with the
+public/private decision.
 
 ### Implementation and automation choices
 
 Follow [native AI automation](automation.md). Recheck scheduled-project access
-and scheduler capabilities, then map the agreed decision mode, cadence,
-timezone, and market rules. Ask only about unresolved material behavior, cost,
-or permission choices.
+and scheduler capabilities, then map the agreed way decisions are made,
+schedule, timezone, and market rules. Ask only about unresolved material
+behavior, cost, or permission choices.
 
-When the design is settled, derive and verify the key's exact setup and runtime
-permissions. Resolve missing access before agreement. Then ask self-healing and
-notification questions in their dependency order, with enabled recommended for
-both. Store private notification destinations through
+When the design is settled, derive and verify the key's exact setup and
+strategy-run permissions. Resolve missing access before agreement. Then ask
+self-healing and notification questions in their dependency order, with
+enabled recommended for both. Store private notification destinations through
 [credentials and configuration](credentials.md) and put only safe
 configuration references in project documents.
 
-Record the exact offline build, target creation or binding, any target update,
-description, scheduler, notification check, and activation actions. Summarize
-the fixed missed-run, overlap, normal-run, dry-run, market-availability, and
-quiet-success safeguards without presenting them as project choices.
+Record the exact offline build, creation or use of the AlphaInsider strategy,
+any agreed AlphaInsider change, description, scheduler, notification check, and
+activation actions. Summarize the fixed missed-run, overlap, strategy run, dry
+run, market-availability, and quiet-success safeguards without presenting them
+as project choices.
 
-### Implementation agreement
+### AlphaInsider setup agreement
 
-Show one normalized summary of the target and its settings, implementation,
-schedule, self-healing, notifications, every planned remote change, and future
-paper-order authority. State clearly that an active schedule and later
-user-triggered normal runs can submit plan-conforming AlphaInsider paper orders
-without another prompt. Offer **Agree to this implementation plan**,
-**Revise**, or **Stop**. State that agreement authorizes the listed local and
-external actions; do not put those later actions in the option label.
+Show one concise summary of the AlphaInsider strategy and its settings,
+implementation, schedule, self-healing, notifications, every planned change on
+AlphaInsider, and authority for future AlphaInsider paper orders. State clearly
+that an active schedule and later user-triggered strategy runs can submit paper
+orders that follow the agreed plan without another prompt. Offer **Agree to
+this AlphaInsider setup**, **Revise**, or **Stop**. State that agreement
+authorizes the listed local and external actions; do not put those later
+actions in the option label.
 
 Agreement authorizes only the listed local and external actions. On agreement:
 
 1. Set **Plan agreement** to Agreed and **Phase** to Building implementation.
 2. Follow [strategy implementation](implementation.md) and pass all offline,
    order-free checks against the
-   [scheduled-run contract](scheduled-runs.md).
-3. Follow [AlphaInsider target](alphainsider-target.md) to create or bind and
-   validate the agreed target.
+   [scheduled run process](scheduled-runs.md).
+3. Follow [AlphaInsider strategy](alphainsider-strategy.md) to create or use and
+   validate the agreed AlphaInsider strategy.
 4. Set **Phase** to Configuring automation and follow
    [native AI automation](automation.md) to activate the agreed schedule.
 
-If a new path, permission, target action, schedule identity, or behavior becomes
-necessary, return the affected plan to Draft and resolve it before continuing.
+If a new path, permission, AlphaInsider change, schedule identity, or behavior
+becomes necessary, return the affected plan to Draft and resolve it before
+continuing.
 
 ## Completion
 
@@ -250,11 +262,12 @@ Set **Phase** to Complete and **Highest completed outcome** to Automated
 strategy only after:
 
 - the implementation and docs conform to `plan.md`;
-- offline plan-conformance tests pass;
-- the AlphaInsider target and saved public ID validate;
-- a new target has the agreed generated description, or an existing target's
-  description is preserved unless an explicitly agreed update was applied;
-- the scheduler is active for the next normal occurrence; and
+- offline tests prove the implementation follows `plan.md`;
+- the AlphaInsider strategy and saved AlphaInsider strategy ID validate;
+- a new AlphaInsider strategy has the agreed generated description, or an
+  existing strategy's description is preserved unless an explicitly agreed
+  update was applied;
+- the scheduler is active for the next scheduled run; and
 - notification delivery has been attempted when enabled.
 
 Keep **Plan agreement** Agreed and **Automation state** Active. Follow the

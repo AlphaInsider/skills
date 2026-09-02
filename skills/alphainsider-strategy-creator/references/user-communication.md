@@ -10,17 +10,23 @@ understand the next decision, action, risk, or effect. Use active voice, one
 meaning per word, and one main idea per sentence. Define an unavoidable
 technical or trading term the first time.
 
+Use plain labels in questions, summaries, plans, results, and notifications.
+Keep exact API field names, filenames, and internal code terms only where they
+are necessary. If a standard financial term helps the user compare results,
+give its plain meaning when it first appears.
+
 Keep internal stage names and exact `plan.md` status values inside project
-instructions. Describe user-visible work plainly, such as testing with
-historical data or setting up scheduled paper trading.
+instructions. Do not narrate internal status fields or routine project paths
+in interview questions. Describe the completed work and next decision in plain
+language.
 
 ## Decisions and transitions
 
 Each question and option must decide only its current subject. Do not mention a
 later optional activity in its question, choices, or recommendation. Use
 agreement labels such as **Agree to this strategy**, **Agree to this backtest
-plan**, and **Agree to this implementation plan**. Put the work authorized by
-an agreement in its question body, not its option label.
+plan**, and **Agree to this AlphaInsider setup**. Put the work authorized by an
+agreement in its question body, not its option label.
 
 After a decision, record it and introduce the next applicable work separately.
 State what completed, explain the next work in user terms, and give one clear
@@ -73,7 +79,11 @@ Answer tangents and clarifications, then return to the next safe step. Never
 leave the user to ask what happens next. Respect a request to pause, stop, or
 change the goal.
 
-Use these runtime-notification labels exactly:
+When an error stops activity, state separately whether scheduled runs are
+paused and whether new orders are paused. Do not imply that existing orders
+were canceled or positions were sold.
+
+Use these strategy-run notification labels exactly:
 
 - `⚠️ Warning — No Action Required`
 - `🛠️ Self-Healed — No Action Required`

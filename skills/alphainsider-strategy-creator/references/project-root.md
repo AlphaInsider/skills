@@ -8,7 +8,7 @@ use it only when it passes the same checks.
 
 The location must outlive this chat and remain available to a new chat. Before
 automation, prove that scheduled AI runs can read and write the same project.
-The project must preserve `plan.md`, source, tests, backtest output, runtime
+The project must preserve `plan.md`, source, tests, backtest output, saved run
 state, locks, run history, and repair records.
 
 Do not use chat memory, a temporary upload area, a cache, an installed skill
@@ -16,7 +16,7 @@ directory, or another session-only filesystem as project storage.
 
 For a hosted or web platform, prefer its persistent project or workspace when
 new chats and scheduled runs can access it. Otherwise, use an already connected
-durable repository or storage integration. Do not provision an unrelated cloud
+durable repository or storage integration. Do not create an unrelated cloud
 service. If no persistent writable location exists, give one clear action to
 enable or connect one and stop before creating files.
 
@@ -24,7 +24,7 @@ For a local platform, prefer the current durable workspace or a suitable
 user-controlled projects directory. Create a dedicated child directory. Do not
 mix a strategy into an unrelated software project or write into this skill.
 
-Planning storage and scheduled-run access are separate checks. A project can
+Planning storage and scheduled run access are separate checks. A project can
 support the interview and backtest while automation remains blocked. Record
 that blocker and the exact next step in `plan.md`.
 
@@ -35,7 +35,7 @@ Recognize a project by a root `plan.md` that follows the
 `## Current status` section with the documented Phase, Plan agreement, Highest
 completed outcome, and Automation state fields. Do not require YAML
 frontmatter. Before any run, require each status value to match the template;
-stop and reconcile an invalid value.
+stop and correct an invalid value.
 
 Search in this order:
 
@@ -70,14 +70,14 @@ tests/
 ```
 
 Create `.env` only through `scripts/set_env_value.py` when project-file secret
-storage is selected. A hosted secure secret store can replace `.env` when the
-scheduled runtime cannot use project secrets safely. Add only the dependency
-and tool files the implementation needs.
+storage is selected. A hosted secure secret store can replace `.env` when
+scheduled runs cannot use project secrets safely. Add only the dependency and
+tool files the implementation needs.
 
-Put the scheduled-agent instructions in `runtime/runbook.md`. Keep mutable
-state, locks, histories, and repair records under `runtime/`. Persist
-project-relative paths except where the native scheduler requires a stable
-external project identity.
+Put the scheduled-run instructions in `runtime/runbook.md`. Keep project state,
+locks, histories, and repair records under `runtime/`. Persist project-relative
+paths except where the native scheduler requires a stable external project
+identity.
 
 Announce the resolved project once. Update `plan.md` after every answer,
 material finding, completed step, failure, or next-step change.

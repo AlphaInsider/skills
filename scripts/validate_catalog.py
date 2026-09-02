@@ -180,7 +180,7 @@ EXPECTED_ALPHA_WEBSOCKET_SECTIONS = (
     ("wsBotActivities", "Bot Activities"),
 )
 EXPECTED_STRATEGY_REFERENCES = {
-    "alphainsider-target.md",
+    "alphainsider-strategy.md",
     "automation.md",
     "backtesting.md",
     "changes-and-deletion.md",
@@ -202,33 +202,40 @@ REQUIRED_PLAN_SECTION_ORDER = (
     "# Strategy Plan",
     "## Strategy plan",
     "## Backtesting plan",
-    "## Implementation plan",
+    "## AlphaInsider setup plan",
     "## Current status",
 )
 REQUIRED_PLAN_FIELDS = {
     "- Goal:",
-    "- Strict asset class:",
-    "- Decision mode:",
+    "- Strategy type:",
+    "- Assets this strategy can trade:",
+    "- How decisions are made:",
     "- Maximum strategy leverage:",
+    "- Open orders, duplicate prevention, retries, and saved state:",
+    "- Strategy schedule, timezone, daylight-saving behavior, and market-hours rules:",
     "- User choice:",
-    "- Benchmark:",
-    "- Metrics and charts:",
-    "- Plan-conformance checks:",
-    "- AlphaInsider target choice and source:",
-    "- Existing-target reuse confirmation:",
+    "- Comparison investment (benchmark):",
+    "- Results to show and charts:",
+    "- Checks that the backtest follows the strategy plan:",
+    "- Scheduled strategy-run design:",
+    "- Strategy run and AI decision flow:",
+    "- Create a new or use an existing AlphaInsider strategy:",
+    "- Existing AlphaInsider strategy reuse confirmation:",
     "- AlphaInsider strategy name:",
-    "- AlphaInsider paper starting scale:",
+    "- AlphaInsider simulated starting value:",
     "- AlphaInsider public or private setting:",
-    "- AlphaInsider paid setting and launch price:",
+    "- AlphaInsider paid access and access price:",
     "- AlphaInsider strategy ID:",
     "- AlphaInsider strategy URL:",
-    "- Generated AlphaInsider description:",
-    "- Native AI scheduler provider and task identity:",
+    "- AlphaInsider strategy description:",
+    "- Native AI scheduler and scheduled task name:",
+    "- Schedule frequency, timezone, daylight-saving behavior, and missed runs:",
+    "- One-run-at-a-time, Run now, chat run, and chat dry run behavior:",
     "- Self-healing:",
     "- Notifications:",
-    "- AlphaInsider discovery, setup, and runtime permissions:",
-    "- Notification channels, safe destination references, and event policy:",
-    "- Future plan-conforming paper-order authority:",
+    "- AlphaInsider API access needed for setup and strategy runs:",
+    "- Notification events, channels, and safe destination references:",
+    "- Future authority for AlphaInsider paper orders that follow this plan:",
     "- Phase:",
     "- Plan agreement:",
     "- Highest completed outcome:",
@@ -260,14 +267,14 @@ REQUIRED_STATUS_VALUES = {
 REQUIRED_INTERVIEW_PHASE_ORDER = (
     "## Stage 1: High-level strategy",
     "## Stage 2: Backtest choice and results",
-    "## Stage 3: AlphaInsider and automation",
+    "## Stage 3: AlphaInsider setup and automation",
     "## Completion",
 )
-REQUIRED_FORWARD_TEST_SECTION_ORDER = (
+REQUIRED_ALPHA_SETUP_SECTION_ORDER = (
     "### Access gate",
-    "### Target choice",
+    "### AlphaInsider strategy choice",
     "### Implementation and automation choices",
-    "### Implementation agreement",
+    "### AlphaInsider setup agreement",
 )
 # Stable user-facing labels, paths, limits, and links are intentional literals.
 # Behavioral rules use flexible patterns below so validation does not freeze
@@ -290,7 +297,7 @@ REQUIRED_STRATEGY_LITERALS = {
     "references/credentials.md": {
         "scripts/set_env_value.py",
     },
-    "references/alphainsider-target.md": {
+    "references/alphainsider-strategy.md": {
         "`$100,000`",
     },
     "references/automation.md": {
@@ -318,12 +325,13 @@ REQUIRED_STRATEGY_BEHAVIORS = {
             r"\b(?:automation|scheduler)\b"
         ),
         "Draft permits safe discovery": (
-            r"\bDraft\b.{0,80}\bpermits?\b.{0,160}\bfeasibility\b"
+            r"\bDraft\b.{0,80}\bpermits?\b.{0,180}\breliable backtest\b"
             r".{0,100}\bread-only\b"
         ),
         "Agreed gates execution": (
-            r"\bAgreed\b.{0,80}\bbefore\b.{0,180}\bremote mutation\b"
-            r".{0,100}\border-capable run\b.{0,100}\bscheduler activation\b"
+            r"\bAgreed\b.{0,80}\bbefore\b.{0,180}\bchange on AlphaInsider\b"
+            r".{0,100}\border-capable strategy run\b.{0,100}"
+            r"\bscheduler activation\b"
         ),
     },
     "references/credentials.md": {
@@ -332,11 +340,11 @@ REQUIRED_STRATEGY_BEHAVIORS = {
         ),
     },
     "references/backtesting.md": {
-        "feasibility precedes the backtest choice": (
-            r"\bFeasibility\b.{0,100}\bafter strategy agreement\b"
+        "reliability check precedes the backtest choice": (
+            r"\bbacktested reliably\b.{0,120}\bafter strategy agreement\b"
             r".{0,100}\bbefore asking\b.{0,80}\bbacktest\b"
         ),
-        "accepted backtest gates replay work": (
+        "accepted backtest gates the build": (
             r"\bremaining sections\b.{0,80}\bonly after\b.{0,80}"
             r"\baccepts?\b.{0,40}\bbacktest\b"
         ),
@@ -352,8 +360,8 @@ REQUIRED_STRATEGY_BEHAVIORS = {
     },
     "references/automation.md": {
         "cron is prohibited": r"\bnever\b.{0,80}\bcron\b",
-        "unsupported cadence requires user selection": (
-            r"\brequested cadence\b.{0,100}\bunavailable\b.{0,140}"
+        "unsupported frequency requires user selection": (
+            r"\brequested frequency\b.{0,100}\bunavailable\b.{0,140}"
             r"\bask\b.{0,80}\buser\b.{0,40}\bselect\b"
         ),
         "description is ready before activation": (
@@ -372,9 +380,12 @@ REQUIRED_STRATEGY_BEHAVIORS = {
         "every run error pauses automation": (
             r"\bfor every error\b.{0,500}\bpause future native automation\b"
         ),
-        "stale-lock removal requires liveness proof": (
-            r"\bnever remove a stale lock\b.{0,120}\bliveness checks\b"
-            r".{0,100}\bowner\b.{0,40}\bnot active\b"
+        "every run error pauses new orders": (
+            r"\bfor every error\b.{0,300}\bnew orders are paused\b"
+        ),
+        "leftover-lock removal requires proof": (
+            r"\bnever remove a leftover lock\b.{0,120}\bchecks prove\b"
+            r".{0,100}\bowning run\b.{0,40}\bnot active\b"
         ),
         "notification failure does not pause trading": (
             r"\bnotification failure\b.{0,80}\bnever pauses trading\b"
@@ -392,8 +403,9 @@ REQUIRED_STRATEGY_BEHAVIORS = {
             r"\bcomplete `\.env`"
         ),
         "generated guide protects update and remote settings": (
-            r"`pending-update\.md`.{0,120}\btarget identity and settings\b"
-            r".{0,120}\bscheduler identity and cadence\b"
+            r"`pending-update\.md`.{0,120}"
+            r"\bAlphaInsider strategy identity and settings\b"
+            r".{0,120}\bscheduler identity and frequency\b"
         ),
     },
 }
@@ -472,8 +484,9 @@ REQUIRED_README_OVERVIEW_GUIDANCE = {
     "npx skills@latest add",
     "root `plan.md`",
     "native AI scheduler",
-    "paper-trading",
-    "code-led, agent-led, or hybrid",
+    "AlphaInsider strategy",
+    "fixed code",
+    "simulated funds",
     "backtest",
     "self-healing",
     "Explicit deletion",
@@ -932,45 +945,45 @@ def validate() -> list[str]:
             f"{list(REQUIRED_INTERVIEW_PHASE_ORDER)}"
         )
 
-    forward_test_section_positions = [
+    alpha_setup_section_positions = [
         interview_text.find(section)
-        for section in REQUIRED_FORWARD_TEST_SECTION_ORDER
+        for section in REQUIRED_ALPHA_SETUP_SECTION_ORDER
     ]
     if (
-        -1 in forward_test_section_positions
-        or forward_test_section_positions
-        != sorted(forward_test_section_positions)
+        -1 in alpha_setup_section_positions
+        or alpha_setup_section_positions
+        != sorted(alpha_setup_section_positions)
         or any(
             interview_text.splitlines().count(section) != 1
-            for section in REQUIRED_FORWARD_TEST_SECTION_ORDER
+            for section in REQUIRED_ALPHA_SETUP_SECTION_ORDER
         )
     ):
         errors.append(
-            "strategy forward-test interview must use section order "
-            f"{list(REQUIRED_FORWARD_TEST_SECTION_ORDER)}"
+            "strategy AlphaInsider setup interview must use section order "
+            f"{list(REQUIRED_ALPHA_SETUP_SECTION_ORDER)}"
         )
     else:
-        access_start, target_start, implementation_start, agreement_start = (
-            forward_test_section_positions
+        access_start, strategy_start, implementation_start, agreement_start = (
+            alpha_setup_section_positions
         )
-        forward_test_routes = {
-            "credentials.md": interview_text[access_start:target_start],
-            "alphainsider-target.md": interview_text[
-                target_start:implementation_start
+        alpha_setup_routes = {
+            "credentials.md": interview_text[access_start:strategy_start],
+            "alphainsider-strategy.md": interview_text[
+                strategy_start:implementation_start
             ],
             "automation.md": interview_text[
                 implementation_start:agreement_start
             ],
         }
-        missing_forward_test_routes = {
+        missing_alpha_setup_routes = {
             route
-            for route, section in forward_test_routes.items()
+            for route, section in alpha_setup_routes.items()
             if route not in section
         }
-        if missing_forward_test_routes:
+        if missing_alpha_setup_routes:
             errors.append(
-                "strategy forward-test sections are missing routes "
-                f"{sorted(missing_forward_test_routes)}"
+                "strategy AlphaInsider setup sections are missing routes "
+                f"{sorted(missing_alpha_setup_routes)}"
             )
 
     implementation_text = reference_texts["implementation.md"]

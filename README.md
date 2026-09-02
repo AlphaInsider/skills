@@ -3,7 +3,7 @@
 ## Overview
 
 Reusable, vendor-neutral skills for AlphaInsider API work and automated
-paper-trading strategy projects.
+AlphaInsider strategy projects.
 
 ## Skills
 
@@ -46,24 +46,26 @@ Strategy Creator remains self-contained when `alphainsider-api` is absent.
 
 Strategy Creator selects a persistent project and maintains its root `plan.md`
 as the strategy agreement and current status. The interview settles the
-strategy first, offers a credible backtest, and then separately offers
-AlphaInsider paper forward testing. Projects can be code-led, agent-led, or
-hybrid.
+strategy first, offers a credible backtest, and then separately offers to set
+up the strategy on AlphaInsider. Strategy decisions can use fixed code, the
+scheduled AI, or both.
 
-If forward testing is accepted, safe API-key access is the first setup gate.
-The skill then discovers compatible owned targets or plans a new one. It builds
-and passes order-free checks before creating a target or activating the
-platform's native AI scheduler. It never installs cron or connects a broker.
+If AlphaInsider setup is accepted, safe API-key access is the first action. The
+skill then discovers compatible owned AlphaInsider strategies or plans a new
+one. It builds and passes order-free checks before creating a strategy or
+activating the platform's native AI scheduler. It never installs cron or
+connects a broker.
 
-The generated plan and runbook let scheduled agents perform normal runs and
-agreed self-healing without loading Strategy Creator. A shared lock prevents
-overlap. A run error blocks paper orders and pauses future automation until a
-verified repair or user-directed recovery succeeds. Healthy runs stay quiet;
-poor performance alone is not an error.
+The generated plan and scheduled-run instructions let scheduled agents perform
+strategy runs and agreed self-healing without loading Strategy Creator. A
+shared lock prevents overlap. A run error pauses new orders and future
+scheduled runs until a verified repair or user-directed recovery succeeds.
+Healthy runs stay quiet; poor performance alone is not an error. AlphaInsider
+uses simulated funds; the skill never submits live-broker orders.
 
-Explicit deletion inventories the project, schedule, target, history, and
-secrets before asking what to remove. It never cancels orders or liquidates
-positions.
+Explicit deletion inventories the project, schedule, AlphaInsider strategy,
+history, and secrets before asking what to remove. It never cancels orders or
+liquidates positions.
 
 After successful setup, the handoff links to
 [AlphaInsider broker automation resources](https://alphainsider.com/resources#automating-trades).
