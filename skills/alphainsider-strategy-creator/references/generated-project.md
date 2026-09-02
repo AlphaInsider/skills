@@ -92,8 +92,9 @@ with the strategy and asset type, AlphaInsider settings and link, schedule and
 scheduled task, self-heal and notification state, project location, and
 backtest report when present.
 
-Then offer broker connection as an optional recommended next step. Embed the
-current video when supported; otherwise link
+Then use the optional-next-step format in
+[user communication](user-communication.md) with the short title **Connect a
+broker**. Embed the current video when supported; otherwise link
 [AlphaInsider broker automation resources](https://alphainsider.com/resources#automating-trades).
 State that live broker mode can use real funds. Do not choose paper or live
 broker mode, request broker credentials, create the connection, or ask another

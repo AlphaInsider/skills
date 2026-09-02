@@ -79,6 +79,14 @@ Answer tangents and clarifications, then return to the next safe step. Never
 leave the user to ask what happens next. Respect a request to pause, stop, or
 change the goal.
 
+After a completed workflow, mark a useful but non-required recommendation as:
+
+```markdown
+💡 **Optional next step — Short title:** Concise recommendation.
+```
+
+Do not use the required-action marker for an optional next step.
+
 When an error stops activity, state separately whether scheduled runs are
 paused and whether new orders are paused. Do not imply that existing orders
 were canceled or positions were sold.

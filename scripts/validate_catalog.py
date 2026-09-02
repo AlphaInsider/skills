@@ -283,6 +283,7 @@ REQUIRED_STRATEGY_LITERALS = {
     "references/user-communication.md": {
         "ASD-STE100-style technical English",
         "👉 **Action — Short title:**",
+        "💡 **Optional next step — Short title:**",
         "`⚠️ Warning — No Action Required`",
         "`🛠️ Self-Healed — No Action Required`",
         "`🚨 Error — Action Required`",
