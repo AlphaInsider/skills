@@ -301,6 +301,9 @@ REQUIRED_STRATEGY_LITERALS = {
         "`$100,000`",
     },
     "references/automation.md": {
+        "**Errors and completed repairs**",
+        "**Errors only**",
+        "**Errors, completed repairs, and warnings**",
         "scheduler **Run now**",
     },
     "references/scheduled-runs.md": {
@@ -360,6 +363,14 @@ REQUIRED_STRATEGY_BEHAVIORS = {
     },
     "references/automation.md": {
         "cron is prohibited": r"\bnever\b.{0,80}\bcron\b",
+        "errors-only notifications are recommended": (
+            r"\bErrors only\b.{0,80}\brecommended\b"
+        ),
+        "notification choices put errors only first": (
+            r"\bwhich events\b.{0,120}\bErrors only\b.{0,200}"
+            r"\bErrors and completed repairs\b.{0,120}"
+            r"\bErrors, completed repairs, and warnings\b"
+        ),
         "unsupported frequency requires user selection": (
             r"\brequested frequency\b.{0,100}\bunavailable\b.{0,140}"
             r"\bask\b.{0,80}\buser\b.{0,40}\bselect\b"
@@ -389,6 +400,16 @@ REQUIRED_STRATEGY_BEHAVIORS = {
         ),
         "notification failure does not pause trading": (
             r"\bnotification failure\b.{0,80}\bnever pauses trading\b"
+        ),
+        "errors-only notifications send only errors": (
+            r"\bErrors only\b.{0,80}\bsends\b.{0,30}\bonly\b"
+            r".{0,30}\bError events\b"
+        ),
+    },
+    "references/plan-template.md": {
+        "errors-only notifications are recommended": (
+            r"\bNotification events\b.{0,200}\berrors only\b.{0,80}"
+            r"\brecommended\b"
         ),
     },
     "references/changes-and-deletion.md": {
@@ -491,6 +512,12 @@ REQUIRED_README_OVERVIEW_GUIDANCE = {
     "self-healing",
     "Explicit deletion",
     "resources#automating-trades",
+}
+REQUIRED_README_OVERVIEW_BEHAVIORS = {
+    "errors-only notifications are the default": (
+        r"(?:\bErrors only\b.{0,80}\bdefault\b|"
+        r"\bdefault\b.{0,80}\bErrors only\b)"
+    ),
 }
 
 
@@ -1184,6 +1211,16 @@ def validate() -> list[str]:
         errors.append(
             "README is missing high-level guidance "
             f"{sorted(missing_readme_overview_guidance)}"
+        )
+    missing_readme_overview_behaviors = {
+        name
+        for name, pattern in REQUIRED_README_OVERVIEW_BEHAVIORS.items()
+        if re.search(pattern, normalized_readme, re.IGNORECASE) is None
+    }
+    if missing_readme_overview_behaviors:
+        errors.append(
+            "README is missing high-level behavior "
+            f"{sorted(missing_readme_overview_behaviors)}"
         )
     readme_install_skills = re.findall(r"--skill ([a-z0-9-]+)", readme_text)
     if not readme_install_skills or readme_install_skills[0] != WRAPPER_NAME:

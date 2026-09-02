@@ -175,10 +175,11 @@ Classify notification events with exactly:
 - `🚨 Error — Action Required` when the user must resolve an error or
   decision.
 
-When notifications are enabled, the recommended choice sends Error and
-Self-Healed events. The broader choice also sends Warning events. Always record
-classified events in project history even when the selected choice does not
-send them.
+When notifications are enabled, the recommended **Errors only** choice sends
+only Error events. The other choices also send Self-Healed events, or
+Self-Healed and Warning events. Always record every classified event in project
+history, so completed repairs and warnings remain available even when they are
+not sent.
 
 Keep messages short and non-technical. State the project, strategy run, plain
 cause, automation state, action already taken, and exact next step. Do not

@@ -80,8 +80,11 @@ Discover native or already authorized channels before asking. Ask enabled or
 disabled first and recommend enabled. If enabled, ask these available
 decisions together in the next round:
 
-- which events to send: **Errors and completed repairs**, recommended, or
-  **Errors, completed repairs, and warnings**; and
+- which events to send, with these choices in order:
+  1. **Errors only** — recommended; completed repairs and warnings remain in
+     project history;
+  2. **Errors and completed repairs**; and
+  3. **Errors, completed repairs, and warnings**; and
 - which supported channels to use, recommending the simplest native in-app
   channel first.
 

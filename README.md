@@ -62,6 +62,8 @@ shared lock prevents overlap. A run error pauses new orders and future
 scheduled runs until a verified repair or user-directed recovery succeeds.
 Healthy runs stay quiet; poor performance alone is not an error. AlphaInsider
 uses simulated funds; the skill never submits live-broker orders.
+Errors only is the default notification choice. Users can also include
+completed repairs, or completed repairs and warnings.
 
 Explicit deletion inventories the project, schedule, AlphaInsider strategy,
 history, and secrets before asking what to remove. It never cancels orders or

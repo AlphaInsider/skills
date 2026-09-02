@@ -61,7 +61,7 @@ credential.
 - Self-healing: _not decided_ <!-- enabled | disabled -->
 - What automatic repair can change, what it must protect, how it undoes a failed repair, and time limit: _not applicable until enabled_
 - Notifications: _not decided_ <!-- enabled | disabled -->
-- Notification events, channels, and safe destination references: _not applicable until enabled_
+- Notification events, channels, and safe destination references: _not applicable until enabled_ <!-- errors only (recommended) | errors and completed repairs | errors, completed repairs, and warnings -->
 - Offline tests and expected results: _not decided_
 - Future authority for AlphaInsider paper orders that follow this plan: _not decided_
 - Managed files and external resources: _not decided_
