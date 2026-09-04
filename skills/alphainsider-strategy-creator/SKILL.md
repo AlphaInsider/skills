@@ -1,132 +1,95 @@
 ---
 name: alphainsider-strategy-creator
-description: Interview users in frontier rounds, maintain a decision-complete plan, and build, test, backtest, document, change, replace, retire, or clean up one automated AlphaInsider paper-trading strategy. Use for stock or cryptocurrency strategies that may depend on market data, models, APIs, or authorized web data but send orders only to AlphaInsider.
+description: Create, resume, backtest, implement, automate, update, or explicitly delete one plan-driven AlphaInsider strategy. Use for stock or cryptocurrency strategies that run through a native AI scheduler and may use code, the scheduled AI agent, or both.
 ---
 
 # AlphaInsider Strategy Creator
 
-Build only the project justified by a confirmed strategy plan. Keep this skill
-read-only.
+Guide one strategy to verified AlphaInsider automation. Keep this skill
+read-only; store artifacts in one persistent project.
 
-## Scope
+## Core contract
 
-- Build one automated strategy per project, send paper orders only to
-  AlphaInsider, and never create a live-broker client.
-- Plan one strict `stock` or `cryptocurrency` asset class and fixed, dynamic,
-  or constrained-dynamic selection. Every traded instrument and target must
-  match that class.
-- Never inspect or print existing `.env` values or API keys. Public strategy
-  IDs may be shown.
-- Keep generated artifacts in the selected project root. Exact confirmed
-  user-level native operation definitions are the only host-write exception;
-  confirmed agent schedulers are external managed resources.
+- `plan.md` is the readable source of truth; tests, code, strategy, and
+  automation must conform to it.
+- One project contains one strategy with one strict `stock` or
+  `cryptocurrency` type.
+- Check applicable AlphaInsider limits before proposing an action and recheck
+  changeable facts immediately before it.
+- Send orders only to AlphaInsider paper strategies. Never create a broker
+  client, connect a broker, or request broker credentials.
+- Never inspect or expose an existing API key, secret store, or complete
+  `.env`. Accept pasted values only through the non-echoing credential flow.
+- Use only the platform's native AI automation or scheduler. Never install a
+  host scheduler, service, daemon, or background process, and never keep a run
+  alive to poll faster than the native scheduler.
+- Before confirming a strategy, inspect the actual native scheduler, current
+  public AlphaInsider constraints, and planned execution operation. Offer only
+  complete implementable timing. Prefer explicit current session guidance;
+  when absent, use the Strategy Creator stock fallback. Cryptocurrency is 24/7
+  subject to scheduler and data-cutoff limits.
+- Generated instructions must support runs and confirmed self-healing without
+  this skill. Use it for changes to strategy or automation.
+- Poor performance never makes a plan-compliant run unhealthy or authorizes a
+  strategy change.
+- Backtest findings summaries pair metrics with saved, data-derived visuals.
+  Embed them when supported or link directly to their named files; the detailed
+  report is additional, not a substitute. State when some planned visuals
+  remain unavailable after a safe rendering repair attempt.
+- Build and pass offline, order-free checks before creating a new AlphaInsider
+  strategy.
+- Never pause active automation automatically for an operational error. Mark
+  health Degraded/Retrying, withhold unsafe orders, and retry checks next
+  trigger. Only the user, update, deletion, or setup workflow pauses it.
+- Creation is Complete only after the AlphaInsider strategy validates and its
+  native automation is active. Stops and blockers remain resumable and never
+  authorize deletion.
 
-## Start
+## Begin or resume
 
-1. Require this skill's three scripts. If any are missing, stop and show:
+1. Read [user communication](references/user-communication.md) before the first
+   user-facing message.
+2. Read [persistent project](references/project-root.md). Resume a clear match
+   or create one safe, durable project.
+3. Read `plan.md` and **Current status** when a project exists. Never open
+   `.env` to discover configuration.
+4. Route the requested work:
+   - For creation or incomplete setup, read the
+     [strategy interview](references/interview.md).
+   - For a run, operational error, notification, or repair, read
+     [scheduled and user-triggered runs](references/scheduled-runs.md).
+   - For an update, detected edit, external drift, or explicit deletion, read
+     [changes and explicit deletion](references/changes-and-deletion.md).
 
-   ```bash
-   npx skills@latest add https://github.com/AlphaInsider/skills \
-     --skill alphainsider-api --skill alphainsider-strategy-creator
-   ```
+Follow links from the selected workflow only when their phase begins.
 
-   Do not require the `alphainsider-api` skill to continue.
+## Confirmation and authority
 
-2. Run `scripts/check_for_update.py` once per invocation. Show its notice once,
-   never run or offer its update command, and continue on no output or failure.
-3. Resolve the project root from the session working directory per
-   `references/project-root.md`. Do not ask where to store the project.
-4. Read `references/versioning.md` to recognize an existing project without
-   opening `.env`. Stop on malformed or newer versions. For a recognized
-   project, follow `interview.md`.
-5. Before confirmation, inventory every changed project path, native
-   definition, and agent task. Research collisions, explain consequences,
-   resolve overwrite or alternate-identity choices, and record every action.
-   Preserve unrelated resources, never overwrite an active unrelated runner,
-   and create no metadata beyond the documented lifecycle plans.
+A Draft strategy permits interviewing and read-only discovery. A reviewed
+next-step choice confirms the strategy; there is no separate agreement prompt.
+Require a Confirmed strategy before planning a backtest or AlphaInsider
+setup.
 
-## Load references progressively
+Only **Build and Run** makes the reviewed backtest plan Authorized for its
+listed build and data access; a results-stage rerun can authorize a displayed
+mechanical correction in that plan. Only **Build, Configure, and Activate**
+makes the reviewed AlphaInsider setup Authorized for its listed actions,
+scheduler activation, and later plan-compliant paper orders.
 
-Do not preload every reference. Read each file in full only when its phase or
-action begins:
+Keep `plan.md` current after every answer, material finding, completed action,
+failure, or next-step change. If a build reveals a required strategy,
+permission, schedule, or AlphaInsider change, return the affected stage to
+Draft and review it again. Apply a mechanical compatible fix without reopening
+unaffected decisions.
 
-- [`references/project-root.md`](references/project-root.md) — session-directory
-  placement; load at Start when resolving the project root.
-- [`references/versioning.md`](references/versioning.md) — recognition and
-  upgrades; load only selected version-log sections.
-- [`references/plan-template.md`](references/plan-template.md) — active plans.
-- [`references/interview.md`](references/interview.md) — draft through final
-  confirmation.
-- [`references/credentials.md`](references/credentials.md) — missing values.
-- [`references/cleanup.md`](references/cleanup.md) — explicit retirement,
-  replacement cleanup, pending-cleanup recovery, or remote deletion.
-- [`references/operation-and-scheduling.md`](references/operation-and-scheduling.md)
-  — the operation interview phase, installation, scheduling, or
-  runtime-affecting updates.
-- [`references/alphainsider-target.md`](references/alphainsider-target.md) — the
-  forward-test target phase, provisioning, cleanup, or description sync.
-- [`references/implementation.md`](references/implementation.md) — confirmed
-  execution and maintenance.
+Future paper-order authority never permits an unlisted AlphaInsider change,
+broker action, or strategy change.
 
-If `alphainsider-api` is installed, read it only for needed API behavior. If
-it is not, read `https://api.alphainsider.com`.
+## AlphaInsider API behavior
 
-## Plan contract
-
-`docs/plan.md` is authoritative and may record the non-secret AlphaInsider
-strategy ID. Stage a replacement in `docs/replacement-plan.md` without altering
-the current strategy. Active plans use `draft`, `confirmed`, or `implemented`;
-completed retirement uses `retired`. Retain `contract_version` until
-`versioning.md` permits advancement.
-
-Follow `interview.md`: ask every unblocked decision in one frontier round
-through the agent's interactive question prompt, not as ordinary chat text,
-update the active plan after each round, and do not code while it is `draft`.
-Follow this order: objective, market and instruments, strategy behavior, data
-and resources, execution and risk, backtesting, implementation contract,
-operation and scheduling, AlphaInsider forward-test setup, and final
-confirmation.
-
-Complete plan confirmation is the only skill-level execution approval. It
-authorizes every exact planned create, modify, overwrite, delete, stop, pause,
-disable, activation, promotion, provisioning, ID-persistence, synchronization,
-build, native-operation, and agent-task action. Resolve warnings and choices
-before confirmation; never request another approval for a confirmed action. If
-any required action, identity, or path was absent or changes afterward, return
-the plan to `draft`, resolve only affected decisions, and require one new
-complete-plan confirmation.
-
-Cleanup is a post-creation lifecycle, not an interview phase. Follow
-`cleanup.md`. One final confirmation authorizes its attributable actions.
-
-Target readiness must be `ready` or `local-only`. A confirmed ready plan may
-provision, build, synchronize, and install or schedule its exact operation
-resources in the confirmed active or inactive state without an immediate run.
-A confirmed local-only plan permits a complete mocked local build but no remote
-calls, operational commands, managed resources, or `implemented` state.
-
-## Execute the lifecycle
-
-- **Draft:** Follow `interview.md` and present one normalized complete plan.
-- **Confirmed:** For a ready target, follow target provisioning, then
-  `implementation.md`, description synchronization, and operation-resource
-  installation or scheduling. For a local-only target, follow only the offline
-  path in `implementation.md` and leave the plan `confirmed`.
-- **Replacement:** Keep the current strategy untouched while drafting. After
-  ready-target confirmation, follow `cleanup.md` and `implementation.md` for
-  only the recorded cleanup, promotion, and build actions.
-- **Cleanup:** Only for an explicit request, follow `cleanup.md`.
-- **Implemented:** Return changes to `draft`, preserve unaffected decisions,
-  interview affected choices, and fully reconfirm.
-- **Retired:** Preserve the plan as a non-operational audit record. Resume
-  pending cleanup only when explicitly requested. Run it only if the user
-  explicitly asks.
-
-Never manually run a one-cycle command, start a persistent process, or trigger
-a scheduled task during build or verification. These actions can submit
-planned AlphaInsider paper orders without an interactive confirmation. After
-the plan is `implemented`, if Initial activation and autostart is `active`,
-start the matching planned command and warn once that paper orders can submit.
-An explicit later chat request may run an `implemented`, `local-only`, or
-`retired` strategy the same way. Do not ask for another plan confirmation.
-Never treat a build or verification step as an immediate test run.
+When installed, read `alphainsider-api` and only needed API sections. Otherwise,
+use the current `https://api.alphainsider.com` index and contracts. During
+Define, also check live schedule-critical pages. Follow stricter compatible
+focused prose, record discrepancies, and never infer sessions from an example
+status. Explicit session guidance overrides the fallback for new or revised
+schedules, never silently expanding a confirmed schedule.

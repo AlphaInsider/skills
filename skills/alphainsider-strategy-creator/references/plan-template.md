@@ -1,99 +1,95 @@
----
-status: draft
-contract_version: 2.2.0
----
-
 # Strategy Plan
 
-Keep this file as a normalized specification, not an interview transcript.
-Replace unresolved placeholders as answers are confirmed. Never record API
-keys or `.env` values. This plan may record the non-secret AlphaInsider
-strategy ID after the user selects or confirmation creates a target.
+This file is the readable source of truth for the strategy. Keep it as a
+concise record of decisions and authority, not a chat transcript. Replace
+placeholders as decisions are made. Never record an API key, secret value, or
+broker credential.
 
-## Objective
+## Strategy plan
 
-- Goal: _not yet decided_
+- Goal: _not decided_
+- Strategy type: _not decided_ <!-- stock | cryptocurrency -->
+- Assets this strategy can trade: _not decided_
+- How assets are selected: _not decided_ <!-- fixed list (fixed) | changes within defined limits (constrained dynamic) | changes anywhere within the strategy type (dynamic) -->
+- How decisions are made: _not decided_ <!-- fixed code (code-led) | AI decision (agent-led) | code and AI (hybrid) -->
+- Required information and data cutoff: _not decided_
+- Data sources, access, how recent data must be, and backup source: _not decided_
+- Native scheduler surface, supported timing limits, source, and checked time: _not checked_
+- AlphaInsider public constraints, session policy and source, checked time, and unresolved documentation differences: _not checked_
+- Signal and decision rules: _not decided_
+- Information the AI can use, decisions it can make, limits, and output: _not applicable unless the strategy uses AI_
+- Entry, exit, holding, and what to do when signal values are equal: _not decided_
+- Planned AlphaInsider execution operation and material side effects: _not decided_
+- AlphaInsider order type and size: _not decided_
+- Maximum strategy exposure and execution-specific limit: _not decided_
+- Known account-tier dependency to verify during implementation: _none identified_
+- Position sizes, total amount invested, and loss limits: _not decided_
+- Open orders, duplicate prevention, retries, and saved state: _not decided_
+- What to do when information is missing, outdated, late, invalid, or conflicting: _not decided_
+- Strategy schedule, timezone, daylight-saving behavior, and market-hours rules: _not decided_
+- Expected outcomes and known strategy limits: _not decided_
 
-## Market and instruments
+## Backtesting plan
 
-- Strict asset class: _not yet decided_ <!-- stock | cryptocurrency -->
-- Instrument selection mode: _not yet decided_ <!-- fixed | dynamic | constrained dynamic -->
-- Selection rules or constraints: _not yet decided_
-- Explicit instruments and validated mappings: _not applicable unless specified_
-- Runtime identifier resolution and AlphaInsider validation: _not yet decided_
-- Validation freshness: _not yet decided_
-- Invalid-instrument behavior: _not yet decided_ <!-- continue with valid candidates | abort cycle -->
+- Backtest choice: Not asked <!-- Not asked | Selected | Skipped -->
+- Feasibility finding and recommended approach: _not assessed_
+- Uses information unavailable at the historical decision time: Not assessed <!-- Not assessed | Yes | No -->
+- Differences from intended automated execution and other limitations: _not decided_
+- Data source, exact dataset, access, cost, and data cutoff: _not decided_
+- Backtest period and decision times: _not decided_
+- Order-fill, fee, estimated price difference (slippage), delay, and exposure assumptions: _not decided_
+- Comparison investment (benchmark): _not decided_
+- Results to show and charts: _not decided_ <!-- normally two to four data-derived visuals; plan two suitable substitutes for a signal-only backtest without portfolio results -->
+- Checks that the backtest follows the strategy plan: _not decided_
+- Backtest run history, changes, future-information use, limitations, dispositions, source snapshots, and artifact paths: _not run_ <!-- include visual-rendering failures and later repairs -->
+- Featured Valid result for the current strategy: _not run_
+- Limits and interpretation: _not decided_
 
-## Strategy behavior
+## AlphaInsider setup plan
 
-- Signal and decision rules: _not yet decided_
-- Entry, exit, and holding behavior: _not yet decided_
-- Decision cadence and schedule: _not yet decided_
+- Scheduled strategy-run design: _not decided_
+- Programming language, required software, and project files: _not decided_
+- Strategy run and AI decision flow: _not decided_
+- Saved state, one-run-at-a-time lock, run history, and how long records are kept: _not decided_
+- Environment variable names and secret location: _not decided_
+- AlphaInsider API access needed for setup and strategy runs: _not decided_
+- Create a new or use an existing AlphaInsider strategy: _not decided_
+- Existing AlphaInsider strategy reuse confirmation: _not applicable unless an existing strategy is selected_ <!-- confirmed | unresolved -->
+- AlphaInsider strategy name: _not decided_
+- AlphaInsider simulated starting value: _not decided_
+- AlphaInsider public or private setting: _not decided_ <!-- public | private -->
+- AlphaInsider paid access and access price: _not applicable unless currently supported and selected_ <!-- free | paid with amount -->
+- AlphaInsider strategy ID: _not assigned_
+- AlphaInsider strategy URL: _not assigned_
+- AlphaInsider strategy description: _not decided_
+- Native AI scheduler and scheduled task name: _not decided_
+- Schedule frequency, timezone, daylight-saving behavior, and missed runs: _not decided_
+- One-run-at-a-time, Run now, chat run, and chat dry run behavior: _not decided_
+- Operational error retry, reconciliation, and duplicate-notification behavior: _not decided_
+- Self-healing: _not decided_ <!-- enabled | disabled -->
+- What automatic repair can change, whether notification repair is in scope, what it must protect, how it undoes a failed repair, and time limit: _not applicable until enabled_
+- Notifications: _not decided_ <!-- enabled | disabled -->
+- Notification events, channels, and safe destination references: _not applicable until enabled_ <!-- errors only (recommended) | errors and completed repairs | errors, completed repairs, and warnings -->
+- Notification support status for each selected channel: _not applicable until enabled_ <!-- supported | user-selected, unverified -->
+- Offline tests and expected results: _not decided_
+- Future authority for AlphaInsider paper orders that follow this plan: _not decided_
+- Managed files and external resources: _not decided_
 
-## Data and resources
+## Current status
 
-- Required inputs and as-of timing: _not yet decided_
-- Selected sources, access method, and freshness rules: _not yet decided_
-- Libraries, models, and external services: _not yet decided_
-- Missing, stale, delayed, or conflicting data behavior: _not yet decided_
-
-## Execution and risk
-
-- AlphaInsider order method and sizing: _not yet decided_
-- Position and exposure constraints: _not yet decided_
-- Open-order, duplicate-event, retry, and recovery behavior: _not yet decided_
-- Automatic pause or shutdown conditions and logging: _not yet decided_
-
-## Backtesting
-
-- Historical reconstructibility: _not yet decided_
-- User choice: _not yet decided_ <!-- unavailable | declined | accepted -->
-- Window, scope, assumptions, and metrics: _not applicable until accepted_
-
-## Implementation
-
-- Project root: `.`
-- Path portability: project-relative paths except confirmed user-level native operation definitions; installed skill directories are read-only
-- Language, dependencies, and project structure: _not yet decided_
-- Data flow and persistent state: _not yet decided_
-- Environment variable names and operator commands: _not yet decided_
-- Exact create, modify, overwrite, delete, stop, pause, disable, activation, promotion, provisioning, synchronization, ID-persistence, native-operation, and agent-task actions: _not yet decided_
-- Managed artifact inventory and retirement state: _not initiated_
-- Tests to run and expected results: _not yet decided_
-
-## Operation and scheduling
-
-- Operation mode: _not yet decided_ <!-- foreground | background process | agent scheduler -->
-- Invocation model: _not yet decided_ <!-- single run | persistent process | recurring schedule -->
-- Cadence, timezone, precision, and worst-case cycle duration: _not yet decided_
-- Capability check and selected runner or environment: _not yet decided_
-- Resource identifier and exact native definitions or agent task: _not applicable for unmanaged foreground operation_
-- Missed-run or catch-up behavior and acceptance: _not applicable unless recurring schedule_
-- Initial activation and autostart: _not yet decided_ <!-- inactive | active -->
-- Overlap, retry, and persistent-service restart policy: _not yet decided_
-- Logs, run history, notifications, rotation, and retention: _not yet decided_
-- Installation state and next scheduled run: _not applicable until managed operation is selected_
-- Operation cleanup state and removal verification: _not initiated_
-
-## AlphaInsider target
-
-- Target readiness: _not yet decided_ <!-- ready | local-only -->
-- Local-only reason: _not applicable unless local-only_ <!-- non-secret reason only -->
-- Target source: _not yet decided_ <!-- selected existing | create after confirmation | local-only -->
-- Owned-strategy discovery: _pending_ <!-- result and UTC time; omit IDs until selected -->
-- Proposed strategy name: _not applicable unless creating_
-- Owner starting balance: _not applicable unless creating_
-- Access eligibility and mode: _not applicable unless creating_ <!-- public | private | paid -->
-- Paid cryptocurrency launch price: _not applicable unless paid_
-- AlphaInsider strategy ID: _not applicable until selected or created_
-- Remote disposition: _not initiated_ <!-- retain and detach | delete | not applicable -->
-- Pending outgoing strategy ID and result: _not applicable unless a confirmed replacement delete is unfinished_
-- Generated AlphaInsider description: _not yet decided_
-- Description synchronization: _pending_ <!-- required before implemented -->
-- Configured strategy validation: _pending_ <!-- result and UTC time -->
-- Target lifecycle disposition: _not initiated_ <!-- active | retained and detached | deleted | deletion pending -->
-
-## Confirmation
-
-- Unresolved decisions: _not yet decided_
-- Agent-provided defaults: _none yet_
+- Creation state: In progress <!-- In progress | Stopped | Blocked | Complete -->
+- Phase: Defining strategy <!-- Defining strategy | Assessing backtest | Planning backtest | Building backtest | Reviewing results | Planning implementation | Building implementation | Configuring automation | Complete -->
+- Strategy status: Draft <!-- Draft | Confirmed -->
+- Backtest status: Not started <!-- Not started | Draft | Authorized | Completed | Failed | Skipped -->
+- AlphaInsider setup status: Not started <!-- Not started | Draft | Authorized | Active -->
+- Highest completed outcome: None <!-- None | Strategy defined | Backtest | Automated strategy -->
+- Automation state: Not configured <!-- Not configured | Active | Paused -->
+- Automation state reason: _not applicable_ <!-- User | Update | Deletion | setup blocker -->
+- Operational health: Not active <!-- Not active | Ready | Healthy | Degraded/Retrying -->
+- Operational health detail and next retry: _not applicable_
+- Creation state reason: _not applicable_ <!-- User stop | Technical blocker -->
+- Last completed step: Project created from the stated objective
+- Next step: Continue the strategy questions
+- Waiting for: User answers
+- Open questions: _not yet recorded_
+- Last updated: _UTC timestamp_

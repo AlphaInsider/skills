@@ -1,80 +1,123 @@
-# Credential Setup
+# Credentials and Configuration
 
-Read this reference only when a required credential or configuration value is
-missing. Never inspect or print existing `.env` values.
+This file owns secret-storage selection, credential collection, private
+verification, and safe setup requests. Read it when `interview.md` records that
+the user wants to set up the strategy on AlphaInsider. Never inspect, print, or
+summarize an existing API key, complete `.env`, process environment, or hosted
+secret store.
 
-For each missing value:
+Require this skill's `scripts/set_env_value.py` and
+`scripts/alphainsider_setup_request.py` before project-file credential or
+AlphaInsider strategy setup. If either is missing, stop only that phase and
+reinstall Strategy Creator. Do not improvise another secret-write or
+setup-request path.
 
-1. Name it and show the selected project's exact `.env` path without opening
-   the file.
-2. Recommend that the user add the values to `.env` themselves and tell you
-   when ready.
-3. If the user wants agent-assisted entry instead, they may paste the values in
-   chat. Warn once, before entry, that pasting credentials is less secure
-   because the value is visible to the agent and may appear in tool metadata or
-   a transient process listing. Accept a bare value for one variable or one
-   `NAME=value` line per variable for several.
-4. Pasted values grant approval to update only those names. Never echo, quote,
-   summarize, log, or record values in plans, `.env.example`, source, tests,
-   or documentation. Use each value in only the exact helper invocation below.
-5. Always pass `--project-root` with the announced selected project root.
-   Do not use the session working directory unless it is that root. Do not
-   chdir to make this helper work. Launch `set_env_value.py --project-root`
-   with NAME VALUE as this exact agent-only CLI, once per name:
+Do not request `ALPHAINSIDER_API_KEY` before that choice. Afterward, supplying a
+missing key is the first user action; do not ask setup questions first. Link to
+[AlphaInsider developer settings](https://alphainsider.com/settings/developers).
+Recommend the **AI Agent** permission preset because future plan changes can
+need additional AlphaInsider functions. Initially, a narrower key is acceptable
+when it supports token verification and the required read-only discovery.
 
-   ```bash
-   python /absolute/path/to/alphainsider-strategy-creator/scripts/set_env_value.py \
-     --project-root /absolute/selected/project NAME VALUE
-   ```
+## Choose secret storage
 
-   Replace `NAME` and `VALUE`; pass the complete value as exactly one argument.
-   Prefer a structured argument-array process call. When only a shell command
-   is available, quote the value as one literal argument so its contents cannot
-   be interpreted by the shell. Never show this command to the user or ask them
-   to run it. Never import the helper, call its functions, reproduce its write
-   logic, or supply a value through a shell pipeline, redirect, heredoc, inline
-   script, environment or shell variable, command substitution, temporary
-   file, patch, direct `.env` edit, or clipboard. Do not open `.env` before or
-   after the update. The helper preserves other entries.
-6. If the pasted value remains available in the active task, use it once at the
-   helper without requesting another approval. If it is unavailable, ask the
-   user to enter it again or edit `.env`; never recover it from `.env`. If a
-   runtime cannot pass it as one safely quoted argument, return to the user-edit
-   workflow. Do not improvise another write path. Defer the affected setup only
-   when the user declines or cannot complete that workflow.
-7. Rerun the non-ordering check. For AlphaInsider configuration, use
-   `scripts/alphainsider_setup_request.py` with `--project-root` set to the
-   announced selected project root and report only the result, never
-   credentials. Public strategy IDs and other non-secret values may be shown,
-   including a value returned by `--print-config ALPHAINSIDER_STRATEGY_ID`.
-   Always pass `--project-root`. Launch this exact agent-only CLI and never
-   import the setup wrapper or show it to the user:
+Before reading or requesting a value, recheck the native automation surface and
+schedule confirmed during Define Strategy, then inspect project and secret
+access that will not require a person during each scheduled run. This is a
+read-only implementation preflight, not an interview question. If surface drift
+would change confirmed timing, return that timing decision to Define Strategy.
+If no safe location will be readable by both the active and scheduled agents,
+do not request a key. Record the blocker and give the required platform action
+instead. Otherwise, API-key entry remains the first user-facing implementation
+action when a valid configured key is unavailable.
 
-   ```bash
-   python /absolute/path/to/alphainsider-strategy-creator/scripts/alphainsider_setup_request.py \
-     --project-root /absolute/selected/project METHOD PATH
+For a resumed project, after this check, use the setup helper to verify a
+configured key privately. Do not request it again when verification succeeds.
+If it is missing, inaccessible, invalid, or insufficient, give the standalone
+action below as the next user-facing step.
 
-   python /absolute/path/to/alphainsider-strategy-creator/scripts/alphainsider_setup_request.py \
-     --project-root /absolute/selected/project --print-config ALPHAINSIDER_STRATEGY_ID
-   ```
+Waiting for the requested key is an ordinary implementation action. Keep
+Creation state In progress and record the action under Waiting for. Use Blocked
+only when safe storage or access cannot work until a technical or platform
+problem is remediated; use Stopped only when the user chooses to stop.
 
-A missing API key is a setup gap, not a strategy decision. A non-local-only
-`ALPHAINSIDER_API_KEY` must pass the target reference's permission gate before
-remote work. If it cannot pass during forward-test setup, record the target as
-local-only and continue only with backtesting planning and local offline
-implementation. A missing `ALPHAINSIDER_STRATEGY_ID` is not a credential
-failure; follow `alphainsider-target.md`. Selecting an existing strategy
-authorizes writing its ID through the non-echoing helper. Complete plan
-confirmation is the sole authorization to write an ID returned by
-`newStrategy`.
+Use the project `.env` when both the current agent and scheduled runs can load
+it. Use the platform's secure non-prompt secret storage when scheduled runs on
+a hosted platform cannot access the project `.env`. Never place a secret in a
+scheduler instruction, plan, source file, example, test, log, or notification.
 
-A missing credential required by another selected data source pauses that
-affected branch until the user supplies it or selects a feasible alternative.
+`ALPHAINSIDER_STRATEGY_ID` is not a secret, but store it through the same
+helper or the selected hosted configuration facility.
 
-Generated `README.md` files must preserve user editing as the preferred setup
-and identify chat entry and command transport as the less-secure agent-assisted
-fallback, but never show the helper command. Generated `AGENTS.md` files must
-point at the installed skill for the write path and never show the helper.
-`--remove NAME` receives no value and is also agent-only. Removing a saved
-strategy binding uses `--remove ALPHAINSIDER_STRATEGY_ID` and must also
-pass `--project-root`.
+Treat notification tokens, webhook URLs, and private destination values as
+protected configuration. Store them through the same safe workflow. Record
+only their configuration names and safe labels in project documents.
+
+## Chat-first setup
+
+For project `.env` storage, use one standalone action. Do not put a Q&A round in
+the same message:
+
+```markdown
+👉 **Action — Add AlphaInsider API key:** Paste the API key in this chat.
+
+Pasting gives this active chat and agent access so the key can be stored
+without displaying it.
+
+↪️ **Alternative:** Add `ALPHAINSIDER_API_KEY` directly to the announced
+project `.env`, then reply `ready`.
+```
+
+Request only missing names. Accept a bare value when one name is pending, or
+clear `NAME=value` entries for several names. If the mapping is unclear, ask
+one focused clarification. Do not echo or restate any value.
+
+Pasted values authorize updates only to the requested names. Write each value
+with the installed `scripts/set_env_value.py` helper. Pass:
+
+```text
+python /absolute/skill/path/scripts/set_env_value.py --project-root /absolute/project NAME
+```
+
+Supply the value through protected standard input or the helper's non-echoing
+prompt. Never put it in a command argument, shell variable, environment
+assignment, pipeline, redirect, heredoc, temporary file, patch, or another
+write path. Do not show the helper command to the user. If protected input is
+not available, use direct user editing or hosted secret storage.
+
+The helper must:
+
+- require the exact project root with a root `plan.md`;
+- reject installed-skill directories and symbolic-link `.env` files;
+- atomically preserve unrelated entries;
+- enforce owner-only `0600` permissions; and
+- reveal only the updated variable name and file path.
+
+Never open `.env` before or after the write. Do not import or reproduce the
+helper's write logic.
+
+## Safe AlphaInsider setup requests
+
+Use `scripts/alphainsider_setup_request.py` only for the setup operations
+allowed by that helper. Always pass the exact `--project-root`. It can load the
+API key privately from process injection or project `.env` and can print only
+the non-secret `ALPHAINSIDER_STRATEGY_ID` configuration value.
+
+Use request bodies through protected standard input when they contain a private
+value. Report only the redacted result. Never use this setup helper for an
+order, allocation, cancellation, or another trading action.
+
+At the initial access gate, verify `GET /verifyToken` and only the permissions
+needed for read-only account and AlphaInsider strategy discovery. After the
+AlphaInsider strategy and implementation are settled, derive the exact setup
+and strategy-run operations, record their required permissions in `plan.md`,
+and reverify the key. List only missing permission names. Accept sufficient
+extra permissions without requiring replacement or rotation. Deliberate chat
+entry is not by itself a reason to rotate the key.
+
+If a missing or replacement value still needs initial storage and is no longer
+available to the active chat, ask for it again or use the direct-edit method.
+Do not request a successfully configured key only because its value is hidden;
+use the setup helper privately. Never recover it by reading `.env`. A hosted
+secret facility remains user-managed; give exact platform steps and wait for
+the completion signal when the agent cannot write it safely.

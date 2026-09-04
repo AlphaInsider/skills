@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import ast
 import re
 import sys
 from pathlib import Path
@@ -18,11 +19,8 @@ EXPECTED_SKILLS = {
 WRAPPER_NAME = "alphainsider"
 EXPECTED_WRAPPER_REFERENCES = {
     "catalog.md",
-    "versioning.md",
 }
-EXPECTED_WRAPPER_SCRIPTS = {
-    "check_for_update.py",
-}
+EXPECTED_WRAPPER_SCRIPTS: set[str] = set()
 REQUIRED_WRAPPER_TRIGGERS = {
     "/alphainsider",
     "use the alphainsider skill",
@@ -30,8 +28,6 @@ REQUIRED_WRAPPER_TRIGGERS = {
     "which AlphaInsider skill",
 }
 REQUIRED_WRAPPER_GUIDANCE = {
-    "scripts/check_for_update.py",
-    "never run or offer its update command",
     "references/catalog.md",
     "always ask",
     "npx skills list",
@@ -42,23 +38,11 @@ REQUIRED_WRAPPER_GUIDANCE = {
     "--skill <name> -g -y",
     "Do not require any specialist",
 }
-REQUIRED_WRAPPER_VERSION_GUIDANCE = {
-    "`MAJOR.MINOR.PATCH`",
-    "Do not keep version logs",
-    "npx skills@latest update alphainsider",
-    "never run its update command",
-}
-REQUIRED_WRAPPER_UPDATE_CHECKER_SOURCE = {
-    "https://raw.githubusercontent.com/AlphaInsider/skills/master/",
-    "skills/alphainsider/references/versioning.md",
-    'UPDATE_COMMAND = "npx skills@latest update alphainsider"',
-    "TIMEOUT_SECONDS = 3",
-    "MAX_RESPONSE_BYTES = 64 * 1024",
-    "response.geturl() != REMOTE_VERSION_URL",
-}
 CATALOG_HEADING_PATTERN = re.compile(
     r"^## ([a-z0-9]+(?:-[a-z0-9]+)*)$", re.MULTILINE
 )
+MARKDOWN_LINK_PATTERN = re.compile(r"\[[^\]]*\]\(([^)\s]+)")
+URI_SCHEME_PATTERN = re.compile(r"^[a-z][a-z0-9+.-]*:", re.IGNORECASE)
 EXPECTED_ALPHA_SCRIPTS = {
     "alphainsider_request.py",
     "alphainsider_stream.py",
@@ -196,448 +180,791 @@ EXPECTED_ALPHA_WEBSOCKET_SECTIONS = (
     ("wsBotActivities", "Bot Activities"),
 )
 EXPECTED_STRATEGY_REFERENCES = {
-    "alphainsider-target.md",
-    "cleanup.md",
+    "alphainsider-strategy.md",
+    "automation.md",
+    "backtesting.md",
+    "changes-and-deletion.md",
     "credentials.md",
+    "generated-project.md",
     "implementation.md",
     "interview.md",
-    "operation-and-scheduling.md",
     "plan-template.md",
     "project-root.md",
-    "versioning.md",
-}
-REQUIRED_STRATEGY_RELEASES = {
-    "1.0.0",
-    "1.1.0",
-    "1.2.0",
-    "1.3.0",
-    "1.3.1",
-    "1.4.0",
-    "1.4.1",
-    "1.4.2",
-    "1.5.0",
-    "1.5.1",
-    "1.6.0",
-    "1.7.0",
-    "1.8.0",
-    "2.0.0",
-    "2.1.0",
-    "2.1.1",
-    "2.2.0",
-}
-STRATEGY_SKILL_MAX_WORDS = 950
-REQUIRED_PROGRESSIVE_DISCLOSURE_GUIDANCE = {
-    "Do not preload every reference",
-    "Read each file in full only when its phase or action begins",
-}
-REQUIRED_INDEPENDENCE_GUIDANCE = {
-    "Require this skill's three scripts",
-    "Do not require the `alphainsider-api` skill to continue",
-    "If `alphainsider-api` is installed, read it only for needed API behavior",
-    "Never copy this skill's setup wrapper",
-}
-REMOVED_SIBLING_DEPENDENCY_GUIDANCE = {
-    "Require this skill's two scripts and the sibling",
-    "use the sibling request helper",
-    "read the sibling `scripts/alphainsider_request.py`",
+    "scheduled-runs.md",
+    "user-communication.md",
 }
 EXPECTED_STRATEGY_SCRIPTS = {
     "alphainsider_setup_request.py",
-    "check_for_update.py",
     "set_env_value.py",
 }
-EXPECTED_PLAN_STATES = {"draft", "confirmed", "implemented", "retired"}
-STRICT_SEMVER_PATTERN = re.compile(
-    r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$"
-)
-STRATEGY_VERSION_FILE_PATTERN = re.compile(r"^v([1-9][0-9]*)\.md$")
+STRATEGY_SKILL_MAX_WORDS = 700
 REQUIRED_PLAN_SECTION_ORDER = (
     "# Strategy Plan",
-    "## Objective",
-    "## Market and instruments",
-    "## Strategy behavior",
-    "## Data and resources",
-    "## Execution and risk",
-    "## Backtesting",
-    "## Implementation",
-    "## Operation and scheduling",
-    "## AlphaInsider target",
-    "## Confirmation",
+    "## Strategy plan",
+    "## Backtesting plan",
+    "## AlphaInsider setup plan",
+    "## Current status",
 )
-REQUIRED_PLAN_SECTIONS = set(REQUIRED_PLAN_SECTION_ORDER)
-REQUIRED_INTERVIEW_PHASE_ORDER = (
-    "1. **Objective**",
-    "2. **Market and instruments**",
-    "3. **Strategy behavior**",
-    "4. **Data and resources**",
-    "5. **Execution and risk**",
-    "6. **Backtesting**",
-    "7. **Implementation**",
-    "8. **Operation and scheduling**",
-    "9. **AlphaInsider target**",
-)
-REQUIRED_PLAIN_LANGUAGE_PLAN_FIELDS = {
+REQUIRED_PLAN_FIELDS = {
     "- Goal:",
-    "- Automatic pause or shutdown conditions and logging:",
-    "- Exact create, modify, overwrite, delete, stop, pause, disable, activation, promotion, provisioning, synchronization, ID-persistence, native-operation, and agent-task actions:",
-    "- Managed artifact inventory and retirement state:",
-    "- Tests to run and expected results:",
-}
-REQUIRED_TARGET_PLAN_FIELDS = {
-    "- Target readiness:",
-    "- Local-only reason:",
-    "- Target source:",
-    "- Owned-strategy discovery:",
-    "- Proposed strategy name:",
-    "- Owner starting balance:",
-    "- Access eligibility and mode:",
-    "- Paid cryptocurrency launch price:",
+    "- Strategy type:",
+    "- Assets this strategy can trade:",
+    "- How decisions are made:",
+    "- Native scheduler surface, supported timing limits, source, and checked time:",
+    "- AlphaInsider public constraints, session policy and source, checked time, and unresolved documentation differences:",
+    "- Planned AlphaInsider execution operation and material side effects:",
+    "- Maximum strategy exposure and execution-specific limit:",
+    "- Known account-tier dependency to verify during implementation:",
+    "- Open orders, duplicate prevention, retries, and saved state:",
+    "- Strategy schedule, timezone, daylight-saving behavior, and market-hours rules:",
+    "- Backtest choice:",
+    "- Feasibility finding and recommended approach:",
+    "- Uses information unavailable at the historical decision time:",
+    "- Differences from intended automated execution and other limitations:",
+    "- Backtest period and decision times:",
+    "- Comparison investment (benchmark):",
+    "- Results to show and charts:",
+    "- Checks that the backtest follows the strategy plan:",
+    "- Backtest run history, changes, future-information use, limitations, dispositions, source snapshots, and artifact paths:",
+    "- Featured Valid result for the current strategy:",
+    "- Scheduled strategy-run design:",
+    "- Strategy run and AI decision flow:",
+    "- Create a new or use an existing AlphaInsider strategy:",
+    "- Existing AlphaInsider strategy reuse confirmation:",
+    "- AlphaInsider strategy name:",
+    "- AlphaInsider simulated starting value:",
+    "- AlphaInsider public or private setting:",
+    "- AlphaInsider paid access and access price:",
     "- AlphaInsider strategy ID:",
-    "- Remote disposition:",
-    "- Pending outgoing strategy ID and result:",
-    "- Generated AlphaInsider description:",
-    "- Description synchronization:",
-    "- Target lifecycle disposition:",
+    "- AlphaInsider strategy URL:",
+    "- AlphaInsider strategy description:",
+    "- Native AI scheduler and scheduled task name:",
+    "- Schedule frequency, timezone, daylight-saving behavior, and missed runs:",
+    "- One-run-at-a-time, Run now, chat run, and chat dry run behavior:",
+    "- Operational error retry, reconciliation, and duplicate-notification behavior:",
+    "- Self-healing:",
+    "- What automatic repair can change, whether notification repair is in scope, what it must protect, how it undoes a failed repair, and time limit:",
+    "- Notifications:",
+    "- AlphaInsider API access needed for setup and strategy runs:",
+    "- Notification events, channels, and safe destination references:",
+    "- Notification support status for each selected channel:",
+    "- Future authority for AlphaInsider paper orders that follow this plan:",
+    "- Creation state:",
+    "- Phase:",
+    "- Strategy status:",
+    "- Backtest status:",
+    "- AlphaInsider setup status:",
+    "- Highest completed outcome:",
+    "- Automation state:",
+    "- Automation state reason:",
+    "- Operational health:",
+    "- Operational health detail and next retry:",
+    "- Creation state reason:",
+    "- Last completed step:",
+    "- Next step:",
+    "- Waiting for:",
+    "- Open questions:",
+    "- Last updated:",
 }
-REQUIRED_OPERATION_PLAN_FIELDS = {
-    "- Operation mode:",
-    "- Invocation model:",
-    "- Cadence, timezone, precision, and worst-case cycle duration:",
-    "- Capability check and selected runner or environment:",
-    "- Resource identifier and exact native definitions or agent task:",
-    "- Missed-run or catch-up behavior and acceptance:",
-    "- Initial activation and autostart:",
-    "- Overlap, retry, and persistent-service restart policy:",
-    "- Logs, run history, notifications, rotation, and retention:",
-    "- Installation state and next scheduled run:",
-    "- Operation cleanup state and removal verification:",
+REQUIRED_PLAN_ENUMS = {
+    "- Creation state:": (
+        "In progress",
+        "Stopped",
+        "Blocked",
+        "Complete",
+    ),
+    "- Phase:": (
+        "Defining strategy",
+        "Assessing backtest",
+        "Planning backtest",
+        "Building backtest",
+        "Reviewing results",
+        "Planning implementation",
+        "Building implementation",
+        "Configuring automation",
+        "Complete",
+    ),
+    "- Strategy status:": ("Draft", "Confirmed"),
+    "- Backtest status:": (
+        "Not started",
+        "Draft",
+        "Authorized",
+        "Completed",
+        "Failed",
+        "Skipped",
+    ),
+    "- AlphaInsider setup status:": (
+        "Not started",
+        "Draft",
+        "Authorized",
+        "Active",
+    ),
+    "- Highest completed outcome:": (
+        "None",
+        "Strategy defined",
+        "Backtest",
+        "Automated strategy",
+    ),
+    "- Automation state:": ("Not configured", "Active", "Paused"),
+    "- Operational health:": (
+        "Not active",
+        "Ready",
+        "Healthy",
+        "Degraded/Retrying",
+    ),
 }
-REQUIRED_PROJECT_ROOT_GUIDANCE = {
-    "Resolve the project root from the session working directory",
-    "Do not ask where to store the project",
-    "dedicated child folder",
-    "nearest recognized strategy ancestor",
-    "Never create a nested strategy",
-    "immediate children",
-    "slug from the Objective",
-    "Rename only if the user asks",
-    "Recommend the matched intent",
+REQUIRED_PLAN_COMMENT_ENUMS = {
+    "- Backtest choice:": ("Not asked", "Selected", "Skipped"),
+    "- Uses information unavailable at the historical decision time:": (
+        "Not assessed",
+        "Yes",
+        "No",
+    ),
+    "- Notification events, channels, and safe destination references:": (
+        "errors only (recommended)",
+        "errors and completed repairs",
+        "errors, completed repairs, and warnings",
+    ),
+    "- Notification support status for each selected channel:": (
+        "supported",
+        "user-selected, unverified",
+    ),
 }
-REMOVED_PROJECT_ROOT_GUIDANCE = {
-    "Ask for the project root",
-    "recommend the invocation directory",
-}
-REQUIRED_GRILL_PROTOCOL_GUIDANCE = {
-    "Ask every currently unblocked user decision in one turn",
-    "interactive question prompt",
-    "not ordinary chat text",
-    "recommended option first",
-    "Research repository, API, host, and provider facts",
-    "A question that depends on an answer still open in this round",
-    "Do not depend on any other skill for this pacing",
-}
-REMOVED_PLAN_FIELDS = {
-    "- Why the strategy could work:",
-    "- When results will be reviewed:",
-    "- What would show the strategy is working:",
-    "- What would show the strategy needs changes or should stop:",
-    "- User confirmation:",
-    "- Confirmation time:",
-    "- Core creation fields approval:",
-    "- Continuous-command mode:",
-    "- Manager, identifier, and capability check:",
-    "- User-level host definition:",
-    "- Login autostart:",
-    "- Failure restart policy and bounded parameters:",
-    "- Log exposure, paths, rotation, and retention:",
-    "- Installation state:",
-    "- Deferred reason:",
-    "- Failed-current-run target cleanup:",
-}
-REMOVED_PLAN_SECTIONS = {"## Background operation"}
-REMOVED_INTERVIEW_PHASES = {"8. **Background operation**"}
-REMOVED_INTERVIEW_QUESTIONS = {
-    "Why do you think this trading idea could work?",
-    "After how much time or how many trades should we review the results?",
-    "What results would tell you the strategy is working?",
-    "What loss or behavior would make you change or stop it?",
-}
-REMOVED_TARGET_ORDER_GUIDANCE = {
-    "Complete its permission gate before the interview",
-    "before the strategy interview",
-    "resolve the target before instrument selection",
-    "pause all interview, remote creation, and implementation work",
-    "after strategy design and background-operation planning and before backtesting",
-    "backtesting planning may continue",
-    "continue through backtesting and plan confirmation",
-    "after strategy, backtesting, implementation-contract, and background-operation planning",
-}
-REMOVED_SEPARATE_CONFIRMATION_GUIDANCE = {
-    "Obtain explicit core creation approval",
-    "Changing any core field invalidates that approval",
-    "record approved core fields for a new target",
-}
-REMOVED_POST_CONFIRMATION_APPROVAL_GUIDANCE = {
-    "does not authorize deletion, plan promotion, or implementation",
-    "separate explicit approval",
-    "Plan confirmation and deletion approval are separate decisions",
-    "an existing file still requires explicit overwrite approval",
-    "Request one explicit approval for that inventory",
-    "Request renewed approval before touching any newly discovered path",
-    "ask whether to delete this exact strategy",
-    "If the user approves cleanup",
-    "approval-gated failed-creation cleanup only",
-    "separate deletion-approval gate",
-    "do not combine plan confirmation with deletion approval",
-}
-REMOVED_TARGET_DELETION_GUIDANCE = {
-    "Never delete a selected existing strategy",
-    "failed-current-run cleanup only",
-    "never authorizes routine deletion or deletion of a selected existing strategy",
-}
-REQUIRED_REPLACEMENT_GUIDANCE = {
-    "every section heading from the current plan template",
-    "update the existing plan",
-    "replace the trading strategy with a new one",
-    "`docs/replacement-plan.md`",
-    "Show and record every exact deletion, overwrite, promotion",
-    "final confirmation sets them to `confirmed`",
-    "authorizes the exact recorded deletion, promotion, cleanup, and implementation actions",
-    "perform only the recorded actions",
-    "Never recursively delete the project root",
-    "Never delete `.env`",
-    "replace `docs/plan.md` with `docs/replacement-plan.md`",
-}
-REQUIRED_CREDENTIAL_GUIDANCE = {
-    "`scripts/set_env_value.py`",
-    "`scripts/alphainsider_setup_request.py`",
-    "Recommend that the user add the values to `.env` themselves",
-    "they may paste the values in chat",
-    "pasting credentials is less secure",
-    "the value is visible to the agent",
-    "tool metadata",
-    "transient process listing",
-    "set_env_value.py --project-root",
-    "Always pass `--project-root`",
-    "announced selected project root",
-    "pass the complete value as exactly one argument",
-    "structured argument-array",
-    "quote the value as one literal argument",
-    "Never show this command to the user",
-    "Do not open `.env` before or after the update",
-    "approval to update only those names",
-    "use the setup request wrapper",
-    "--print-config ALPHAINSIDER_STRATEGY_ID",
-    "--remove ALPHAINSIDER_STRATEGY_ID",
-    "agent-only helper",
-    "Never import the helper",
-    "reproduce its write logic",
-    "shell pipeline, redirect",
-    "environment or shell variable",
-    "temporary file",
-    "direct `.env` edit",
-    "without requesting another approval",
-    "never recover it from `.env`",
-    "runtime cannot pass it as one safely quoted argument",
-    "return to the user-edit workflow",
-    "Do not improvise another write path",
-    "`--remove NAME` receives no value and is also agent-only",
-    "Generated `README.md` files must preserve user editing",
-    "never show the helper command",
-    "Generated `AGENTS.md` files must point at the installed skill",
-}
-REMOVED_LIVE_INPUT_CREDENTIAL_GUIDANCE = {
-    "interactive terminal",
-    "live process-input",
-    "live-input workflow",
-    "non-echoing prompt",
-    "process-input channel",
-    "readiness prompt",
-}
-REMOVED_CREDENTIAL_CWD_GUIDANCE = {
-    "From the project root, launch",
-    "from the project root and report",
-    "Run project commands and helpers from the project root",
-}
-REQUIRED_STRATEGY_API_PERMISSIONS = (
-    "getUserInfo",
-    "getStrategies",
-    "getStrategyValues",
-    "getUserStrategies",
-    "getStrategyPerformance",
-    "getRecommendedStrategies",
-    "searchStrategies",
-    "newStrategy",
-    "updateStrategy",
-    "deleteStrategy",
-    "getStrategySubscriptions",
-    "getStrategyCalculation",
-    "getAccountSubscription",
-    "getTimelines",
-    "getStrategyTimelines",
-    "newPost",
-    "previewPost",
-    "deletePost",
-    "getPositions",
-    "getOrders",
-    "getMaxOrderSize",
-    "newOrder",
-    "newOrderAllocations",
-    "deleteOrder",
-    "wsStockPrice",
-    "wsStrategyValue",
-    "wsOrders",
-    "wsPositions",
-    "wsTimelines",
+REQUIRED_INTERVIEW_PHASE_ORDER = (
+    "## Stage 1: Define Strategy",
+    "## Stage 2: Backtest Strategy",
+    "## Stage 3: Implement Strategy on AlphaInsider",
+    "## Completion",
 )
-REQUIRED_PROVISIONING_GUIDANCE = {
-    "https://alphainsider.com/settings/developers",
-    "selecting the **AI Agent** preset",
-    "`verifyToken` has no selectable permission",
-    "stock REST lookup endpoints require no API-key permission",
-    "`like` and `unlike` are not required",
-    "subscription permissions are read-only",
-    "list only the missing permission names",
-    "pause AlphaInsider target setup and every remote action",
-    "use the verified token's `user_id` with `getUserStrategies`",
-    "Never pick the first result or create a duplicate silently",
-    "Persist the user's selection",
-    "Compare the owned strategy count with `limits.max_strategies`",
-    "stop if either eligibility check fails",
-    "`getAccountSubscription.level > 0`",
-    "`getUserInfo.verified` is true",
-    "record public access without an extra access question",
-    "Never offer paid stock creation",
-    "$10 through $1000",
-    "public to `private: false, price: 0`",
-    "private to `private: true, price: 0`",
-    "Do not ask for separate creation approval",
-    "Changing a core field before confirmation updates the draft",
-    "changing one after confirmation returns the plan to `draft`",
-    "Do not call `newStrategy` before complete plan confirmation",
-    "one to three plain-language sentences",
-    "write it only to `ALPHAINSIDER_STRATEGY_ID`",
-    "report it once",
-    "retain the created target and saved ID",
-    "Never request another skill-level approval",
-    "Only after deletion succeeds",
-    "Never remove a default that now refers to another strategy",
-    "send the current name and owner `input_value` unchanged",
-    "If synchronization fails, leave the plan `confirmed`",
+REQUIRED_ALPHA_SETUP_SECTION_ORDER = (
+    "### Access gate",
+    "### AlphaInsider strategy choice",
+    "### Implementation and automation choices",
+    "### Review AlphaInsider setup and choose the next step",
+)
+# Stable user-facing labels, paths, limits, and links are intentional literals.
+# Behavioral rules use flexible patterns below so validation does not freeze
+# incidental sentence wording.
+REQUIRED_STRATEGY_LITERALS = {
+    "references/user-communication.md": {
+        "ASD-STE100-style technical English",
+        "👉 **Action — Short title:**",
+        "💡 **Optional next step — Short title:**",
+        "`⚠️ Warning — No Action Required`",
+        "`🔄 Retrying — No Action Required`",
+        "`🛠️ Self-Healed — No Action Required`",
+        "`🚨 Error — Action Required`",
+    },
+    "references/interview.md": {
+        "**Backtest Strategy**",
+        "**Skip Backtesting and Implement on AlphaInsider**",
+        "**Build and Run**",
+        "**Build, Configure, and Activate**",
+        "Creation incomplete",
+        "`2×`",
+        "`1×`",
+    },
+    "references/backtesting.md": {
+        "Backtest <date or ID>",
+        "**Valid**",
+        "**Superseded**",
+        "**Failed**",
+    },
+    "references/credentials.md": {
+        "scripts/set_env_value.py",
+    },
+    "references/alphainsider-strategy.md": {
+        "`$100,000`",
+    },
+    "references/automation.md": {
+        "**Errors and completed repairs**",
+        "**Errors only**",
+        "**Errors, completed repairs, and warnings**",
+        "scheduler **Run now**",
+    },
+    "references/scheduled-runs.md": {
+        "30 minutes",
+    },
+    "references/generated-project.md": {
+        "Creation incomplete",
+        "Strategy created successfully",
+        "Strategy automation completed successfully",
+        "https://alphainsider.com/resources#automating-trades",
+    },
 }
-REQUIRED_CLEANUP_GUIDANCE = {
-    "The active or replacement plan is the sole place",
-    "Before setting `implemented`",
-    "exact project-relative managed-artifact inventory",
-    "retain and detach",
-    "selected existing owned targets",
-    "Disable future cycles",
-    "safe cycle boundary",
-    "preventing another internal cycle",
-    "releasing its runtime marker",
-    "never force-kill an uncertain process",
-    "getStrategySubscriptions",
-    "open orders",
-    "nonzero positions",
-    "does not state whether or how those resources cascade",
-    "never calls `newOrder`",
-    "never calls `deleteOrder`",
-    "verify that the target no longer resolves",
-    "Never recursively delete the project root",
-    "`.env`, `.gitignore`",
-    "`status: retired`",
-    "If the replacement target is local-only",
-    "allow its confirmed future activation with a prominent pending-cleanup warning",
-    "never retry it during unrelated work",
-    "pending outgoing strategy ID",
+FORBIDDEN_STRATEGY_LITERALS = {
+    "references/interview.md": {
+        "Agree to this strategy",
+        "Agree to this backtest plan",
+        "Agree to this AlphaInsider setup",
+        "Finish here",
+        "AlphaInsider permits up to `2×` leverage",
+        "Stage 3 selects the actual native automation surface",
+    },
+    "references/automation.md": {
+        "Attempt a non-trading delivery check",
+        "notification delivery has been attempted",
+    },
+    "references/plan-template.md": {
+        "- Maximum strategy leverage:",
+    },
 }
-REQUIRED_SINGLE_CONFIRMATION_GUIDANCE = {
-    "Complete plan confirmation is the only skill-level execution approval",
-    "authorizes every exact planned create, modify, overwrite, delete, stop, pause, disable, activation, promotion, provisioning, ID-persistence, synchronization, build, native-operation, and agent-task action",
-    "never request another approval for a confirmed action",
-    "If any required action, identity, or path was absent or changes afterward, return the plan to `draft`",
-    "exact action, and ask once for final confirmation",
-    "Never request a one-off approval against a confirmed plan",
-    "sole authorization for `newStrategy`",
-    "sole authorization to call `newStrategy` and persist the returned strategy ID",
-    "do not ask again",
-    "must not prompt for confirmation before submitting planned paper orders",
-    "Running either command is the user's execution action",
-    "Never manually run a one-cycle command, start a persistent process, or trigger a scheduled task during build or verification",
-    "An explicit later chat request may run",
+FORBIDDEN_BACKTEST_NAME_PATTERNS = {
+    "retired test alias": re.compile(
+        r"\bhistorical(?:-|\s+)test(?:s|ing)?\b", re.IGNORECASE
+    ),
+    "hindsight": re.compile(r"\bhindsight\b", re.IGNORECASE),
 }
-REQUIRED_LOCAL_ONLY_TARGET_GUIDANCE = {
-    "after strategy, backtesting, implementation-contract, and operation-and-scheduling planning as the final AlphaInsider forward-test setup phase before confirmation",
-    "offer a compatible owned target or a new target",
-    "target readiness",
-    "`ready` or `local-only`",
-    "preserve every completed earlier planning decision",
-    "continue to plan confirmation",
-    "complete local build",
-    "Make no remote calls",
-    "mark them unavailable until target readiness is resolved",
-    "keep the plan `confirmed`",
-    "never `implemented`",
-    "return the plan to `draft`",
-    "reconfirm the complete plan",
-    "return to target setup before confirmation",
+REQUIRED_STRATEGY_BEHAVIORS = {
+    "SKILL.md": {
+        "plan.md authority": (
+            r"`plan\.md`.{0,120}\b(?:source of truth|authoritative)\b"
+        ),
+        "one strict asset type": (
+            r"\bone project\b.{0,100}\bone strategy\b.{0,100}"
+            r"`stock`.{0,40}`cryptocurrency`"
+        ),
+        "native AI scheduler only": (
+            r"\buse only\b.{0,100}\bnative AI\b.{0,100}"
+            r"\b(?:automation|scheduler)\b"
+        ),
+        "Draft permits safe discovery": (
+            r"\bDraft strategy\b.{0,80}\bpermits?\b.{0,80}"
+            r"\binterviewing\b.{0,80}\bread-only discovery\b"
+        ),
+        "reviewed next step confirms strategy": (
+            r"\breviewed next-step choice\b.{0,80}\bconfirms the strategy\b"
+        ),
+        "stage choices gate execution": (
+            r"\bBuild and Run\b.{0,160}\bAuthorized\b.{0,180}"
+            r"\bBuild, Configure, and Activate\b.{0,180}\bAuthorized\b"
+        ),
+        "Complete requires active automation": (
+            r"\bCreation is Complete only after\b.{0,180}"
+            r"\bnative automation is active\b"
+        ),
+        "Define verifies scheduler and public execution constraints": (
+            r"\bBefore confirming a strategy\b.{0,120}"
+            r"\bactual native scheduler\b.{0,120}"
+            r"\bpublic AlphaInsider constraints\b.{0,120}"
+            r"\bplanned execution operation\b"
+        ),
+        "scheduler cadence cannot be simulated": (
+            r"\bnever keep a run alive\b.{0,100}\bpoll faster\b"
+        ),
+        "session policy has a documented fallback": (
+            r"\bPrefer explicit current session guidance\b"
+            r".{0,120}\bwhen absent\b.{0,120}\bstock fallback\b"
+            r".{0,120}\b24/7\b"
+        ),
+        "operational errors keep automation active": (
+            r"\bNever pause active automation automatically\b.{0,120}"
+            r"\bDegraded/Retrying\b.{0,180}\bnext trigger\b"
+        ),
+        "backtest findings include visual evidence": (
+            r"\bBacktest findings summaries\b.{0,100}\bdata-derived visuals\b"
+            r".{0,180}\bEmbed them when supported\b.{0,100}"
+            r"\blink directly\b.{0,180}\breport is additional, not a substitute\b"
+        ),
+    },
+    "references/credentials.md": {
+        "missing API key is the first action": (
+            r"\bmissing key\b.{0,100}\bfirst user action\b"
+        ),
+        "waiting for a requested key stays in progress": (
+            r"\bWaiting for the requested key\b.{0,120}"
+            r"\bCreation state In progress\b"
+        ),
+    },
+    "references/user-communication.md": {
+        "summary and next step share one prompt": (
+            r"\bend of a stage\b.{0,100}\bsummary\b.{0,100}"
+            r"\bnext step in the same prompt\b"
+        ),
+        "forward choice confirms reviewed summary": (
+            r"\bforward choice confirms the reviewed summary\b"
+        ),
+        "no separate agreement question": (
+            r"\bNever add a separate agreement question\b"
+        ),
+        "recommendations are constraint first": (
+            r"\bFilter recommendations through known constraints\b.{0,180}"
+            r"\bcomplete compatible choices\b.{0,220}"
+            r"\bDo not ask how to handle a hypothetical failure\b"
+        ),
+    },
+    "references/interview.md": {
+        "backtest is always offered before assessment": (
+            r"\bAlways show this choice\b.{0,120}"
+            r"\bdo not assess feasibility before\b"
+        ),
+        "stops never complete creation": (
+            r"\bNever set\b.{0,80}\bPhase\b.{0,80}"
+            r"\bCreation state\b.{0,80}\bComplete\b.{0,80}"
+            r"\bstop or blocker\b"
+        ),
+        "terminal success has no approval": (
+            r"\bStrategy created successfully\b.{0,180}"
+            r"\binformational\b.{0,80}\basks for no approval\b"
+        ),
+        "Define timing uses discovered scheduler": (
+            r"\bBefore asking timing questions\b.{0,220}"
+            r"\bDefine-time capability discovery\b.{0,700}"
+            r"\boffer only complete supported alternatives\b"
+        ),
+        "Define avoids implementation questions": (
+            r"\bDuring Define Strategy ask only\b.{0,160}"
+            r"\bdefer credentials and setup decisions\b"
+        ),
+        "execution operation is mapped internally": (
+            r"\bInternally map\b.{0,120}\bAlphaInsider operation\b"
+            r".{0,120}\bdo not ask the user to choose an endpoint\b"
+        ),
+        "allocation side effects are disclosed": (
+            r"\bnewOrderAllocations\b.{0,180}\bcancels existing open orders\b"
+            r".{0,100}\bcloses positions omitted\b"
+        ),
+        "exposure guidance is execution specific": (
+            r"\bexecution-specific exposure rules\b.{0,180}"
+            r"\bnewOrder\b.{0,100}\bno leverage field\b.{0,100}"
+            r"\bno documented universal `2×`"
+        ),
+        "stock sessions use docs then US fallback": (
+            r"\bexplicit current rule is authoritative\b.{0,180}"
+            r"\bno explicit mapping is published\b.{0,180}"
+            r"09:30.{0,80}16:00.{0,80}`America/New_York`"
+        ),
+        "cryptocurrency sessions are 24/7": (
+            r"\bcryptocurrency order availability as 24/7\b.{0,120}"
+            r"\bDo not ask a market-session question\b"
+        ),
+        "compatible recommendations have no hypothetical fallback": (
+            r"\bNever offer submission with an expected rejection\b"
+            r".{0,180}\bsaved signal with no supported execution time\b"
+        ),
+        "tier limits stay operation scoped": (
+            r"\bApply a public tier limit only to the operation\b"
+            r".{0,220}\bminimum documented tier dependency\b.{0,180}"
+            r"\bVerify the actual tier only in Stage 3\b"
+        ),
+        "focused prose discrepancy is retained": (
+            r"\bfocused operation prose is stricter than OpenAPI\b"
+            r".{0,120}\brecord the discrepancy\b"
+        ),
+        "implementation does not select timing": (
+            r"\bDo not ask the user to select timing here\b.{0,180}"
+            r"\breturn the affected timing to Stage 1\b"
+        ),
+        "terminal title adapts to reuse": (
+            r"\bStrategy created successfully\b.{0,180}"
+            r"\bStrategy automation completed successfully\b"
+        ),
+        "results summary includes saved visuals": (
+            r"\bInclude the featured run's exact saved result visuals\b"
+            r".{0,80}\bresults summary\b.{0,100}\bnot only a link\b"
+            r".{0,160}\bEmbed the images when supported\b.{0,100}"
+            r"\blink directly to each named image\b"
+        ),
+        "later creation handoffs reuse result visuals": (
+            r"\bReuse those artifacts in every later creation handoff\b"
+            r".{0,80}\bpresents the findings\b"
+        ),
+    },
+    "references/backtesting.md": {
+        "backtest choice precedes feasibility": (
+            r"\bafter the user selects\b.{0,80}\bBacktest Strategy\b"
+            r".{0,250}\bfeasibility\b.{0,100}\bfirst\b"
+        ),
+        "Build and Run gates the test": (
+            r"\bOnly the user's\b.{0,40}\bBuild and Run\b.{0,100}"
+            r"\bBacktest status\b.{0,30}\bAuthorized\b"
+        ),
+        "user-directed backtests may run after warning": (
+            r"\blet the user choose or suggest any safe\b.{0,100}"
+            r"\border-free backtest\b.{0,120}\bChallenge\b.{0,100}"
+            r"\bbefore execution\b.{0,80}\brun it\b"
+        ),
+        "methodology facts are separate from run disposition": (
+            r"\bmethodology facts describe\b.{0,160}"
+            r"\bseparate disposition\b"
+        ),
+        "backtest runs preserve recoverable source": (
+            r"\bimmutable snapshot\b.{0,100}\bsource and configuration\b"
+            r".{0,100}\bexact durable commit\b"
+        ),
+        "future information is resolved before authorization": (
+            r"\banswer may remain\b.{0,60}\bNot assessed\b.{0,120}"
+            r"\bmust be\b.{0,60}\bYes\b.{0,30}\bNo\b.{0,100}"
+            r"\bAuthorized\b"
+        ),
+        "future information receives a mandatory results warning": (
+            r"\banswer is\b.{0,30}\bYes\b.{0,100}\bbegin with a warning\b"
+            r".{0,160}\bcannot demonstrate real-time strategy performance\b"
+            r".{0,160}\brepeat that warning beside every affected measurement\b"
+        ),
+        "each run retains methodology facts": (
+            r"\brecord\b.{0,100}\brun's future-information answer\b"
+            r".{0,100}\bexact limitations\b"
+        ),
+        "disclosed approximations retain strategy identity": (
+            r"\bmatches the current strategy when it evaluates\b.{0,120}"
+            r"\bwithout silently revising intended strategy behavior\b"
+            r".{0,220}\bbacktest-only substitute\b.{0,180}"
+            r"\bdoes not by itself make the run evidence for a different strategy\b"
+        ),
+        "every result uses a backtest identity": (
+            r"\bIdentify each result as `Backtest <date or ID>"
+            r" — Valid \| Superseded \| Failed`"
+        ),
+        "primary backtest uses implementable cadence": (
+            r"\bconfirmed implementable cadence\b.{0,120}"
+            r"\bprimary backtest\b.{0,300}\bnative scheduler cannot run\b"
+        ),
+        "revisions supersede current evidence": (
+            r"\bMark affected Valid evidence Superseded\b.{0,220}"
+            r"\bHighest completed outcome to Strategy defined\b"
+        ),
+        "run source remains until explicit deletion": (
+            r"\brecoverable source and configuration until\b.{0,100}"
+            r"\bexplicitly\b.{0,80}\bdeletion\b"
+        ),
+        "backtest plan authorizes exact result visuals": (
+            r"\bNormally plan two to four data-derived visuals\b.{0,160}"
+            r"\bportfolio backtest\b.{0,160}\bequity curve\b.{0,120}"
+            r"\bdrawdown\b.{0,180}\bsignal-only backtest\b.{0,180}"
+            r"\btwo suitable substitutes\b.{0,220}\breviewed plan before\b"
+            r".{0,40}\bBuild and Run\b"
+        ),
+        "visuals supplement results and direct image links": (
+            r"\bSupplement the table and written interpretation\b.{0,120}"
+            r"\bsaved result visuals\b.{0,1400}\bEmbed the saved images\b"
+            r".{0,120}\blink directly to each named image\b.{0,120}"
+            r"\bdetailed report alone is not a substitute\b"
+        ),
+        "visual artifacts carry standalone context": (
+            r"\bstandalone artifact\b.{0,100}\bbacktest identity and period\b"
+            r".{0,80}\blabels and units\b.{0,160}"
+            r"\balternative text or a caption\b.{0,80}\bone-sentence takeaway\b"
+            r".{0,180}\bwarning inside the artifact\b.{0,100}"
+            r"\brepeat it beside the visual\b"
+        ),
+        "visual render failures preserve valid evidence": (
+            r"\bplanned visual does not render\b.{0,120}"
+            r"\bone safe mechanical repair attempt\b.{0,120}"
+            r"\bremaining rendering failure\b.{0,140}\bdoes not\b.{0,100}"
+            r"\bevidence Failed\b.{0,260}\blater repair\b.{0,100}"
+            r"\bsame saved outputs\b.{0,120}\bnever reruns the trading logic\b"
+        ),
+        "unavailable visuals receive a terse disclosure": (
+            r"\bstate only that some planned visuals are unavailable\b"
+        ),
+    },
+    "references/plan-template.md": {
+        "plan records visual selection": (
+            r"\bResults to show and charts:\b.{0,120}"
+            r"\btwo to four data-derived visuals\b.{0,180}"
+            r"\bsignal-only backtest\b"
+        ),
+        "plan records visual failures and repairs": (
+            r"\bBacktest run history\b.{0,300}"
+            r"\bvisual-rendering failures and later repairs\b"
+        ),
+    },
+    "references/implementation.md": {
+        "stock sessions use docs then fallback": (
+            r"\bexplicit current AlphaInsider accepted-session\b.{0,100}"
+            r"\bWhen no mapping is published\b.{0,160}"
+            r"09:30.{0,120}16:00.{0,80}`America/New_York`"
+        ),
+        "crypto availability is 24/7": (
+            r"\bFor cryptocurrency, treat order availability as 24/7\b"
+        ),
+        "failed actions wait for another trigger": (
+            r"\bfailed external or strategy action ends order-capable work\b"
+            r".{0,180}\bnever retry an order in the same trigger\b"
+        ),
+        "exposure limits are operation specific": (
+            r"\bconfirmed maximum exposure\b.{0,160}"
+            r"\busing `2×` only where\b.{0,120}"
+            r"\ballocation or webhook contract\b"
+        ),
+        "tier limits are operation specific": (
+            r"\bApply a tier limit only to an operation\b.{0,100}"
+            r"\bdocumentation explicitly names\b"
+        ),
+        "tests cannot place or cancel orders": (
+            r"\btests\b.{0,80}\bmust not\b.{0,80}\bsubmit\b"
+            r".{0,30}\bcancel\b.{0,100}\border\b"
+        ),
+    },
+    "references/automation.md": {
+        "cron is prohibited": r"\bnever\b.{0,80}\bcron\b",
+        "errors-only notifications are recommended": (
+            r"\bErrors only\b.{0,80}\brecommended\b"
+        ),
+        "notification choices put errors only first": (
+            r"\bwhich events\b.{0,120}\bErrors only\b.{0,200}"
+            r"\bErrors and completed repairs\b.{0,120}"
+            r"\bErrors, completed repairs, and warnings\b"
+        ),
+        "unsupported frequency requires user selection": (
+            r"\brequested (?:frequency|cadence)\b.{0,100}\bunavailable\b"
+            r".{0,180}\bask\b.{0,80}\buser\b.{0,40}"
+            r"\b(?:select|choose)\b"
+        ),
+        "description is ready before activation": (
+            r"\bactivate only after\b.{0,120}\bdescription\b"
+        ),
+        "setup notifications are not sent": (
+            r"\bnever send\b.{0,80}\bsetup or test notification\b"
+        ),
+        "unverifiable notification choice is retained": (
+            r"\bsupport cannot be checked\b.{0,120}\baccept\b.{0,80}"
+            r"\buser-selected, unverified\b"
+        ),
+        "notification delivery is not an activation gate": (
+            r"\bNotification delivery is not an activation gate\b"
+        ),
+        "Define discovers actual scheduler before timing": (
+            r"\bBefore asking strategy timing questions\b.{0,120}"
+            r"\bactual current platform\b.{0,120}\bofficial scheduler\b"
+        ),
+        "Define offers supported schedules only": (
+            r"\bcomplete compatible timing choices\b.{0,500}"
+            r"\bnearest complete supported alternatives\b"
+        ),
+        "faster cadence workarounds are prohibited": (
+            r"\bNever simulate a faster cadence\b.{0,180}"
+            r"\bpolling\b.{0,120}\bbackground process\b"
+        ),
+        "undocumented stock sessions use US fallback": (
+            r"\bAn exchange-status name or example is not proof\b"
+            r".{0,180}\bWhen the sources publish no mapping\b.{0,180}"
+            r"09:30.{0,120}16:00"
+        ),
+        "crypto session questions are omitted": (
+            r"\bcryptocurrency order availability as 24/7\b.{0,100}"
+            r"\bDo not ask a cryptocurrency market-session question\b"
+        ),
+        "compatible timing avoids hypothetical fallback": (
+            r"\bDo not ask a hypothetical fallback question\b.{0,100}"
+            r"\bcompatible choice\b"
+        ),
+        "Define does not inspect account": (
+            r"\bDo not request a key\b.{0,100}"
+            r"\binspect the user's account tier\b"
+        ),
+        "implementation drift returns to Define": (
+            r"\bDo not reselect timing during implementation\b.{0,180}"
+            r"\breturn the schedule decision to Draft in Define Strategy\b"
+        ),
+        "notification repair requires enabled scope": (
+            r"\bAttempt a bounded channel repair\b.{0,160}"
+            r"\bself-healing is enabled\b.{0,100}"
+            r"\bnotification repair is inside its confirmed scope\b"
+        ),
+        "notification repair scope is explicitly chosen": (
+            r"\bAsk explicitly whether notification channel repair\b"
+            r".{0,100}\binside that scope\b.{0,160}"
+            r"\bdisabled unless both self-healing and that scope are confirmed\b"
+        ),
+    },
+    "references/scheduled-runs.md": {
+        "dry runs require an explicit chat request": (
+            r"\bdry run\b.{0,80}\bonly\b.{0,80}"
+            r"\bexplicit chat request\b"
+        ),
+        "performance is not run health": (
+            r"\b(?:profit|loss|return|win rate)\b.{0,180}"
+            r"\bnot a health criterion\b"
+        ),
+        "operational errors keep automation active": (
+            r"\boperational error never pauses native automation automatically\b"
+            r".{0,180}\bAutomation state\b.{0,60}\bPaused\b"
+        ),
+        "errors become degraded next-trigger retries": (
+            r"\bFor every error\b.{0,500}\bDegraded/Retrying\b"
+            r".{0,160}\bnext scheduled retry\b"
+        ),
+        "ambiguous orders gate later orders": (
+            r"\border might have reached AlphaInsider\b.{0,100}"
+            r"\bnever assume success or failure\b.{0,220}"
+            r"\bsubmits nothing while ambiguity remains\b"
+        ),
+        "recovery does not replay orders": (
+            r"\bnext trigger\b.{0,220}\brecompute from current inputs\b"
+            r".{0,120}\bNever replay a missed signal or order\b"
+        ),
+        "repairs need new evidence": (
+            r"\battempt another repair only when new evidence\b.{0,160}"
+            r"\bNever repeat the same failed repair\b"
+        ),
+        "duplicate error notifications are suppressed": (
+            r"\bSend the first enabled notification\b.{0,220}"
+            r"\bSuppress an equivalent repeat\b"
+        ),
+        "leftover-lock removal requires proof": (
+            r"\bnever remove a leftover lock\b.{0,120}\bchecks prove\b"
+            r".{0,100}\bowning run\b.{0,40}\bnot active\b"
+        ),
+        "notification failure does not pause trading": (
+            r"\bnotification failure\b.{0,80}\bnever pauses\b.{0,80}"
+            r"\btrading\b"
+        ),
+        "notification channels fail independently": (
+            r"\bconfigured channels independently\b.{0,100}"
+            r"\bWorking channels send\b"
+        ),
+        "errors-only notifications send retrying and action errors": (
+            r"\bErrors only\b.{0,80}\bsends\b.{0,60}"
+            r"\bRetrying and Error events\b"
+        ),
+        "one trigger cannot simulate faster cadence": (
+            r"\bEach trigger performs at most one strategy run\b.{0,180}"
+            r"\bimitate a cadence faster\b"
+        ),
+        "notification repair requires enabled scope": (
+            r"\blimited channel repair\b.{0,140}"
+            r"\bself-healing is enabled\b.{0,100}"
+            r"\bnotification repair is inside its confirmed scope\b"
+        ),
+    },
+    "references/plan-template.md": {
+        "errors-only notifications are recommended": (
+            r"\bNotification events\b.{0,200}\berrors only\b.{0,80}"
+            r"\brecommended\b"
+        ),
+        "operational health is separate from automation": (
+            r"\bAutomation state\b.{0,180}\bOperational health\b.{0,120}"
+            r"\bDegraded/Retrying\b"
+        ),
+    },
+    "references/project-root.md": {
+        "Complete transition is cross-field verified": (
+            r"\bCreation state can first transition to Complete only when\b"
+            r".{0,300}"
+            r"\bAutomation state is Active\b"
+        ),
+        "runtime errors preserve active completed creation": (
+            r"\blater operational error does not undo completed creation\b"
+            r".{0,120}\bAutomation state Active\b.{0,120}"
+            r"\bDegraded/Retrying\b"
+        ),
+        "legacy plans remain resumable": (
+            r"\bformer \*\*Plan agreement\*\* field\b.{0,420}\blegacy version\b"
+            r".{0,120}\bnot an unrelated directory\b"
+        ),
+        "legacy plans cannot be promoted": (
+            r"\bNever promote ambiguous legacy work\b.{0,120}"
+            r"\bAuthorized, Active, or Complete\b"
+        ),
+        "project env is conditional": (
+            r"`\.env` file is conditional\b.{0,100}"
+            r"\bnot part of a new project's required initial layout\b"
+        ),
+        "legacy migration has timestamped backup": (
+            r"\bBefore changing `plan\.md`.{0,120}"
+            r"plan-before-schema-migration-YYYYMMDDTHHMMSSZ\.md"
+            r".{0,260}\bNever overwrite a prior backup\b"
+        ),
+        "legacy leverage becomes operation-specific exposure": (
+            r"\bTranslate an old leverage value\b.{0,160}"
+            r"\b(?:not|without)\b.{0,100}\buniversal AlphaInsider limit\b"
+            r".{0,260}\bcurrent order operation\b"
+        ),
+    },
+    "references/changes-and-deletion.md": {
+        "full deletion leaves no tombstone": (
+            r"\bfull deletion\b.{0,100}\bremove\b.{0,80}"
+            r"\bentire selected project\b.{0,80}\bno tombstone\b"
+        ),
+        "strategy revisions supersede affected evidence": (
+            r"\bmark every affected Valid backtest run Superseded\b"
+            r".{0,180}\bcurrent outcome to Strategy defined\b"
+        ),
+        "backtest source needs explicit deletion": (
+            r"\bnever authorize deletion\b.{0,160}"
+            r"\bbacktest source or configuration\b"
+        ),
+    },
+    "references/generated-project.md": {
+        "generated guide forbids complete env inspection": (
+            r"\bforbid\b.{0,120}\b(?:opening|inspecting)\b.{0,80}"
+            r"\bcomplete `\.env`"
+        ),
+        "generated guide protects update and remote settings": (
+            r"`pending-update\.md`.{0,120}"
+            r"\bAlphaInsider strategy identity and settings\b"
+            r".{0,120}\bscheduler identity and frequency\b"
+        ),
+        "generated outputs warn about future information": (
+            r"\bWhen future-information use is\b.{0,30}\bYes\b.{0,80}"
+            r"\bmandatory warning\b.{0,80}\bbefore backtest results\b"
+            r".{0,80}\bbeside every affected measurement\b"
+        ),
+        "incomplete handoff omits broker resource": (
+            r"\bCreation incomplete\b.{0,2200}\bDo not show the broker resource\b"
+        ),
+        "runtime errors are not incomplete creation": (
+            r"\bDo not use this handoff\b.{0,100}\boperational error\b"
+            r".{0,100}\bcreation already completed\b"
+        ),
+        "generated runbook keeps automation active on errors": (
+            r"\boperational error ends order work for that trigger\b"
+            r".{0,160}\bAutomation state Active\b.{0,100}"
+            r"\bDegraded/Retrying\b"
+        ),
+        "terminal wording adapts to strategy reuse": (
+            r"\bStrategy created successfully\b.{0,180}"
+            r"\bStrategy automation completed successfully\b"
+        ),
+        "backtest handoffs reuse and directly present visuals": (
+            r"\bWhenever an incomplete or terminal handoff presents backtest findings\b"
+            r".{0,120}\breuse the exact saved result visuals\b.{0,180}"
+            r"\bEmbed them when supported\b.{0,100}"
+            r"\blink directly to each named image\b.{0,120}"
+            r"\breport link is additional and never replaces\b"
+        ),
+        "backtest handoffs preserve visual failure handling": (
+            r"\bplanned visual remains unavailable\b.{0,100}"
+            r"\bstate only that some planned visuals are unavailable\b"
+            r".{0,220}\bsame saved run outputs\b.{0,100}"
+            r"\bpreserve the original failure record\b"
+        ),
+    },
 }
-REQUIRED_OPERATION_GUIDANCE = {
-    "Separate how long the strategy operates from how long one process lives",
-    "a `single run` executes one decision cycle",
-    "a `persistent process` stays visible or managed and performs cycles itself",
-    "a `recurring schedule` invokes the finite one-cycle command at each planned interval",
-    "Always present `foreground`",
-    "Linux systemd and macOS launchd may run a persistent process or recurring finite cycles",
-    "Windows Task Scheduler supports only recurring finite cycles",
-    "Recommend a compatible `background process` runner before an `agent scheduler`",
-    "Never omit a family",
-    "Inspect those tools",
-    "worst-case cycle duration is shorter than the interval",
-    "require the user's acceptance",
-    "Recurring one-cycle execution cannot overlap",
-    "fail-closed process-lifetime lock",
-    "Scheduler-level retries and task-level restart-on-failure are disabled",
-    "default agent-task notifications to failures only",
-    "Never put credentials",
-    "Never overwrite an active unrelated resource",
-    "allow an active cycle to reach a safe completion",
-    "~/.config/systemd/user/<identifier>.service",
-    "~/.config/systemd/user/<identifier>.timer",
-    "`Type=oneshot` with `Restart=no`",
-    "`StartCalendarInterval`",
-    "`MultipleInstancesPolicy`",
-    "Do not require a named agent product, proprietary task schema, or vendor-specific conversation type",
-    "does not mean skip this agent's own scheduler or automation tools",
-    "Prefer the confirmed persistent project rather than an ephemeral or isolated copy",
-    "already available durable runtime",
-    "Do not provision cloud infrastructure",
-    "recorded limitations, not reasons to hide the family",
-    "create the task even when project access, runtime, or durability is missing",
-    "run the exact confirmed one-cycle invocation once",
-    "Never manually trigger a run during creation or validation",
-    "recommend active",
-    "Ask Initial activation and autostart",
-    "create no native definition or agent task",
-    "not an immediate test run",
-    "explicit later chat request",
+REQUIRED_CORE_LAYOUT = {
+    "plan.md",
+    ".env.example",
+    ".gitignore",
+    "README.md",
+    "AGENTS.md",
+    "strategy/",
+    "backtest/",
+    "runtime/",
+    "tests/",
 }
-REMOVED_CURRENT_OPERATION_GUIDANCE = {
-    "Offer tmux only when it is installed",
-    "a one-cycle command always remains foreground-only",
-    "tmux is manual-only",
-    "offer only usable runners",
-    "Offer `agent scheduled task` only when",
-    "native user-system",
-    "independent recurring scheduled task whose saved instruction and lifecycle do not depend on the planning conversation",
+EXPECTED_SETUP_OPERATIONS = {
+    "/verifyToken",
+    "/getUserInfo",
+    "/getStrategies",
+    "/getUserStrategies",
+    "/newStrategy",
+    "/updateStrategy",
+    "/deleteStrategy",
+    "/getStrategySubscriptions",
+    "/getAccountSubscription",
+    "/getPositions",
+    "/getOrders",
+    "/getStocks",
+    "/searchStocks",
+    "/getExchangeStatus",
 }
-FORBIDDEN_AGENT_SCHEDULER_VENDOR_TERMS = {
-    "ChatGPT",
-    "Codex",
-    "OpenAI",
-    "RRULE",
-    "automation_update",
-    "thread-attached heartbeat",
+REQUIRED_NEW_STRATEGY_SETUP_FIELDS = {
+    "type",
+    "name",
+    "input_value",
+    "private",
 }
 REQUIRED_ALPHA_CREDENTIAL_GUIDANCE = {
     "never return the API key or arbitrary environment contents",
@@ -662,76 +989,67 @@ REQUIRED_ALPHA_DOC_AUDIT_GUIDANCE = {
     "https://api.alphainsider.com/asyncapi.yaml",
     "Reconcile every discrepancy in the same change",
 }
-REQUIRED_STARTUP_GUIDANCE = {
-    "a short `## Start` section",
-    "ordered, copy-paste commands",
-    "dependency installation and `.env` preparation",
-    "a single cycle, persistent operation when available, and recurring scheduling equally",
-    "Match the selected language",
-    "`source .venv/bin/activate` immediately before the execution commands",
-    "the project's exact package-manager and runtime commands",
+REQUIRED_ALPHA_EXECUTION_BEHAVIORS = {
+    "SKILL.md": {
+        "focused prose can be stricter than schema": (
+            r"\bfocused prose states a stricter compatible rule\b.{0,120}"
+            r"\bfollow the prose\b.{0,100}\brecord the documentation discrepancy\b"
+        ),
+        "exchange status is not order permission": (
+            r"\bDo not infer that an exchange-status value permits an order\b"
+            r".{0,220}\bdoes not map stock statuses to accepted order sessions\b"
+        ),
+        "tier limit remains operation scoped": (
+            r"\bnew_order\b.{0,100}\bsuccessful direct `/newOrder` requests\b"
+            r".{0,160}\bdo not silently apply it to allocation or webhook\b"
+        ),
+    },
+    "references/api-reference.md": {
+        "exchange example is not an eligibility rule": (
+            r"\bexample value `extended-hours`.{0,100}"
+            r"\bpossible response value only\b.{0,300}"
+            r"\bkeep stock-session eligibility unresolved\b"
+        ),
+    },
+    "references/stocks.md": {
+        "status strings require an explicit mapping": (
+            r"\bdo not treat a status string by itself as permission\b"
+            r".{0,240}\bdoes not enumerate\b.{0,320}"
+            r"\bstock-session eligibility remains unresolved\b"
+        ),
+    },
+    "references/trades.md": {
+        "newOrder prose overrides looser schema": (
+            r"\bfocused operation prose is stricter than the OpenAPI request schema\b"
+            r".{0,180}\bFollow the focused requirement\b"
+        ),
+        "allocation behavior is materially distinct": (
+            r"\bnewOrderAllocations\b.{0,100}\bcomplete desired position set\b"
+            r".{0,140}\bcancels existing open orders\b.{0,100}"
+            r"\bcloses omitted positions\b"
+        ),
+        "allocation contract contradictions are recorded": (
+            r"\boperation description and response example\b.{0,120}"
+            r"\bmarket\b.{0,120}\bslippage\b.{0,100}\blimit order\b"
+            r".{0,180}\bprovider `polygon`.{0,120}\benum omits it\b"
+        ),
+    },
+    "references/limits.md": {
+        "newOrder tier scope is not generalized": (
+            r"\bnew_order\b.{0,120}\bsuccessful direct\b.{0,60}`/newOrder`"
+            r".{0,260}\bdoes not state\b.{0,180}"
+            r"`/newOrderAllocations` or `/newOrderWebhook`"
+        ),
+    },
+    "references/websockets.md": {
+        "example-only WebSocket fields are qualified": (
+            r"\bAsyncAPI server-message schemas\b.{0,180}"
+            r"\bexamples contain the detailed response objects\b.{0,160}"
+            r"\bexample-only fields as illustrative\b"
+        ),
+    },
 }
-REQUIRED_EXPOSURE_GUIDANCE = {
-    "100% is 1× portfolio value",
-    "up to 200% (2×)",
-    "platform ceiling, not a default",
-    "do not assume 100% is the platform maximum",
-    "Record the user's chosen cap",
-    "`getMaxOrderSize`",
-}
-REQUIRED_MARKET_DATA_GUIDANCE = {
-    "Prefer AlphaInsider's applicable stock REST endpoints and `wsStockPrice`",
-    "supported current instrument metadata, exchange status, and bid, ask, or last prices",
-    "Use an external provider when AlphaInsider does not supply the required live",
-    "For historical inputs used by live operation",
-    "compare AlphaInsider and external sources case by case",
-    "Never use AlphaInsider's `getStockPriceHistory` for a backtest",
-    "Require a credible external historical source",
-    "mark backtesting unavailable",
-    "same decision-logic input contract",
-    "timestamp, symbol, price-adjustment, and coverage differences",
-}
-REQUIRED_VERSION_GUIDANCE = {
-    "`scripts/check_for_update.py` once at the start of every invocation",
-    "never run its update command or ask for permission to run it",
-    "`MAJOR.MINOR.PATCH`",
-    "Increment the version for every published Strategy Creator change",
-    "Treat that exact legacy shape as `0.0.0`",
-    "Compare the project with the installed version",
-    "never a remote version",
-    "npx skills@latest update alphainsider-api alphainsider-strategy-creator",
-    "one `vN.md` file per major version",
-    "Select every documented release greater than",
-    "less than or equal to the installed version",
-    "Process the selected release sections in ascending semantic-version order",
-    "Audit the project against the installed skill",
-    "Combine all selected increments into one target audit",
-    "every exact create, modify, and delete path",
-    "Final complete-plan confirmation is the sole authorization for the exact recorded upgrade actions",
-    "instead of requesting a one-off approval",
-    "Advance `contract_version` only after",
-    "do not write intermediate contract versions",
-    "interrupted or failed upgrade",
-    "For a version-only upgrade, classify the configured target as an existing strategy",
-    "do not create a strategy or sync its description",
-    "The upgrade alone does not require runtime-code or dependency changes",
-    "Pass `reconnect=True` to `stream_events` when the plan requires continuous reconnection and re-subscription",
-    "retain the default one-session behavior when the plan requires the strategy to stop on a stream error",
-}
-REQUIRED_STRATEGY_VERSION_LAYOUT_GUIDANCE = {
-    "sole nested exception",
-    "`references/versions/vN.md`",
-    "highest documented release",
-}
-REQUIRED_UPDATE_CHECKER_SOURCE = {
-    "https://raw.githubusercontent.com/AlphaInsider/skills/master/",
-    "skills/alphainsider-strategy-creator/references/versioning.md",
-    'UPDATE_COMMAND = "npx skills@latest update alphainsider-api alphainsider-strategy-creator"',
-    "TIMEOUT_SECONDS = 3",
-    "MAX_RESPONSE_BYTES = 64 * 1024",
-    "response.geturl() != REMOTE_VERSION_URL",
-}
-README_MAX_WORDS = 550
+README_MAX_WORDS = 500
 REQUIRED_README_SECTIONS = {
     "# AlphaInsider Skills",
     "## Overview",
@@ -747,35 +1065,73 @@ REQUIRED_README_OVERVIEW_GUIDANCE = {
     "/alphainsider",
     "use the alphainsider skill",
     "npx skills@latest add",
-    "npx skills@latest update alphainsider",
-    "`docs/plan.md`",
-    "paper-trading",
-    "Credentials remain",
-    "agent-only",
-    "offline tests",
-    "language-specific `Start` section",
-    "sole approval for every exact planned implementation or update action",
-    "without another approval",
-    "never submits AlphaInsider orders",
-    "prefer it for supported current market data",
-    "Backtests require credible external history",
-    "`contract_version`",
-    "npx skills@latest update alphainsider-api alphainsider-strategy-creator",
-    "never installed automatically",
-    "verifies its required API-key permissions",
-    "**AI Agent** preset",
-    "discovers owned strategies",
-    "syncs the confirmed description",
-    "`references/versions/vN.md`",
-    "final-confirmation upgrade",
-    "Operation and scheduling",
-    "user-level systemd or launchd",
-    "Windows Task Scheduler",
-    "or an agent scheduler",
-    "default active",
-    "retain and detach",
-    "retired audit plan",
-    "never cancels orders, liquidates positions",
+    "root `plan.md`",
+    "native AI scheduler",
+    "AlphaInsider strategy",
+    "fixed code",
+    "simulated funds",
+    "backtest",
+    "self-healing",
+    "Explicit deletion",
+    "resources#automating-trades",
+}
+REQUIRED_README_OVERVIEW_BEHAVIORS = {
+    "errors-only notifications are the default": (
+        r"(?:\bErrors only\b.{0,80}\bdefault\b|"
+        r"\bdefault\b.{0,80}\bErrors only\b)"
+    ),
+    "strategy creation journey is ordered": (
+        r"\bDefine Strategy\b.{0,100}\bBacktest Strategy\b.{0,100}"
+        r"\bImplement Strategy on AlphaInsider\b"
+    ),
+    "backtesting is always offered before feasibility": (
+        r"\bBacktesting is always offered\b.{0,120}"
+        r"\bFeasibility is assessed only after\b"
+    ),
+    "Complete requires active automation": (
+        r"\bCreation is Complete only after\b.{0,160}"
+        r"\bnative automation is active\b"
+    ),
+    "setup sends no test notifications": (
+        r"\bSetup discovers notification support without sending test messages\b"
+    ),
+    "backtest runs preserve disposition and source": (
+        r"\bEvery run is a backtest\b.{0,180}\bValid\b.{0,80}\bSuperseded\b"
+        r".{0,80}\bFailed\b.{0,100}\brecoverable source\b"
+    ),
+    "backtests disclose future information": (
+        r"\bEvery run is a backtest\b.{0,100}\bfuture-information use\b"
+        r".{0,260}\bwarned before results\b.{0,100}\baffected measurements\b"
+    ),
+    "Define uses actual scheduler and public constraints": (
+        r"\bDuring Define\b.{0,120}\bactual native AI scheduler\b"
+        r".{0,120}\bpublic AlphaInsider constraints\b"
+    ),
+    "faster cadence is not simulated": (
+        r"\bnever fakes a faster cadence\b.{0,100}\bbackground loop\b"
+    ),
+    "Define uses explicit sessions then a stock fallback": (
+        r"\bExplicit session guidance takes priority\b.{0,180}"
+        r"\bstocks use the Strategy Creator fallback\b.{0,100}"
+        r"\bcryptocurrency is available 24/7\b"
+    ),
+    "operational errors retry without pausing automation": (
+        r"\brun error ends that run's order work\b.{0,140}"
+        r"\bautomation stays Active\b.{0,100}\bDegraded/Retrying\b"
+        r".{0,100}\bnext trigger\b"
+    ),
+    "only current Valid evidence advances": (
+        r"\bOnly Valid evidence for the current strategy advances\b"
+    ),
+    "notification repair needs enabled confirmed scope": (
+        r"\bNotification repair\b.{0,120}"
+        r"\benabled, confirmed self-healing scope\b"
+    ),
+    "backtest summaries include result visuals": (
+        r"\bFindings summaries embed or directly link\b.{0,60}"
+        r"\btwo to four saved data-derived visuals\b.{0,80}"
+        r"\bdetailed report alone is insufficient\b"
+    ),
 }
 
 
@@ -803,11 +1159,37 @@ def section_link(label: str, reference: str, heading: str) -> str:
     return f"[`{label}`]({reference}#{markdown_anchor(heading)})"
 
 
-def semver_tuple(value: str) -> tuple[int, int, int] | None:
-    match = STRICT_SEMVER_PATTERN.fullmatch(value)
-    if match is None:
-        return None
-    return tuple(int(part) for part in match.groups())
+def local_link_targets(
+    source: Path, text: str, root: Path
+) -> tuple[set[Path], set[str]]:
+    """Return valid in-root links and invalid local targets from Markdown."""
+    targets: set[Path] = set()
+    invalid: set[str] = set()
+    resolved_root = root.resolve()
+
+    for match in MARKDOWN_LINK_PATTERN.finditer(text):
+        raw_target = match.group(1).strip("<>")
+        path_text = raw_target.split("#", 1)[0]
+        if not path_text:
+            continue
+        if URI_SCHEME_PATTERN.match(path_text):
+            continue
+        if path_text.startswith("/"):
+            invalid.add(raw_target)
+            continue
+
+        target = (source.parent / path_text).resolve()
+        try:
+            target.relative_to(resolved_root)
+        except ValueError:
+            invalid.add(raw_target)
+            continue
+        if not target.is_file():
+            invalid.add(raw_target)
+            continue
+        targets.add(target)
+
+    return targets, invalid
 
 
 def catalog_specialists(text: str) -> list[str]:
@@ -815,121 +1197,62 @@ def catalog_specialists(text: str) -> list[str]:
     return CATALOG_HEADING_PATTERN.findall(text)
 
 
-def markdown_section_lines(text: str, heading: str) -> list[str] | None:
-    match = re.search(
-        rf"^## {re.escape(heading)}\n(?P<body>.*?)(?=^## |\Z)",
-        text,
-        re.MULTILINE | re.DOTALL,
-    )
-    if match is None:
-        return None
-    return [line.strip() for line in match.group("body").splitlines() if line.strip()]
-
-
-def validate_strategy_version_history(
-    version_text: str,
-    version_files: dict[str, str],
-    current_version: str | None,
-) -> tuple[list[str], list[str]]:
-    errors: list[str] = []
-    release_versions: list[str] = []
-    major_files: list[tuple[int, str, str]] = []
-
-    for relative_path, text in version_files.items():
-        match = STRATEGY_VERSION_FILE_PATTERN.fullmatch(relative_path)
-        if match is None:
-            errors.append(
-                "strategy version logs must use references/versions/vN.md: "
-                f"{relative_path}"
-            )
-            continue
-        major_files.append((int(match.group(1)), relative_path, text))
-
-    major_files.sort(key=lambda item: item[0])
-    expected_index = [
-        f"- [Version {major}](versions/{relative_path})"
-        for major, relative_path, _text in major_files
-    ]
-    actual_index = markdown_section_lines(version_text, "Version logs")
-    if actual_index != expected_index:
-        errors.append(
-            "strategy version index must link every major-version log exactly "
-            "once in ascending order"
-        )
-
-    for major, relative_path, text in major_files:
-        title = f"# Strategy Creator Version {major}"
-        if text.splitlines().count(title) != 1:
-            errors.append(
-                f"strategy version log {relative_path} must contain exactly "
-                f"one {title!r} heading"
-            )
-
-        headings = re.findall(r"^## (.+)$", text, re.MULTILINE)
-        if not headings or headings[0] != "Contents" or headings.count("Contents") != 1:
-            errors.append(
-                f"strategy version log {relative_path} must start with one "
-                "Contents section"
-            )
-        release_headings = [heading for heading in headings if heading != "Contents"]
-        parsed_releases: list[tuple[int, int, int]] = []
-        for release in release_headings:
-            parsed = semver_tuple(release)
-            if parsed is None:
-                errors.append(
-                    f"strategy version log {relative_path} has malformed "
-                    f"release heading {release!r}"
-                )
-                continue
-            if parsed[0] != major:
-                errors.append(
-                    f"strategy version log {relative_path} contains release "
-                    f"{release} from major version {parsed[0]}"
-                )
-            parsed_releases.append(parsed)
-            release_versions.append(release)
-
-        if parsed_releases != sorted(parsed_releases) or len(parsed_releases) != len(
-            set(parsed_releases)
+def literal_string_collection(
+    tree: ast.Module, assignment_name: str
+) -> set[str] | None:
+    """Read a literal string collection from a module assignment."""
+    value_node: ast.expr | None = None
+    for node in tree.body:
+        if isinstance(node, ast.Assign) and any(
+            isinstance(target, ast.Name) and target.id == assignment_name
+            for target in node.targets
         ):
-            errors.append(
-                f"strategy version log {relative_path} releases must be unique "
-                "and in ascending order"
-            )
+            value_node = node.value
+            break
+        if (
+            isinstance(node, ast.AnnAssign)
+            and isinstance(node.target, ast.Name)
+            and node.target.id == assignment_name
+        ):
+            value_node = node.value
+            break
+    if value_node is None:
+        return None
+    if (
+        isinstance(value_node, ast.Call)
+        and isinstance(value_node.func, ast.Name)
+        and value_node.func.id == "frozenset"
+        and len(value_node.args) == 1
+        and not value_node.keywords
+    ):
+        value_node = value_node.args[0]
+    try:
+        values = ast.literal_eval(value_node)
+    except (TypeError, ValueError):
+        return None
+    if not isinstance(values, (set, frozenset, list, tuple)) or not all(
+        isinstance(value, str) for value in values
+    ):
+        return None
+    return set(values)
 
-        expected_contents = [
-            f"- [`{release}`](#{markdown_anchor(release)})"
-            for release in release_headings
-        ]
-        actual_contents = markdown_section_lines(text, "Contents")
-        if actual_contents != expected_contents:
-            errors.append(
-                f"strategy version log {relative_path} contents must link "
-                "every release exactly once in heading order"
-            )
 
-    if len(release_versions) != len(set(release_versions)):
-        errors.append("strategy release headings must be unique across version logs")
-
-    missing_releases = REQUIRED_STRATEGY_RELEASES - set(release_versions)
-    if missing_releases:
-        errors.append(
-            "strategy version history is missing releases "
-            f"{sorted(missing_releases)}"
-        )
-
-    current = semver_tuple(current_version) if current_version is not None else None
-    documented = [
-        parsed
-        for release in release_versions
-        if (parsed := semver_tuple(release)) is not None
-    ]
-    if current is not None and (not documented or max(documented) != current):
-        errors.append(
-            "strategy current_version must match the highest documented release"
-        )
-
-    return errors, release_versions
+def function_calls(tree: ast.Module, function_name: str, called_name: str) -> bool:
+    """Return whether one module function calls a named function."""
+    function = next(
+        (
+            node
+            for node in tree.body
+            if isinstance(node, ast.FunctionDef) and node.name == function_name
+        ),
+        None,
+    )
+    return function is not None and any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == called_name
+        for node in ast.walk(function)
+    )
 
 
 def validate() -> list[str]:
@@ -943,7 +1266,7 @@ def validate() -> list[str]:
             f"expected skills {sorted(EXPECTED_SKILLS)}, found {sorted(discovered)}"
         )
 
-    all_skill_files = list(ROOT.rglob("SKILL.md"))
+    all_skill_files = list(SKILLS_DIR.glob("*/SKILL.md"))
     if len(all_skill_files) != len(EXPECTED_SKILLS):
         errors.append(
             f"expected exactly {len(EXPECTED_SKILLS)} SKILL.md files, "
@@ -1057,50 +1380,6 @@ def validate() -> list[str]:
                 "alphainsider catalog headings must be in ascending name order"
             )
 
-    version_path = wrapper_references / "versioning.md"
-    if version_path.is_file():
-        try:
-            wrapper_version_fields = frontmatter(version_path)
-        except ValueError as exc:
-            errors.append(str(exc))
-        else:
-            if set(wrapper_version_fields) != {"current_version"}:
-                errors.append(
-                    "alphainsider version reference must declare only current_version"
-                )
-            wrapper_version = wrapper_version_fields.get("current_version")
-            if wrapper_version is None or STRICT_SEMVER_PATTERN.fullmatch(
-                wrapper_version
-            ) is None:
-                errors.append(
-                    "alphainsider version reference must use strict MAJOR.MINOR.PATCH"
-                )
-        wrapper_version_text = version_path.read_text(encoding="utf-8")
-        missing_wrapper_version_guidance = {
-            guidance
-            for guidance in REQUIRED_WRAPPER_VERSION_GUIDANCE
-            if guidance not in wrapper_version_text
-        }
-        if missing_wrapper_version_guidance:
-            errors.append(
-                "alphainsider version reference is missing guidance "
-                f"{sorted(missing_wrapper_version_guidance)}"
-            )
-
-    wrapper_checker = wrapper_scripts / "check_for_update.py"
-    if wrapper_checker.is_file():
-        wrapper_checker_source = wrapper_checker.read_text(encoding="utf-8")
-        missing_wrapper_checker_source = {
-            marker
-            for marker in REQUIRED_WRAPPER_UPDATE_CHECKER_SOURCE
-            if marker not in wrapper_checker_source
-        }
-        if missing_wrapper_checker_source:
-            errors.append(
-                "alphainsider update checker is missing required safeguards "
-                f"{sorted(missing_wrapper_checker_source)}"
-            )
-
     strategy = SKILLS_DIR / "alphainsider-strategy-creator"
     strategy_references = strategy / "references"
     actual_strategy_refs = {
@@ -1111,17 +1390,19 @@ def validate() -> list[str]:
             "strategy-creator references must be exactly "
             f"{sorted(EXPECTED_STRATEGY_REFERENCES)}"
         )
-    strategy_reference_directories = {
+    nested_strategy_reference_dirs = {
         path.name for path in strategy_references.iterdir() if path.is_dir()
     }
-    if strategy_reference_directories != {"versions"}:
+    if nested_strategy_reference_dirs:
         errors.append(
-            "strategy-creator reference directories must contain only versions"
+            "strategy-creator references must not contain nested directories "
+            f"{sorted(nested_strategy_reference_dirs)}"
         )
 
+    strategy_scripts_dir = strategy / "scripts"
     strategy_scripts = {
-        path.relative_to(strategy / "scripts").as_posix()
-        for path in (strategy / "scripts").rglob("*")
+        path.relative_to(strategy_scripts_dir).as_posix()
+        for path in strategy_scripts_dir.rglob("*")
         if path.is_file() and "__pycache__" not in path.parts
     }
     if strategy_scripts != EXPECTED_STRATEGY_SCRIPTS:
@@ -1130,208 +1411,232 @@ def validate() -> list[str]:
             f"{sorted(EXPECTED_STRATEGY_SCRIPTS)}"
         )
 
-    plan_template = strategy / "references" / "plan-template.md"
-    version_reference = strategy / "references" / "versioning.md"
-    version_directory = strategy / "references" / "versions"
-    version_files = {
-        path.relative_to(version_directory).as_posix(): path.read_text(
-            encoding="utf-8"
-        )
-        for path in version_directory.rglob("*")
-        if path.is_file()
-    }
-    current_version: str | None = None
-    if version_reference.is_file():
-        try:
-            version_fields = frontmatter(version_reference)
-        except ValueError as exc:
-            errors.append(str(exc))
-        else:
-            if set(version_fields) != {"current_version"}:
-                errors.append(
-                    "strategy version reference must declare only current_version"
-                )
-            current_version = version_fields.get("current_version")
-            if current_version is None or STRICT_SEMVER_PATTERN.fullmatch(
-                current_version
-            ) is None:
-                errors.append(
-                    "strategy version reference must use strict MAJOR.MINOR.PATCH"
-                )
-
-    version_text = (
-        version_reference.read_text(encoding="utf-8")
-        if version_reference.is_file()
-        else ""
-    )
-    version_errors, _release_versions = validate_strategy_version_history(
-        version_text,
-        version_files,
-        current_version,
-    )
-    errors.extend(version_errors)
-
-    if plan_template.is_file():
-        plan_text = plan_template.read_text(encoding="utf-8")
-        try:
-            plan_fields = frontmatter(plan_template)
-        except ValueError as exc:
-            errors.append(str(exc))
-        else:
-            if plan_fields.get("status") != "draft":
-                errors.append("strategy plan template must start in draft status")
-            if set(plan_fields) != {"status", "contract_version"}:
-                errors.append(
-                    "strategy plan template must declare status and contract_version"
-                )
-            plan_version = plan_fields.get("contract_version")
-            if plan_version is None or STRICT_SEMVER_PATTERN.fullmatch(
-                plan_version
-            ) is None:
-                errors.append(
-                    "strategy plan template contract_version must use strict "
-                    "MAJOR.MINOR.PATCH"
-                )
-            elif current_version is not None and plan_version != current_version:
-                errors.append(
-                    "strategy plan template contract_version must match the "
-                    "strategy version reference"
-                )
-        missing_sections = REQUIRED_PLAN_SECTIONS - set(plan_text.splitlines())
-        if missing_sections:
-            errors.append(
-                "strategy plan template is missing sections "
-                f"{sorted(missing_sections)}"
-            )
-        actual_plan_section_order = tuple(
-            line
-            for line in plan_text.splitlines()
-            if line in REQUIRED_PLAN_SECTIONS
-        )
-        if actual_plan_section_order != REQUIRED_PLAN_SECTION_ORDER:
-            errors.append(
-                "strategy plan template sections must use order "
-                f"{list(REQUIRED_PLAN_SECTION_ORDER)}"
-            )
-        plan_lines = {line.partition(" _")[0] for line in plan_text.splitlines()}
-        missing_fields = REQUIRED_PLAIN_LANGUAGE_PLAN_FIELDS - plan_lines
-        if missing_fields:
-            errors.append(
-                "strategy plan template is missing plain-language fields "
-                f"{sorted(missing_fields)}"
-            )
-        missing_target_fields = REQUIRED_TARGET_PLAN_FIELDS - plan_lines
-        if missing_target_fields:
-            errors.append(
-                "strategy plan template is missing AlphaInsider target fields "
-                f"{sorted(missing_target_fields)}"
-            )
-        missing_operation_fields = REQUIRED_OPERATION_PLAN_FIELDS - plan_lines
-        if missing_operation_fields:
-            errors.append(
-                "strategy plan template is missing operation-and-scheduling fields "
-                f"{sorted(missing_operation_fields)}"
-            )
-        obsolete_fields = {
-            field for field in REMOVED_PLAN_FIELDS if field in plan_text
-        }
-        if obsolete_fields:
-            errors.append(
-                "strategy plan template contains removed fields "
-                f"{sorted(obsolete_fields)}"
-            )
-        obsolete_sections = REMOVED_PLAN_SECTIONS & set(plan_text.splitlines())
-        if obsolete_sections:
-            errors.append(
-                "strategy plan template contains removed sections "
-                f"{sorted(obsolete_sections)}"
-            )
-
     strategy_text = (strategy / "SKILL.md").read_text(encoding="utf-8")
     reference_texts = {
         name: (strategy_references / name).read_text(encoding="utf-8")
         for name in EXPECTED_STRATEGY_REFERENCES
     }
-    strategy_id_field_references = {
-        name
-        for name, text in reference_texts.items()
-        if "\n- AlphaInsider strategy ID:" in text
-    }
-    if strategy_id_field_references != {"plan-template.md"}:
-        errors.append(
-            "only the strategy plan template may define an AlphaInsider strategy ID field"
-        )
-    long_references_without_contents = {
-        name
-        for name, text in reference_texts.items()
-        if len(text.splitlines()) > 100 and "## Contents" not in text
-    }
-    if long_references_without_contents:
-        errors.append(
-            "strategy-creator long references must include contents navigation "
-            f"{sorted(long_references_without_contents)}"
-        )
-    target_text = reference_texts["alphainsider-target.md"]
-    cleanup_text = reference_texts["cleanup.md"]
-    operation_text = reference_texts["operation-and-scheduling.md"]
-    normalized_strategy_text = " ".join(strategy_text.split())
+    all_reference_text = "\n".join(
+        reference_texts[name] for name in sorted(reference_texts)
+    )
+
     if len(strategy_text.split()) > STRATEGY_SKILL_MAX_WORDS:
         errors.append(
             "strategy-creator SKILL.md exceeds compact-word limit "
             f"{STRATEGY_SKILL_MAX_WORDS}"
         )
+
+    strategy_sources = {"SKILL.md": strategy / "SKILL.md"}
+    strategy_sources.update(
+        {
+            f"references/{name}": strategy_references / name
+            for name in EXPECTED_STRATEGY_REFERENCES
+        }
+    )
+    strategy_source_texts = {"SKILL.md": strategy_text}
+    strategy_source_texts.update(
+        {
+            f"references/{name}": text_value
+            for name, text_value in reference_texts.items()
+        }
+    )
+    reference_graph: dict[str, set[str]] = {}
+    broken_strategy_links: set[str] = set()
+    for source_name, source_path in strategy_sources.items():
+        targets, invalid = local_link_targets(
+            source_path, strategy_source_texts[source_name], strategy
+        )
+        routed_targets = {
+            target.relative_to(strategy).as_posix() for target in targets
+        }
+        reference_graph[source_name] = routed_targets & set(strategy_sources)
+        broken_strategy_links.update(
+            f"{source_name} -> {target}" for target in invalid
+        )
+
+    if broken_strategy_links:
+        errors.append(
+            "strategy-creator has invalid local links "
+            f"{sorted(broken_strategy_links)}"
+        )
+
+    reachable_strategy_files = {"SKILL.md"}
+    frontier = ["SKILL.md"]
+    while frontier:
+        source_name = frontier.pop()
+        for target_name in reference_graph.get(source_name, set()):
+            if target_name not in reachable_strategy_files:
+                reachable_strategy_files.add(target_name)
+                frontier.append(target_name)
+
     missing_reference_routes = {
         name
         for name in EXPECTED_STRATEGY_REFERENCES
-        if f"references/{name}" not in strategy_text
+        if f"references/{name}" not in reachable_strategy_files
     }
     if missing_reference_routes:
         errors.append(
-            "strategy-creator SKILL.md is missing direct reference routes "
+            "strategy-creator references are not reachable from SKILL.md "
             f"{sorted(missing_reference_routes)}"
         )
-    missing_progressive_disclosure = {
-        guidance
-        for guidance in REQUIRED_PROGRESSIVE_DISCLOSURE_GUIDANCE
-        if guidance not in normalized_strategy_text
+
+    for owner, literals in REQUIRED_STRATEGY_LITERALS.items():
+        owner_text = " ".join(strategy_source_texts[owner].split())
+        missing_literals = {
+            item for item in literals if item not in owner_text
+        }
+        if missing_literals:
+            errors.append(
+                f"strategy-creator {owner} is missing stable contract values "
+                f"{sorted(missing_literals)}"
+            )
+
+    for owner, literals in FORBIDDEN_STRATEGY_LITERALS.items():
+        owner_text = " ".join(strategy_source_texts[owner].split())
+        present_literals = {item for item in literals if item in owner_text}
+        if present_literals:
+            errors.append(
+                f"strategy-creator {owner} contains obsolete contract values "
+                f"{sorted(present_literals)}"
+            )
+
+    obsolete_backtest_names = {
+        f"{owner}: {name}"
+        for owner, owner_text in strategy_source_texts.items()
+        for name, pattern in FORBIDDEN_BACKTEST_NAME_PATTERNS.items()
+        if pattern.search(owner_text)
     }
-    if missing_progressive_disclosure:
+    if obsolete_backtest_names:
         errors.append(
-            "strategy-creator SKILL.md is missing progressive-disclosure guidance "
-            f"{sorted(missing_progressive_disclosure)}"
+            "strategy-creator contains obsolete backtest names "
+            f"{sorted(obsolete_backtest_names)}"
         )
-    permission_block = re.search(
-        r"## API-key permission gate.*?```text\n(.*?)\n```",
-        target_text,
-        re.DOTALL,
+
+    for owner, behaviors in REQUIRED_STRATEGY_BEHAVIORS.items():
+        owner_text = " ".join(strategy_source_texts[owner].split())
+        missing_behaviors = {
+            name
+            for name, pattern in behaviors.items()
+            if re.search(pattern, owner_text, re.IGNORECASE) is None
+        }
+        if missing_behaviors:
+            errors.append(
+                f"strategy-creator {owner} is missing behavioral contracts "
+                f"{sorted(missing_behaviors)}"
+            )
+
+    plan_template = strategy_references / "plan-template.md"
+    plan_text = reference_texts["plan-template.md"]
+    if plan_text.startswith("---"):
+        errors.append("strategy plan template must not use lifecycle frontmatter")
+
+    plan_headings = tuple(
+        line
+        for line in plan_text.splitlines()
+        if line in set(REQUIRED_PLAN_SECTION_ORDER)
     )
-    documented_permissions = (
-        tuple(permission_block.group(1).splitlines()) if permission_block else ()
-    )
-    if documented_permissions != REQUIRED_STRATEGY_API_PERMISSIONS:
+    if plan_headings != REQUIRED_PLAN_SECTION_ORDER:
         errors.append(
-            "strategy-creator API-key permission bundle must exactly match "
-            f"{list(REQUIRED_STRATEGY_API_PERMISSIONS)}"
+            "strategy plan template sections must use order "
+            f"{list(REQUIRED_PLAN_SECTION_ORDER)}"
         )
-    missing_states = {
-        state for state in EXPECTED_PLAN_STATES if f"`{state}`" not in strategy_text
+
+    plan_lines = plan_text.splitlines()
+    plan_field_lines = {
+        field: [line for line in plan_lines if line.startswith(field)]
+        for field in REQUIRED_PLAN_FIELDS
     }
-    if missing_states:
+    missing_plan_fields = {
+        field for field, lines in plan_field_lines.items() if not lines
+    }
+    if missing_plan_fields:
         errors.append(
-            "strategy-creator is missing plan states " f"{sorted(missing_states)}"
+            "strategy plan template is missing fields "
+            f"{sorted(missing_plan_fields)}"
+        )
+
+    duplicate_plan_fields = {
+        field for field, lines in plan_field_lines.items() if len(lines) > 1
+    }
+    if duplicate_plan_fields:
+        errors.append(
+            "strategy plan template repeats fields "
+            f"{sorted(duplicate_plan_fields)}"
+        )
+
+    fields_without_inline_values = {
+        field
+        for field, lines in plan_field_lines.items()
+        if lines
+        and not lines[0][len(field) :].split("<!--", 1)[0].strip()
+    }
+    if fields_without_inline_values:
+        errors.append(
+            "strategy plan template fields need values on their field lines "
+            f"{sorted(fields_without_inline_values)}"
+        )
+
+    invalid_plan_enums: dict[str, tuple[str, ...] | None] = {}
+    invalid_plan_defaults: dict[str, str] = {}
+    for field, expected_values in REQUIRED_PLAN_ENUMS.items():
+        lines = plan_field_lines.get(field, [])
+        if not lines:
+            continue
+        line = lines[0]
+        comment = re.search(r"<!--\s*(.*?)\s*-->", line)
+        actual_values = (
+            tuple(value.strip() for value in comment.group(1).split("|"))
+            if comment
+            else None
+        )
+        if actual_values != expected_values:
+            invalid_plan_enums[field] = actual_values
+
+        default_value = line[len(field) :].split("<!--", 1)[0].strip()
+        if default_value not in expected_values:
+            invalid_plan_defaults[field] = default_value
+
+    if invalid_plan_enums:
+        errors.append(
+            "strategy plan template has invalid status enums "
+            f"{invalid_plan_enums}"
+        )
+    if invalid_plan_defaults:
+        errors.append(
+            "strategy plan template has invalid status defaults "
+            f"{invalid_plan_defaults}"
+        )
+
+    invalid_plan_contract_enums: dict[str, tuple[str, ...] | None] = {}
+    for field, expected_values in REQUIRED_PLAN_COMMENT_ENUMS.items():
+        lines = plan_field_lines.get(field, [])
+        if not lines:
+            continue
+        comment = re.search(r"<!--\s*(.*?)\s*-->", lines[0])
+        actual_values = (
+            tuple(value.strip() for value in comment.group(1).split("|"))
+            if comment
+            else None
+        )
+        if actual_values != expected_values:
+            invalid_plan_contract_enums[field] = actual_values
+    if invalid_plan_contract_enums:
+        errors.append(
+            "strategy plan template has invalid workflow enums "
+            f"{invalid_plan_contract_enums}"
+        )
+
+    strategy_id_field_references = {
+        name
+        for name, text_value in reference_texts.items()
+        if "\n- AlphaInsider strategy ID:" in text_value
+    }
+    if strategy_id_field_references != {"plan-template.md"}:
+        errors.append(
+            "only plan-template.md may define the AlphaInsider strategy ID field"
         )
 
     interview_text = reference_texts["interview.md"]
-    obsolete_questions = {
-        question
-        for question in REMOVED_INTERVIEW_QUESTIONS
-        if question in interview_text
-    }
-    if obsolete_questions:
-        errors.append(
-            "strategy interview contains removed evaluation questions "
-            f"{sorted(obsolete_questions)}"
-        )
     interview_phase_positions = [
         interview_text.find(phase) for phase in REQUIRED_INTERVIEW_PHASE_ORDER
     ]
@@ -1342,351 +1647,115 @@ def validate() -> list[str]:
             "strategy interview phases must use order "
             f"{list(REQUIRED_INTERVIEW_PHASE_ORDER)}"
         )
-    obsolete_interview_phases = {
-        phase for phase in REMOVED_INTERVIEW_PHASES if phase in interview_text
-    }
-    if obsolete_interview_phases:
-        errors.append(
-            "strategy interview contains removed phases "
-            f"{sorted(obsolete_interview_phases)}"
-        )
-    version_history_text = "\n".join(version_files.values())
-    all_reference_text = "\n".join(
-        reference_texts[name] for name in sorted(reference_texts)
-    )
-    manual_text = " ".join(
-        (
-            f"{strategy_text}\n{all_reference_text}\n{version_history_text}"
-        ).split()
-    )
-    current_contract_text = " ".join(
-        (f"{strategy_text}\n{all_reference_text}").split()
-    )
-    stale_operation_guidance = {
-        guidance
-        for guidance in REMOVED_CURRENT_OPERATION_GUIDANCE
-        if guidance in current_contract_text
-    }
-    if stale_operation_guidance:
-        errors.append(
-            "strategy-creator contains obsolete operation guidance "
-            f"{sorted(stale_operation_guidance)}"
-        )
-    missing_independence_guidance = {
-        guidance
-        for guidance in REQUIRED_INDEPENDENCE_GUIDANCE
-        if guidance not in current_contract_text
-    }
-    if missing_independence_guidance:
-        errors.append(
-            "strategy-creator is missing independence guidance "
-            f"{sorted(missing_independence_guidance)}"
-        )
-    stale_sibling_dependency = {
-        guidance
-        for guidance in REMOVED_SIBLING_DEPENDENCY_GUIDANCE
-        if guidance in current_contract_text
-    }
-    if stale_sibling_dependency:
-        errors.append(
-            "strategy-creator still requires the sibling API skill "
-            f"{sorted(stale_sibling_dependency)}"
-        )
-    vendor_specific_agent_guidance = {
-        term
-        for term in FORBIDDEN_AGENT_SCHEDULER_VENDOR_TERMS
-        if term in f"{operation_text}\n{cleanup_text}"
-    }
-    if vendor_specific_agent_guidance:
-        errors.append(
-            "strategy-creator agent scheduling must remain vendor-neutral "
-            f"{sorted(vendor_specific_agent_guidance)}"
-        )
-    stale_target_order_guidance = {
-        guidance
-        for guidance in REMOVED_TARGET_ORDER_GUIDANCE
-        if guidance in manual_text
-    }
-    if stale_target_order_guidance:
-        errors.append(
-            "strategy-creator contains obsolete target ordering guidance "
-            f"{sorted(stale_target_order_guidance)}"
-        )
-    stale_separate_confirmation_guidance = {
-        guidance
-        for guidance in REMOVED_SEPARATE_CONFIRMATION_GUIDANCE
-        if guidance in manual_text
-    }
-    if stale_separate_confirmation_guidance:
-        errors.append(
-            "strategy-creator contains obsolete creation-confirmation guidance "
-            f"{sorted(stale_separate_confirmation_guidance)}"
-        )
-    stale_post_confirmation_approval_guidance = {
-        guidance
-        for guidance in REMOVED_POST_CONFIRMATION_APPROVAL_GUIDANCE
-        if guidance in manual_text
-    }
-    if stale_post_confirmation_approval_guidance:
-        errors.append(
-            "strategy-creator contains obsolete post-confirmation approval guidance "
-            f"{sorted(stale_post_confirmation_approval_guidance)}"
-        )
-    stale_target_deletion_guidance = {
-        guidance
-        for guidance in REMOVED_TARGET_DELETION_GUIDANCE
-        if guidance in current_contract_text
-    }
-    if stale_target_deletion_guidance:
-        errors.append(
-            "strategy-creator contains obsolete target-deletion guidance "
-            f"{sorted(stale_target_deletion_guidance)}"
-        )
-    missing_replacement_guidance = {
-        guidance
-        for guidance in REQUIRED_REPLACEMENT_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_replacement_guidance:
-        errors.append(
-            "strategy-creator is missing replacement guidance "
-            f"{sorted(missing_replacement_guidance)}"
-        )
 
-    missing_cleanup_guidance = {
-        guidance
-        for guidance in REQUIRED_CLEANUP_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_cleanup_guidance:
+    alpha_setup_section_positions = [
+        interview_text.find(section)
+        for section in REQUIRED_ALPHA_SETUP_SECTION_ORDER
+    ]
+    if (
+        -1 in alpha_setup_section_positions
+        or alpha_setup_section_positions
+        != sorted(alpha_setup_section_positions)
+        or any(
+            interview_text.splitlines().count(section) != 1
+            for section in REQUIRED_ALPHA_SETUP_SECTION_ORDER
+        )
+    ):
         errors.append(
-            "strategy-creator is missing cleanup and retirement guidance "
-            f"{sorted(missing_cleanup_guidance)}"
+            "strategy AlphaInsider setup interview must use section order "
+            f"{list(REQUIRED_ALPHA_SETUP_SECTION_ORDER)}"
         )
-
-    missing_credential_guidance = {
-        guidance
-        for guidance in REQUIRED_CREDENTIAL_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_credential_guidance:
-        errors.append(
-            "strategy-creator is missing credential setup guidance "
-            f"{sorted(missing_credential_guidance)}"
+    else:
+        access_start, strategy_start, implementation_start, review_start = (
+            alpha_setup_section_positions
         )
-    current_credential_text = " ".join(
-        reference_texts[name]
-        for name in (
-            "alphainsider-target.md",
-            "credentials.md",
-            "implementation.md",
-            "interview.md",
-        )
-    )
-    stale_live_input_guidance = {
-        guidance
-        for guidance in REMOVED_LIVE_INPUT_CREDENTIAL_GUIDANCE
-        if guidance in current_credential_text
-    }
-    if stale_live_input_guidance:
-        errors.append(
-            "strategy-creator contains obsolete live-input credential guidance "
-            f"{sorted(stale_live_input_guidance)}"
-        )
-    stale_credential_cwd_guidance = {
-        guidance
-        for guidance in REMOVED_CREDENTIAL_CWD_GUIDANCE
-        if guidance in manual_text
-    }
-    if stale_credential_cwd_guidance:
-        errors.append(
-            "strategy-creator still launches .env helpers from session cwd "
-            f"{sorted(stale_credential_cwd_guidance)}"
-        )
-
-    missing_provisioning_guidance = {
-        guidance
-        for guidance in REQUIRED_PROVISIONING_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_provisioning_guidance:
-        errors.append(
-            "strategy-creator is missing AlphaInsider provisioning guidance "
-            f"{sorted(missing_provisioning_guidance)}"
-        )
-
-    missing_single_confirmation_guidance = {
-        guidance
-        for guidance in REQUIRED_SINGLE_CONFIRMATION_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_single_confirmation_guidance:
-        errors.append(
-            "strategy-creator is missing single-confirmation guidance "
-            f"{sorted(missing_single_confirmation_guidance)}"
-        )
-
-    missing_local_only_target_guidance = {
-        guidance
-        for guidance in REQUIRED_LOCAL_ONLY_TARGET_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_local_only_target_guidance:
-        errors.append(
-            "strategy-creator is missing local-only-target guidance "
-            f"{sorted(missing_local_only_target_guidance)}"
-        )
-
-    missing_grill_protocol_guidance = {
-        guidance
-        for guidance in REQUIRED_GRILL_PROTOCOL_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_grill_protocol_guidance:
-        errors.append(
-            "strategy-creator is missing grill-interview protocol guidance "
-            f"{sorted(missing_grill_protocol_guidance)}"
-        )
-
-    missing_project_root_guidance = {
-        guidance
-        for guidance in REQUIRED_PROJECT_ROOT_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_project_root_guidance:
-        errors.append(
-            "strategy-creator is missing project-root placement guidance "
-            f"{sorted(missing_project_root_guidance)}"
-        )
-    stale_project_root_guidance = {
-        guidance
-        for guidance in REMOVED_PROJECT_ROOT_GUIDANCE
-        if guidance in manual_text
-    }
-    if stale_project_root_guidance:
-        errors.append(
-            "strategy-creator still asks for a project location "
-            f"{sorted(stale_project_root_guidance)}"
-        )
-
-    missing_operation_guidance = {
-        guidance
-        for guidance in REQUIRED_OPERATION_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_operation_guidance:
-        errors.append(
-            "strategy-creator is missing operation-and-scheduling guidance "
-            f"{sorted(missing_operation_guidance)}"
-        )
-
-    missing_startup_guidance = {
-        guidance
-        for guidance in REQUIRED_STARTUP_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_startup_guidance:
-        errors.append(
-            "strategy-creator is missing generated README startup guidance "
-            f"{sorted(missing_startup_guidance)}"
-        )
-
-    missing_exposure_guidance = {
-        guidance
-        for guidance in REQUIRED_EXPOSURE_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_exposure_guidance:
-        errors.append(
-            "strategy-creator is missing portfolio exposure guidance "
-            f"{sorted(missing_exposure_guidance)}"
-        )
-
-    missing_market_data_guidance = {
-        guidance
-        for guidance in REQUIRED_MARKET_DATA_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_market_data_guidance:
-        errors.append(
-            "strategy-creator is missing market-data source guidance "
-            f"{sorted(missing_market_data_guidance)}"
-        )
-
-    missing_version_guidance = {
-        guidance
-        for guidance in REQUIRED_VERSION_GUIDANCE
-        if guidance not in manual_text
-    }
-    if missing_version_guidance:
-        errors.append(
-            "strategy-creator is missing versioning guidance "
-            f"{sorted(missing_version_guidance)}"
-        )
-
-    missing_strategy_version_layout_guidance = {
-        guidance
-        for guidance in REQUIRED_STRATEGY_VERSION_LAYOUT_GUIDANCE
-        if guidance not in agent_guide_text
-    }
-    if missing_strategy_version_layout_guidance:
-        errors.append(
-            "AGENTS.md is missing Strategy Creator version-layout guidance "
-            f"{sorted(missing_strategy_version_layout_guidance)}"
-        )
-
-    update_checker = strategy / "scripts" / "check_for_update.py"
-    if update_checker.is_file():
-        checker_source = update_checker.read_text(encoding="utf-8")
-        missing_checker_source = {
-            marker
-            for marker in REQUIRED_UPDATE_CHECKER_SOURCE
-            if marker not in checker_source
+        alpha_setup_routes = {
+            "credentials.md": interview_text[access_start:strategy_start],
+            "alphainsider-strategy.md": interview_text[
+                strategy_start:implementation_start
+            ],
+            "automation.md": interview_text[
+                implementation_start:review_start
+            ],
         }
-        if missing_checker_source:
+        missing_alpha_setup_routes = {
+            route
+            for route, section in alpha_setup_routes.items()
+            if route not in section
+        }
+        if missing_alpha_setup_routes:
             errors.append(
-                "strategy update checker is missing required safeguards "
-                f"{sorted(missing_checker_source)}"
+                "strategy AlphaInsider setup sections are missing routes "
+                f"{sorted(missing_alpha_setup_routes)}"
             )
 
-    env_helper = strategy / "scripts" / "set_env_value.py"
+    implementation_text = reference_texts["implementation.md"]
+    if implementation_text.splitlines().count(
+        "## AlphaInsider compatibility"
+    ) != 1:
+        errors.append(
+            "strategy implementation must define one AlphaInsider "
+            "compatibility section"
+        )
+
+    project_root_text = reference_texts["project-root.md"]
+    missing_layout_entries = {
+        entry for entry in REQUIRED_CORE_LAYOUT if entry not in project_root_text
+    }
+    if missing_layout_entries:
+        errors.append(
+            "strategy project contract is missing core layout entries "
+            f"{sorted(missing_layout_entries)}"
+        )
+
+    lifecycle_frontmatter = re.findall(
+        r"^status:\s*(draft|confirmed|implemented|retired)\s*$",
+        all_reference_text,
+        re.MULTILINE,
+    )
+    if lifecycle_frontmatter:
+        errors.append(
+            "strategy references must not define legacy lifecycle status "
+            f"{sorted(set(lifecycle_frontmatter))}"
+        )
+
+    env_helper = strategy_scripts_dir / "set_env_value.py"
     if env_helper.is_file():
         helper_source = env_helper.read_text(encoding="utf-8")
-        required_helper_source = {
-            '"--remove",',
-            '"--project-root",',
-            'parser.add_argument("value", nargs="?"',
+        required_helper_markers = {
             'if __name__ != "__main__":',
             "set_env_value.py is CLI-only",
-            "Agent-only update or removal",
-            "def _remove_env(",
-            "def _removed_contents(",
-            "def _update_env(",
-            "if args.value is not None:",
-            "if args.value is None:",
-            "_update_env(env_path, args.name, args.value)",
-            'action = "Removed" if args.remove else "Updated"',
-            "docs/plan.md",
-            "Path.cwd()",
-            "if args.project_root else Path.cwd()",
+            '"--project-root",',
+            '"--remove",',
+            "getpass.getpass",
+            "sys.stdin.buffer.read",
+            '_validate_project_root(chosen_root)',
+            'resolved_root / "plan.md"',
+            "env_path.is_symlink()",
+            "os.replace(",
+            "0o600",
+            "_MAX_VALUE_BYTES",
+            "_MAX_ENV_BYTES",
         }
-        missing_helper_source = {
-            marker for marker in required_helper_source if marker not in helper_source
+        missing_helper_markers = {
+            item for item in required_helper_markers if item not in helper_source
         }
-        if missing_helper_source:
+        if missing_helper_markers:
             errors.append(
-                "strategy environment helper is missing CLI-only safeguards "
-                f"{sorted(missing_helper_source)}"
+                "strategy environment helper is missing safeguards "
+                f"{sorted(missing_helper_markers)}"
             )
-        obsolete_helper_source = {
-            marker
-            for marker in ("getpass", "sys.stdin", "Ready for", "live process-input")
-            if marker in helper_source
+        forbidden_helper_markers = {
+            'parser.add_argument("value"',
+            'resolved_root / "docs"',
         }
-        if obsolete_helper_source:
+        present_forbidden_helper_markers = {
+            item for item in forbidden_helper_markers if item in helper_source
+        }
+        if present_forbidden_helper_markers:
             errors.append(
-                "strategy environment helper contains obsolete live-input behavior "
-                f"{sorted(obsolete_helper_source)}"
+                "strategy environment helper contains obsolete input or plan paths "
+                f"{sorted(present_forbidden_helper_markers)}"
             )
         public_helper_functions = re.findall(
             r"^def ([A-Za-z][A-Za-z0-9_]*)\(", helper_source, re.MULTILINE
@@ -1696,48 +1765,92 @@ def validate() -> list[str]:
                 "strategy environment helper exposes public Python functions "
                 f"{sorted(public_helper_functions)}"
             )
-        import_guard_position = helper_source.find('if __name__ != "__main__":')
-        first_function_position = helper_source.find("\ndef ")
-        if (
-            import_guard_position == -1
-            or first_function_position == -1
-            or import_guard_position > first_function_position
-        ):
-            errors.append(
-                "strategy environment helper must reject imports before defining functions"
-            )
 
-    setup_wrapper = strategy / "scripts" / "alphainsider_setup_request.py"
+    setup_wrapper = strategy_scripts_dir / "alphainsider_setup_request.py"
     if setup_wrapper.is_file():
         wrapper_source = setup_wrapper.read_text(encoding="utf-8")
-        required_wrapper_source = {
+        required_wrapper_markers = {
             'if __name__ != "__main__":',
             "alphainsider_setup_request.py is CLI-only",
-            "--print-config",
             '"--project-root",',
-            'ALPHAINSIDER_STRATEGY_ID"',
-            "_PRINTABLE_CONFIG = \"ALPHAINSIDER_STRATEGY_ID\"",
-            "headers[\"Authorization\"] = api_key",
-            "def _print_config(",
-            "def _send_request(",
-            "docs/plan.md",
-            "if args.project_root else Path.cwd()",
+            "--print-config",
+            "--json-stdin",
+            'resolved_root / "plan.md"',
+            "_NoRedirectHandler",
+            "_ALLOWED_OPERATIONS",
+            "MAX_RESPONSE_BYTES",
+            "MAX_REQUEST_BODY_BYTES",
+            "MAX_ENV_BYTES",
+            "_validated_api_key",
+            "_credential_values",
+            "path.is_symlink()",
         }
-        missing_wrapper_source = {
-            marker for marker in required_wrapper_source if marker not in wrapper_source
+        missing_wrapper_markers = {
+            item for item in required_wrapper_markers if item not in wrapper_source
         }
-        if missing_wrapper_source:
+        if missing_wrapper_markers:
             errors.append(
-                "strategy setup wrapper is missing CLI-only safeguards "
-                f"{sorted(missing_wrapper_source)}"
+                "strategy setup wrapper is missing safeguards "
+                f"{sorted(missing_wrapper_markers)}"
             )
-        if "STRATEGY_QUERY_PATHS" in wrapper_source or "STRATEGY_BODY_PATHS" in wrapper_source:
+
+        operation_block = re.search(
+            r"_ALLOWED_OPERATIONS = \{(.*?)\n\}",
+            wrapper_source,
+            re.DOTALL,
+        )
+        setup_operations = (
+            set(re.findall(r'"(/[^"]+)":', operation_block.group(1)))
+            if operation_block
+            else set()
+        )
+        if setup_operations != EXPECTED_SETUP_OPERATIONS:
             errors.append(
-                "strategy setup wrapper must not inject default strategy IDs"
+                "strategy setup wrapper operation allowlist must be exactly "
+                f"{sorted(EXPECTED_SETUP_OPERATIONS)}"
             )
-        if "os.getcwd()" in wrapper_source:
+
+        try:
+            wrapper_tree = ast.parse(wrapper_source)
+        except SyntaxError:
+            wrapper_tree = None
+
+        new_strategy_fields = (
+            literal_string_collection(
+                wrapper_tree, "_NEW_STRATEGY_REQUIRED_FIELDS"
+            )
+            if wrapper_tree is not None
+            else None
+        )
+        if new_strategy_fields != REQUIRED_NEW_STRATEGY_SETUP_FIELDS:
             errors.append(
-                "strategy setup wrapper must not read .env from os.getcwd()"
+                "strategy setup wrapper newStrategy fields must be exactly "
+                f"{sorted(REQUIRED_NEW_STRATEGY_SETUP_FIELDS)}"
+            )
+
+        guard_is_called = wrapper_tree is not None and function_calls(
+            wrapper_tree, "_build_request", "_validate_setup_body"
+        )
+        if not guard_is_called:
+            errors.append(
+                "strategy setup wrapper must enforce its newStrategy body guard"
+            )
+
+        forbidden_wrapper_markers = {
+            '"--base-url"',
+            "urllib.request.urlopen(",
+            'resolved_root / "docs"',
+            '"/newOrder"',
+            '"/newOrderAllocations"',
+            '"/deleteOrder"',
+        }
+        present_forbidden_wrapper_markers = {
+            item for item in forbidden_wrapper_markers if item in wrapper_source
+        }
+        if present_forbidden_wrapper_markers:
+            errors.append(
+                "strategy setup wrapper exposes unsafe or obsolete behavior "
+                f"{sorted(present_forbidden_wrapper_markers)}"
             )
         public_wrapper_functions = re.findall(
             r"^def ([A-Za-z][A-Za-z0-9_]*)\(", wrapper_source, re.MULTILINE
@@ -1747,19 +1860,19 @@ def validate() -> list[str]:
                 "strategy setup wrapper exposes public Python functions "
                 f"{sorted(public_wrapper_functions)}"
             )
-        import_guard_position = wrapper_source.find('if __name__ != "__main__":')
-        first_function_position = wrapper_source.find("\ndef ")
-        if (
-            import_guard_position == -1
-            or first_function_position == -1
-            or import_guard_position > first_function_position
-        ):
-            errors.append(
-                "strategy setup wrapper must reject imports before defining functions"
-            )
 
     readme_text = (ROOT / "README.md").read_text(encoding="utf-8")
     normalized_readme = " ".join(readme_text.split())
+    obsolete_readme_backtest_names = {
+        name
+        for name, pattern in FORBIDDEN_BACKTEST_NAME_PATTERNS.items()
+        if pattern.search(normalized_readme)
+    }
+    if obsolete_readme_backtest_names:
+        errors.append(
+            "README contains obsolete backtest names "
+            f"{sorted(obsolete_readme_backtest_names)}"
+        )
     missing_readme_sections = REQUIRED_README_SECTIONS - set(
         readme_text.splitlines()
     )
@@ -1784,6 +1897,16 @@ def validate() -> list[str]:
         errors.append(
             "README is missing high-level guidance "
             f"{sorted(missing_readme_overview_guidance)}"
+        )
+    missing_readme_overview_behaviors = {
+        name
+        for name, pattern in REQUIRED_README_OVERVIEW_BEHAVIORS.items()
+        if re.search(pattern, normalized_readme, re.IGNORECASE) is None
+    }
+    if missing_readme_overview_behaviors:
+        errors.append(
+            "README is missing high-level behavior "
+            f"{sorted(missing_readme_overview_behaviors)}"
         )
     readme_install_skills = re.findall(r"--skill ([a-z0-9-]+)", readme_text)
     if not readme_install_skills or readme_install_skills[0] != WRAPPER_NAME:
@@ -1812,6 +1935,41 @@ def validate() -> list[str]:
         errors.append(
             "alphainsider is missing focused section routing guidance "
             f"{sorted(missing_alpha_routing_guidance)}"
+        )
+
+    alpha_execution_sources = {
+        "SKILL.md": alphainsider_text,
+        **{
+            owner: (alphainsider / owner).read_text(encoding="utf-8")
+            for owner in REQUIRED_ALPHA_EXECUTION_BEHAVIORS
+            if owner != "SKILL.md"
+        },
+    }
+    for owner, behaviors in REQUIRED_ALPHA_EXECUTION_BEHAVIORS.items():
+        owner_text = " ".join(alpha_execution_sources[owner].split())
+        missing_behaviors = {
+            name
+            for name, pattern in behaviors.items()
+            if re.search(pattern, owner_text, re.IGNORECASE) is None
+        }
+        if missing_behaviors:
+            errors.append(
+                f"alphainsider-api {owner} is missing execution contracts "
+                f"{sorted(missing_behaviors)}"
+            )
+
+    normalized_alpha_execution_text = " ".join(
+        "\n".join(alpha_execution_sources.values()).split()
+    )
+    if re.search(
+        r"\bstock orders?\b.{0,120}\b(?:only|must)\b.{0,80}"
+        r"\bregular market hours\b",
+        normalized_alpha_execution_text,
+        re.IGNORECASE,
+    ):
+        errors.append(
+            "alphainsider-api must not assert undocumented regular-hours-only "
+            "stock order eligibility"
         )
 
     websocket_guidance = " ".join(
