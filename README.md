@@ -2,8 +2,7 @@
 
 ## Overview
 
-Reusable, vendor-neutral skills for AlphaInsider API work and automated
-AlphaInsider strategy projects.
+Vendor-neutral skills for AlphaInsider API work and strategy automation.
 
 ## Skills
 
@@ -32,7 +31,7 @@ npx skills@latest add https://github.com/AlphaInsider/skills \
   --skill alphainsider-api
 ```
 
-Install Strategy Creator with the API specialist:
+Install both specialists:
 
 ```bash
 npx skills@latest add https://github.com/AlphaInsider/skills \
@@ -40,12 +39,13 @@ npx skills@latest add https://github.com/AlphaInsider/skills \
   --skill alphainsider-strategy-creator
 ```
 
-Strategy Creator works without `alphainsider-api`.
+`alphainsider-api` is optional.
 
 ## How it works
 
-Strategy Creator stores the confirmed strategy and current status in a
-persistent project's root `plan.md`. The journey is **Define
+Strategy Creator stores its source of truth in a persistent project's root
+`plan.md`, with **Current status** first; former flat plans remain compatible.
+The journey is **Define
 Strategy**, optional **Backtest Strategy**, then **Implement Strategy on
 AlphaInsider**. During Define, it inspects the actual native AI scheduler and
 public AlphaInsider constraints and offers implementable timing choices.
