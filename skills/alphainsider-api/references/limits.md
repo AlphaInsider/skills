@@ -63,6 +63,12 @@ Use this file before creating high-volume workflows, orders, posts, likes, bots,
 | API tokens | 50 | Avoid generating extra tokens for automation. |
 | Sessions | 100 | Oldest session is dropped after the limit is reached. |
 
+The published `new_order` limit is explicitly the number of successful direct
+`/newOrder` requests per day per strategy. The documentation does not state
+the reset timezone, whether failed attempts count, or whether
+`/newOrderAllocations` or `/newOrderWebhook` consume this limit. Do not extend
+the tier limit to those operations without current documentation that does so.
+
 ## 429 Rate Limit Handling
 
 OpenAPI defines HTTP 429 as `{ "success": false, "response": "Rate limit reached." }`. On 429, stop the current burst, back off, and retry later only if the workflow is safe to repeat.

@@ -2,8 +2,8 @@
 
 This file owns AlphaInsider strategy discovery, selection, settings, use, and
 creation. Read it after `credentials.md` verifies API access. Discovery happens
-before the final AlphaInsider setup agreement. Creation happens only after the
-agreed implementation passes every offline, order-free check.
+before the AlphaInsider setup summary. Creation happens only after the
+authorized implementation passes every offline, order-free check.
 
 Read the installed `alphainsider-api` skill for current endpoint behavior. If
 it is unavailable, read the live AlphaInsider documentation index and relevant
@@ -45,14 +45,14 @@ For an existing AlphaInsider strategy:
 - preserve all existing performance and trade history;
 - always preserve its public or private state and price in this reuse flow;
   preserve its name, simulated starting value, and description unless the user
-  separately agrees to a supported change; and
+  separately confirms a supported change; and
 - persist the selected AlphaInsider strategy ID through the safe configuration
   workflow.
 
 ## Plan a new AlphaInsider strategy
 
 Check current account eligibility and strategy limits. Inherit the strict
-`stock` or `cryptocurrency` type from the agreed plan; do not ask it again.
+`stock` or `cryptocurrency` type from the confirmed plan; do not ask it again.
 
 Ask these available decisions together:
 
@@ -82,38 +82,38 @@ its access price only when current account and product rules independently
 confirm eligibility, supported combinations, units, and limits. Do not present
 public, private, and paid as one fixed three-choice API field.
 
-Generate a concise AlphaInsider description from `plan.md`. Include the
-assets the strategy can trade, how decisions are made, entry and exit behavior,
-schedule, and important sizing or risk rules. Do not include performance
-promises, implementation paths, credentials, or unsupported claims. Show the
-generated text in the final AlphaInsider setup agreement and let the user
-revise it; do not require a separate description-writing question when it is
-accurate.
+Generate a concise AlphaInsider description from the confirmed strategy in
+`plan.md`. Include the assets the strategy can trade, how decisions are made,
+entry and exit behavior, schedule, and important sizing or risk rules. Do not
+include performance promises, implementation paths, credentials, or unsupported
+claims. Show the generated text in the AlphaInsider setup summary and let the
+user revise it; do not require a separate description-writing question when it
+is accurate.
 
 Record the AlphaInsider strategy choice, name, simulated starting value, public
 or private state, conditional access price, description, and exact
-`newStrategy` action as separate plan fields before final agreement. Do not
+`newStrategy` action as separate plan fields before the setup summary. Do not
 create while an applicable field is unresolved. The setup helper must reject a
 `newStrategy` body that omits type, name, starting value, or the explicit
 public/private boolean. Do not ask for another creation approval after the user
-agrees to the complete AlphaInsider setup.
+selects **Build, Configure, and Activate** for the complete setup.
 
 ## Create or use after offline verification
 
 Immediately before creation, recheck the key, final setup permissions, account
 limit, eligibility, and complete planned fields. Compare every applicable
-creation-request field with the separate Agreed `plan.md` AlphaInsider
-strategy fields, including the selected public/private boolean and conditional
-access price. The setup helper checks request completeness and basic types; it
-does not prove that the request follows the plan. Stop on any mismatch. Call
-`newStrategy` only after code, docs, static checks, and mocked tests pass. Never
-run an order-capable strategy run as a creation test.
+creation-request field with the Authorized `plan.md` AlphaInsider setup fields,
+including the selected public/private boolean and conditional access price.
+The setup helper checks request completeness and basic types; it does not prove
+that the request follows the plan. Stop on any mismatch. Call `newStrategy`
+only after code, docs, static checks, and mocked tests pass. Never run an
+order-capable strategy run as a creation test.
 
 Save the pre-call owned-strategy inventory. If `newStrategy` has an ambiguous
 outcome, do not retry it. Refresh owned strategies and compare the inventory
-and all agreed creation fields. Use the result only when exactly one new owned
-match is proven. Otherwise, stop with an ambiguous error and the exact next
-step. Never blindly create a replacement.
+and all authorized creation fields. Use the result only when exactly one new
+owned match is proven. Otherwise, stop with an ambiguous error and the exact
+next step. Never blindly create a replacement.
 
 After creation:
 
@@ -128,13 +128,13 @@ For an existing AlphaInsider strategy, revalidate the exact choice and project
 configuration at the same point.
 
 For a new AlphaInsider strategy, synchronize the generated description when
-creation does not produce the agreed text. For an existing strategy, update its
-description only when that specific change was shown and agreed. Preserve
-API-required current fields when an update operation needs them. If description
-sync or later scheduling fails, retain the strategy and saved AlphaInsider
-strategy ID. Report the exact next step; do not create a duplicate on
-resumption.
+creation does not produce the confirmed text. For an existing strategy, update
+its description only when that specific change was shown and authorized.
+Preserve API-required current fields when an update operation needs them. If
+description sync or later scheduling fails, retain the strategy and saved
+AlphaInsider strategy ID. Report the exact next step; do not create a duplicate
+on resumption.
 
 AlphaInsider strategy creation, description updates, and deletion never
 authorize orders. AlphaInsider paper orders are allowed only through an active,
-agreed strategy-run process.
+confirmed strategy-run process.

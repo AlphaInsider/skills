@@ -54,3 +54,14 @@ section plus the domain guidance before its first endpoint section.
 `stock_id` accepts either an internal AlphaInsider stock ID or `SYMBOL:EXCHANGE`, such as `SPY:ARCX`, `AAPL:XNAS`, or `ETH-USD:COINBASE`.
 
 Prefer `searchStocks` for discovery. Use `getAllStocks` sparingly because the docs mark it as limited to 20 requests per hour.
+
+## Exchange Session Eligibility
+
+`getExchangeStatus` reports current status strings, but the local OpenAPI
+snapshot does not enumerate them or define which stock statuses permit an
+order. The example value `extended-hours` demonstrates a possible response
+value only. Before timing a stock order, check the current `llms.txt` index for
+session guidance, then the focused `getExchangeStatus` and selected
+order-operation pages for an explicit accepted-session rule. If none exists,
+keep stock-session eligibility unresolved rather than inferring it from the
+value or example.

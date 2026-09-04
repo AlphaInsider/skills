@@ -40,34 +40,49 @@ npx skills@latest add https://github.com/AlphaInsider/skills \
   --skill alphainsider-strategy-creator
 ```
 
-Strategy Creator remains self-contained when `alphainsider-api` is absent.
+Strategy Creator works without `alphainsider-api`.
 
 ## How it works
 
-Strategy Creator selects a persistent project and maintains its root `plan.md`
-as the strategy agreement and current status. The interview settles the
-strategy first, offers a credible backtest, and then separately offers to set
-up the strategy on AlphaInsider. Strategy decisions can use fixed code, the
-scheduled AI, or both.
+Strategy Creator stores the confirmed strategy and current status in a
+persistent project's root `plan.md`. The journey is **Define
+Strategy**, optional **Backtest Strategy**, then **Implement Strategy on
+AlphaInsider**. During Define, it inspects the actual native AI scheduler and
+public AlphaInsider constraints and offers implementable timing choices.
+Explicit session guidance takes priority. When it is absent, stocks use the
+Strategy Creator fallback of US
+regular hours; cryptocurrency is available 24/7. Scheduler and data-cutoff
+limits still apply. It never fakes a faster cadence with a background loop.
+Decisions use fixed code, scheduled AI, or both.
 
-If AlphaInsider setup is accepted, safe API-key access is the first action. The
-skill then discovers compatible owned AlphaInsider strategies or plans a new
-one. It builds and passes order-free checks before creating a strategy or
-activating the platform's native AI scheduler. It never installs cron or
-connects a broker.
+Backtesting is always offered. Feasibility is assessed only after selection.
+Every run is a backtest with recorded future-information use, differences from
+intended automation, a Valid, Superseded, or Failed disposition, and
+recoverable source. Future-information use is warned before results and beside
+affected measurements. Only Valid evidence for the current strategy advances
+the outcome. Findings summaries embed or directly link two to four saved
+data-derived visuals; a detailed report alone is insufficient.
 
-The generated plan and scheduled-run instructions let scheduled agents perform
-strategy runs and agreed self-healing without loading Strategy Creator. A
-shared lock prevents overlap. A run error pauses new orders and future
-scheduled runs until a verified repair or user-directed recovery succeeds.
-Healthy runs stay quiet; poor performance alone is not an error. AlphaInsider
-uses simulated funds; the skill never submits live-broker orders.
+Implementation safely obtains missing API access and selects a compatible or
+new strategy. **Build, Configure, and Activate** authorizes reviewed work.
+Order-free checks precede creation and activation. It never installs cron or
+connects a broker. Creation is Complete only after the AlphaInsider strategy
+validates and native automation is active.
+
+Generated instructions support strategy runs and confirmed self-healing without
+loading Strategy Creator. A shared lock prevents overlap. A run error ends
+that run's order work: automation stays Active and Degraded/Retrying, and
+the next trigger reconciles and retries. Unsafe, duplicate, missed, and same-run
+retry orders are prohibited. Only the user, setup, update, or deletion pauses
+automation. AlphaInsider uses simulated funds.
 Errors only is the default notification choice. Users can also include
-completed repairs, or completed repairs and warnings.
+completed repairs, or completed repairs and warnings. Setup discovers
+notification support without sending test messages. Delivery during operation
+is best effort; failure never pauses trading or automation. Notification repair
+runs only inside enabled, confirmed self-healing scope.
 
-Explicit deletion inventories the project, schedule, AlphaInsider strategy,
-history, and secrets before asking what to remove. It never cancels orders or
-liquidates positions.
+Explicit deletion inventories resources before selection. It never cancels
+orders or liquidates positions.
 
 After successful setup, the handoff links to
 [AlphaInsider broker automation resources](https://alphainsider.com/resources#automating-trades).

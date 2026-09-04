@@ -4,6 +4,11 @@ WebSocket URL: `wss://alphainsider.com/ws`.
 
 Send `ping` about every 30 seconds; the server responds with `pong`. Send one `subscribe` message with the full desired channel list because a new subscribe request overwrites previous subscriptions. After a recoverable connection or server error, reconnect and re-subscribe with that complete list. Treat missing credentials, invalid channel configuration, and authentication failures as terminal.
 
+Contract note: several current AsyncAPI server-message schemas define only an
+envelope or selected enum fields while their examples contain the detailed
+response objects listed below. Treat example-only fields as illustrative, not
+required schema guarantees, and handle missing or additive fields safely.
+
 WebSocket strategy, position, order, and timeline payloads carry normalized strategy values. Read `input-multiplier.md` before displaying live strategy values, positions, orders, trades, or performance changes to users.
 
 ## Channel Summary

@@ -6,6 +6,13 @@ Positions, open orders, max order sizing, fixed orders, allocation orders, and o
 
 Read `input-multiplier.md` before displaying positions or orders, calculating user-facing order size, or converting user-entered quantities into `newOrder`.
 
+Choose the operation from the intended execution behavior. `newOrder` places
+one fixed order, while `newOrderAllocations` replaces the complete desired
+position set, cancels existing open orders, and closes omitted positions. Do
+not infer stock-session eligibility from an unenumerated `getExchangeStatus`
+value; use an explicit rule in the current focused documentation or leave it
+unresolved.
+
 ## getPositions - GET `/getPositions`
 
 Get strategy positions.
@@ -151,7 +158,16 @@ Authorization: <API_TOKEN>
 
 Create a new open order. Must pass `amount` or `total` not both. For TradingView or webhook integrations with percentage based order actions, see [newOrderWebhook](https://api.alphainsider.com/resources/webhooks/neworderwebhook) or [newOrderAllocations](https://api.alphainsider.com/resources/trades/neworderallocations).
 
-Note: Send exactly one of `amount` or `total`. Owner-managed trades must resolve the owner `input_multiplier` before converting user-entered quantities. If the user entered share/crypto or USD quantity, divide by `input_multiplier` before sending `newOrder.amount` or `newOrder.total`; see `input-multiplier.md`. Subscriber/non-owner missing-multiplier fallback is display-only unless the user explicitly provides normalized strategy units. Use `newOrderAllocations` for percentage allocation rebalances.
+Note: Send exactly one of `amount` or `total`. The focused operation prose is
+stricter than the OpenAPI request schema here: OpenAPI does not put either
+field in its `required` list or encode the exclusive choice. Follow the
+focused requirement. Owner-managed trades must resolve the owner
+`input_multiplier` before converting user-entered quantities. If the user
+entered share/crypto or USD quantity, divide by `input_multiplier` before
+sending `newOrder.amount` or `newOrder.total`; see `input-multiplier.md`.
+Subscriber/non-owner missing-multiplier fallback is display-only unless the
+user explicitly provides normalized strategy units. Use
+`newOrderAllocations` for percentage allocation rebalances.
 
 Inputs:
 
@@ -219,6 +235,14 @@ Content-Type: application/json
 Create new orders based on percentage allocations.
 
 Note: Before submitting allocation-generated orders, this endpoint cancels any existing open orders for the strategy. It then creates market orders to move the strategy toward target percentage allocations.
+
+Documentation discrepancy: the operation description and response example say
+the generated orders are `market` orders, while the `slippage` field describes
+placing a limit order. Also, the response example uses provider `polygon` while
+the response schema's provider enum omits it. Treat both as unresolved contract
+differences. Rely on the documented complete-target and cancellation effects,
+and do not make order-type- or provider-sensitive behavior depend on either
+side of these differences without current clarification.
 
 Inputs:
 

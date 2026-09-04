@@ -30,12 +30,18 @@ that blocker and the exact next step in `plan.md`.
 
 ## Find or create the project
 
-Recognize a project by a root `plan.md` that follows the
-[plan template](plan-template.md): exactly one `# Strategy Plan` title and one
-`## Current status` section with the documented Phase, Plan agreement, Highest
-completed outcome, and Automation state fields. Do not require YAML
-frontmatter. Before any run, require each status value to match the template;
-stop and correct an invalid value.
+Recognize a project by a root `plan.md` with exactly one `# Strategy Plan` title
+and one `## Current status` section. A current plan follows the
+[plan template](plan-template.md) and has the documented Creation state, Phase,
+Strategy status, Backtest status, AlphaInsider setup status, Highest completed
+outcome, Automation state, and Operational health fields. A plan with the
+former **Plan agreement** field, former Plan outcome value,
+former **Maximum strategy leverage** field, an Error automation-pause reason,
+or missing current Define-time scheduler, execution, session-policy, and
+AlphaInsider-constraint fields is a legacy version of the same project, not an
+unrelated directory. Do not require YAML frontmatter. Before any run, migrate
+the legacy schema and require each resulting value to match the current
+template.
 
 Search in this order:
 
@@ -58,7 +64,6 @@ Create and maintain this core layout:
 
 ```text
 plan.md
-.env
 .env.example
 .gitignore
 README.md
@@ -69,8 +74,9 @@ runtime/
 tests/
 ```
 
-Create `.env` only through `scripts/set_env_value.py` when project-file secret
-storage is selected. A hosted secure secret store can replace `.env` when
+The `.env` file is conditional, not part of a new project's required initial
+layout. Create it only through `scripts/set_env_value.py` after project-file
+secret storage is selected. A hosted secure secret store replaces `.env` when
 scheduled runs cannot use project secrets safely. Add only the dependency and
 tool files the implementation needs.
 
@@ -81,3 +87,71 @@ identity.
 
 Announce the resolved project once. Update `plan.md` after every answer,
 material finding, completed step, failure, or next-step change.
+
+## Migrate a legacy plan schema
+
+Migrate an older Strategy Creator plan in place before resuming it. Preserve
+all strategy and setup decisions, historical evidence, resource identities,
+and safe resume details. Never open `.env`, repeat an external action, or
+create a sibling project only because the status schema is older.
+
+Before changing `plan.md`, save its exact contents to a new timestamped backup
+at `runtime/migrations/plan-before-schema-migration-YYYYMMDDTHHMMSSZ.md`, using
+the current UTC time and a collision-safe suffix when necessary. Never
+overwrite a prior backup. Record the backup path and migration time in the
+migrated plan, and retain the backup until explicit deletion.
+
+Use saved artifacts and status together:
+
+- map an agreed strategy, or a Plan, Backtest, or Automated strategy
+  outcome, to Strategy status Confirmed; otherwise use Draft;
+- map an accepted backtest choice to Backtest choice Selected. Map a
+  declined choice to Backtest choice and status Skipped. For a selected backtest,
+  set Backtest status to Completed only for a verified Valid artifact that
+  matches the current strategy and backtest plan, Authorized only when the old
+  phase or last step proves that the backtest plan was authorized, and otherwise
+  Draft. Preserve an old unavailable finding but offer Backtest Strategy unless
+  the user already chose implementation. Use Highest completed outcome
+  Backtest only for that matching Valid evidence; otherwise use Strategy
+  defined for a confirmed strategy;
+- map an old building or configuring setup phase to AlphaInsider setup status
+  Authorized, but map it to Active only after every current completion gate is
+  freshly verified;
+- map an old Complete phase with no verified active automation to Creation
+  state Stopped and reconstruct its nonterminal Phase from the last completed
+  step and exact resume point; and
+- derive Operational health from durable run history: Not active before
+  activation, Ready for verified active automation with no operational run,
+  Healthy after the latest plan-compliant run, or Degraded/Retrying after an
+  unresolved run error. Preserve the actual native Automation state. If an old
+  project was automatically paused for an error, keep it Paused during
+  migration rather than silently resuming an external task, preserve the error
+  as Degraded/Retrying, and give the user the native resume action.
+
+Translate an old leverage value into maximum strategy exposure without
+claiming that it is a universal AlphaInsider limit. Preserve the value, mark
+its execution-specific validation unresolved, and map the intended behavior to
+the current order operation. For incomplete creation, a previously confirmed
+strategy that lacks the current scheduler, session-policy, execution, or
+public-limit checks returns to Draft at the affected Define Strategy decision.
+A previously completed creation remains Complete when its current completion
+gates still verify; unresolved run-time compatibility prevents a new order,
+keeps active automation Degraded/Retrying, and uses the next-trigger error flow
+rather than rewriting creation history.
+
+Never promote ambiguous legacy work to Authorized, Active, or Complete. Use
+the least-authoritative matching status, keep external resources intact, and
+resolve a material ambiguity in the next combined summary and next-step prompt.
+Record the migration and resulting resume step in `plan.md`.
+
+Creation state can first transition to Complete only when Phase is Complete,
+Strategy status is Confirmed, AlphaInsider setup status is Active, Highest
+completed outcome is Automated strategy, Automation state is Active,
+Operational health is Ready or Healthy, and the completion gates in
+`interview.md` are verified. A later operational error does not undo completed
+creation or pause automation; keep Creation state and Phase Complete,
+Automation state Active, and record Degraded/Retrying with the next retry. A
+later user pause also preserves completed creation but sets Automation state to
+Paused. During creation, a user stop sets Creation state to Stopped and a
+technical gate sets it to Blocked. Both preserve the current nonterminal Phase
+and exact resume step.

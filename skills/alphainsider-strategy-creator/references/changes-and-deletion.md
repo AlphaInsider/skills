@@ -3,12 +3,13 @@
 This file owns updates, checks of user edits or external changes, and explicit
 deletion. Use only create, resume, update, and explicit deletion paths.
 
-## Update an agreed strategy
+## Update a confirmed strategy
 
-Preserve the active agreed `plan.md` while an update is being decided. Record
+Preserve the active confirmed `plan.md` while an update is being decided. Record
 the proposed change, affected decisions, open questions, and prior automation
 state in root `pending-update.md`. Mark the pending update Draft while keeping
-the current plan Agreed and authoritative for any allowed current operation.
+the current Strategy status Confirmed and authoritative for any allowed current
+operation.
 
 For a behavior-changing update:
 
@@ -17,23 +18,33 @@ For a behavior-changing update:
 3. wait for the shared run or repair lock to become idle;
 4. use the [strategy interview](interview.md) for only changed and dependent
    decisions;
-5. show a concise summary of the change and obtain agreement;
-6. run every affected credible backtest;
-7. update implementation, protected tests, docs, and scheduled-run
+5. show the revised strategy summary and next-step choices; a forward choice
+   confirms the revision without broadly authorizing later work;
+6. mark every affected Valid backtest run Superseded, preserve its
+   recoverable source, configuration, and artifacts, clear it as featured, and
+   set the pending current outcome to Strategy defined until a new matching
+   Valid run exists;
+7. run each user-selected affected backtest with its exact future-information
+   disclosure and limitations only after **Build and Run** authorizes its
+   reviewed backtest plan;
+8. show the reviewed implementation changes; continue only after **Build,
+   Configure, and Activate** authorizes those listed local and external actions;
+9. update implementation, protected tests, docs, and scheduled-run
    instructions;
-8. pass offline checks that prove the implementation follows the plan;
-9. update the AlphaInsider description when needed;
-10. merge the agreed result into `plan.md` and remove `pending-update.md`; and
-11. allow new orders and resume automation when it was active before the
+10. pass offline checks that prove the implementation follows the plan;
+11. update the AlphaInsider description when needed;
+12. merge the confirmed result into `plan.md` and remove `pending-update.md`;
+    and
+13. allow new orders and resume automation when it was active before the
     update.
 
 If safe pause or idle state cannot be verified, do not change files used by
 strategy runs. Keep unaffected choices and artifacts. An implementation repair
-that does not change the agreed strategy does not need a strategy update.
+that does not change the confirmed strategy does not need a strategy update.
 
 Performance alone never starts an automatic strategy change. It can prompt a
 correctness review. Change trading behavior only when the user chooses and
-agrees to that change.
+confirms that change from its reviewed summary.
 
 ## Review user edits
 
@@ -47,7 +58,7 @@ changes before writing:
 
 If a user edit changed behavior, use `pending-update.md` and the normal update
 flow. If it broke only implementation while preserving clear intent, repair it
-within the agreed scope.
+within the confirmed scope.
 
 ## Detect external changes
 
@@ -55,7 +66,7 @@ Compare the native scheduler, AlphaInsider strategy, description, access
 setting, and saved run state with `plan.md`. A mismatch that can affect orders
 must pause new orders in project state and pause automation. Repair only wiring
 that follows the plan. AlphaInsider strategy identity, schedule frequency,
-access mode, or strategy behavior require user agreement.
+access mode, or strategy behavior require a reviewed user confirmation.
 
 ## Explicit deletion interview
 
@@ -77,6 +88,10 @@ Recommend a scope that matches the user's words; otherwise recommend retaining
 historical and backtest evidence until the user confirms it is no longer
 needed.
 
+Superseded or failed status, retention cleanup, a newer Valid run, and completed
+creation never authorize deletion of backtest source or configuration.
+Remove them only when the explicit deletion choices name them.
+
 Before final confirmation, show exact paths, scheduled task name, AlphaInsider
 strategy ID, secret locations without values, retained items, irreversible
 effects, and any action the user must complete. Do not infer ownership from a
@@ -84,7 +99,7 @@ similar name alone.
 
 ## Delete safely
 
-Apply the agreed deletion actions in this order:
+Apply the confirmed deletion actions in this order:
 
 1. save in project state that new orders are paused for deletion;
 2. pause future automation and wait for the shared lock to become idle;

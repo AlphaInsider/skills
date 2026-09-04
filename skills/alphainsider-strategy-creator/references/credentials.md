@@ -21,16 +21,25 @@ when it supports token verification and the required read-only discovery.
 
 ## Choose secret storage
 
-Before reading or requesting a value, inspect project access and secret access
-that does not require a person during each scheduled run. This is a read-only
-capability check, not an interview question or user action. If no safe location
-will be readable by both the active and scheduled agents, do not request a key.
-Record the blocker and give the required platform action instead.
+Before reading or requesting a value, recheck the native automation surface and
+schedule confirmed during Define Strategy, then inspect project and secret
+access that will not require a person during each scheduled run. This is a
+read-only implementation preflight, not an interview question. If surface drift
+would change confirmed timing, return that timing decision to Define Strategy.
+If no safe location will be readable by both the active and scheduled agents,
+do not request a key. Record the blocker and give the required platform action
+instead. Otherwise, API-key entry remains the first user-facing implementation
+action when a valid configured key is unavailable.
 
 For a resumed project, after this check, use the setup helper to verify a
 configured key privately. Do not request it again when verification succeeds.
 If it is missing, inaccessible, invalid, or insufficient, give the standalone
 action below as the next user-facing step.
+
+Waiting for the requested key is an ordinary implementation action. Keep
+Creation state In progress and record the action under Waiting for. Use Blocked
+only when safe storage or access cannot work until a technical or platform
+problem is remediated; use Stopped only when the user chooses to stop.
 
 Use the project `.env` when both the current agent and scheduled runs can load
 it. Use the platform's secure non-prompt secret storage when scheduled runs on

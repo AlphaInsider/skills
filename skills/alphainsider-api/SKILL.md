@@ -18,7 +18,7 @@ Use this skill when working with AlphaInsider REST or WebSocket integrations.
 
 1. Start with `references/api-reference.md`, identify the API area, and follow its link to the exact endpoint or WebSocket message section.
 2. Read the linked section and the domain guidance before the first endpoint section. Do not load unrelated endpoint sections from the same grouped reference.
-3. When current behavior or an unlisted detail matters, use `llms.txt` to find the focused Markdown page, then verify REST details in OpenAPI or WebSocket details in AsyncAPI. Use `llms-full.txt` only as a fallback.
+3. When current behavior or an unlisted detail matters, use `llms.txt` to find the focused Markdown page, then verify REST details in OpenAPI or WebSocket details in AsyncAPI. Use `llms-full.txt` only as a fallback. When focused prose states a stricter compatible rule than the schema encodes, follow the prose and record the documentation discrepancy.
 4. Construct endpoint paths, parameters, bodies, and channel names from the references; the Python scripts are generic transports, not an endpoint SDK.
 5. For REST calls, use `scripts/alphainsider_request.py`; for WebSocket connections, use `scripts/alphainsider_stream.py`. Do not manually read or inject credentials.
 6. Let the helpers own authentication and helper-managed default IDs. Use the deterministic calculation functions only for the normalized-value formulas they cover.
@@ -54,6 +54,12 @@ AlphaInsider strategy performance, position, order, and trade values are normali
 - `newOrderWebhook` uses signal-style actions and no `input_multiplier` math. Alerts go fully in or out by default; `pyramiding` enables stepped entries.
 - `newOrderAllocations` and `newOrderWebhook` cancel any existing open orders for the strategy before submitting new orders.
 - Open order responses from `getOrders`, `newOrder`, `newOrderAllocations`, `newOrderWebhook`, and `wsOrders` include `order_dependencies` as an array of prerequisite order IDs; `[]` means there are no outstanding prerequisites.
+
+## Order And Session Boundaries
+
+- Choose direct `newOrder`, complete-target `newOrderAllocations`, or signal-style `newOrderWebhook` from the intended execution behavior. Their fields, limits, and side effects are not interchangeable.
+- Do not infer that an exchange-status value permits an order. The local contract snapshot gives `getExchangeStatus.response.stock` and `.cryptocurrency` as unenumerated strings and does not map stock statuses to accepted order sessions. Its `extended-hours` example is not an eligibility rule. Check `llms.txt` for any current session-specific guidance, then the focused exchange-status and selected order-operation pages; if they still do not define the mapping, treat stock-session eligibility as unresolved.
+- Apply an account or rate limit only to the operations its documentation names. The published `new_order` tier limit covers successful direct `/newOrder` requests per strategy per day; do not silently apply it to allocation or webhook calls without current documentation that says so.
 
 ## Thin Helpers
 
