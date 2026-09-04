@@ -108,8 +108,9 @@ personal fact nor authorizes an unlisted action.
 ## Review and advance a decision stage
 
 1. Show one concise summary after every decision in the stage is resolved.
-2. In the same prompt, offer destination-specific next-step choices and explain
-   what happens at each destination.
+2. In the same prompt, introduce destination-specific next-step choices with
+   `❓ **Next step:** What would you like to do?` and explain what happens at
+   each destination.
 3. Treat a forward choice as confirmation of the reviewed summary; never add a
    separate agreement question.
 4. Update `plan.md`, state what completed, explain the chosen destination in

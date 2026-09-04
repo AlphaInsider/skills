@@ -62,8 +62,9 @@ becomes Authorized.
    cost, licensing, and technical requirements can be met.
 4. Challenge a misleading method before execution, but run it when the user
    still selects it and every prerequisite is satisfied.
-5. If no proposed method can run, explain the exact blocker and offer strategy
-   revision, implementation without a backtest, or Save and Stop.
+5. If no proposed method can run, explain the exact blocker, introduce the
+   choices with `❓ **Next step:** What would you like to do?`, and offer
+   strategy revision, implementation without a backtest, or Save and Stop.
 
 For this no-method branch, implementation sets Backtest choice and status
 Skipped, sets Phase Planning implementation, and continues to [implement and
@@ -127,7 +128,8 @@ scheduled implementation.
 2. When the future-information answer is Yes, lead with the warning that this
    backtest cannot demonstrate real-time strategy performance. Omit that
    warning only when the answer is No.
-3. Offer:
+3. Introduce the choices with
+   `❓ **Next step:** What would you like to do?`, then offer:
 
    - **Build and Run** — authorizes only the displayed local build and data
      access.
@@ -295,7 +297,8 @@ other results normally.
    without advancing the outcome.
 4. When an earlier matching Valid run exists, keep Completed and record the
    later failure separately.
-5. Show the reviewed results and offer:
+5. Show the reviewed results, introduce the choices with
+   `❓ **Next step:** What would you like to do?`, then offer:
 
    - **Implement Strategy on AlphaInsider** — enters API access, paper-strategy
      selection, implementation, and automation.
