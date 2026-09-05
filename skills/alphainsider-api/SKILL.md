@@ -18,7 +18,7 @@ Use this skill when working with AlphaInsider REST or WebSocket integrations.
 
 1. Start with `references/api-reference.md`, identify the API area, and follow its link to the exact endpoint or WebSocket message section.
 2. Read the linked section and the domain guidance before the first endpoint section. Do not load unrelated endpoint sections from the same grouped reference.
-3. When current behavior or an unlisted detail matters, use `llms.txt` to find the focused Markdown page, then verify REST details in OpenAPI or WebSocket details in AsyncAPI. Use `llms-full.txt` only as a fallback. When focused prose states a stricter compatible rule than the schema encodes, follow the prose and record the documentation discrepancy.
+3. When current behavior or an unlisted detail matters, use `llms.txt` to find the focused Markdown page, then verify REST details in OpenAPI or WebSocket details in AsyncAPI. Use `llms-full.txt` only as a fallback.
 4. Construct endpoint paths, parameters, bodies, and channel names from the references; the Python scripts are generic transports, not an endpoint SDK.
 5. For REST calls, use `scripts/alphainsider_request.py`; for WebSocket connections, use `scripts/alphainsider_stream.py`. Do not manually read or inject credentials.
 6. Let the helpers own authentication and helper-managed default IDs. Use the deterministic calculation functions only for the normalized-value formulas they cover.
