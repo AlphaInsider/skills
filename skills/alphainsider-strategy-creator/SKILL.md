@@ -1,85 +1,76 @@
 ---
 name: alphainsider-strategy-creator
-description: Create, resume, backtest, implement, automate, run, update, or explicitly delete one plan-driven AlphaInsider stock or cryptocurrency strategy that uses native AI scheduling.
+description: Define, backtest, implement, schedule, resume, and update AlphaInsider paper strategies with a persistent project plan and optional automatic recovery.
 ---
 
 # AlphaInsider Strategy Creator
 
-Guide one strategy to verified AlphaInsider paper automation. Keep this skill
-read-only; create and change artifacts only in the selected persistent project.
+Turn a strategy idea into working AlphaInsider paper automation. Use judgment
+to choose relevant questions, guardrails, implementation, and checks for this
+strategy. Keep the user's high-level decisions in charge of that judgment.
 
-## Contract
+Read [workflow contracts](references/workflow-contracts.md) for the interview
+and project continuity. Resume from the selected project's `plan.md` before
+starting new work; keep all generated artifacts outside this skill repository.
 
-- Send orders only to AlphaInsider paper strategies. Never create or connect a
-  broker client, request broker credentials, or treat future order authority as
-  authority for another external action.
-- Treat project `plan.md` as the readable source of truth. Tests, code, the
-  AlphaInsider strategy, and automation must conform to it.
-- Keep one strategy with one strict `stock` or `cryptocurrency` type in each
-  project.
-- Never inspect or expose an existing API key, complete `.env`, process
-  environment, or secret store. Use only the protected credential workflow.
-- Use only the platform's native AI automation or scheduler. Never install a
-  host scheduler or keep a run alive to simulate a faster cadence.
-- Check applicable AlphaInsider and scheduler constraints before proposing an
-  action; recheck changeable facts immediately before acting.
-- Keep active automation running through operational errors. Withhold unsafe
-  orders, set health to Degraded/Retrying, and retry checks on the next trigger.
-  Only the user or an explicit setup, update, or deletion workflow may pause it.
-- Treat poor performance as information, never as permission to change a plan
-  or as proof that a plan-compliant run is unhealthy.
-- Call creation Complete only after the AlphaInsider strategy validates and its
-  native automation is active. A stop or blocker remains resumable and never
-  authorizes deletion.
+## 1. Define strategy
 
-Read [workflow contracts](references/workflow-contracts.md) for authority,
-status, communication, evidence, and API-source rules.
+Ask high-level questions until the intended behavior is clear enough to test
+and implement. Research facts yourself and explain tradeoffs that affect the
+user's choices. Decide which details need an answer and which you can choose.
 
-Follow links from the selected workflow only when their phase begins.
+Take the actual AI scheduler's capabilities, AlphaInsider constraints, data
+availability, and other relevant limits into account before recommending a
+strategy or cadence. Explain conflicts and offer feasible alternatives. Use
+fixed code, scheduled AI judgment, or both as appropriate; record their roles.
 
-## 1. Start or resume
+For API behavior, read `alphainsider-api` when installed. Otherwise use the live
+[documentation index](https://api.alphainsider.com/llms.txt), relevant focused
+Markdown pages, and applicable [OpenAPI](https://api.alphainsider.com/openapi.yaml)
+or [AsyncAPI](https://api.alphainsider.com/asyncapi.yaml) sections. Verify the
+limits and side effects relevant to the intended actions rather than inventing
+platform rules or copying an endpoint catalog into this skill.
 
-1. Read [start or resume](references/start-or-resume.md).
-2. Resolve one safe persistent project without opening `.env`.
-3. Read `plan.md` and **Current status** when the project already exists.
-4. Route the request from the recorded state and the user's current words.
+## 2. Backtest
 
-## 2. Route the request
+Assess whether the strategy can be tested with information available at each
+historical decision time. Explain material limitations before asking backtest
+questions. When a faithful test is unavailable, still offer the closest useful
+options, such as a proxy, a signal-only test, or forward observation; explain
+what each can establish. The user may choose a test, revise, or skip testing.
 
-1. Compare the user's current words with the recorded project state.
-2. Select one branch below without presenting unrelated later work.
+Ask the questions needed for the chosen test. Build and run it without
+AlphaInsider orders. Save the methodology, assumptions, limitations, results,
+and artifact links in the project and summarize them in `plan.md`. Clearly
+identify approximations and future information; do not present them as a
+faithful historical result.
 
-### Create or complete a strategy
+Show understandable results and interpretation, with data-derived charts and
+visuals when possible. Choose useful views for the test rather than a fixed
+chart count. Save reproducible outputs and reports, including failures, and
+let the user decide whether to revise, test further, implement, or stop.
 
-1. Follow [define strategy](references/define-strategy.md) for a new strategy,
-   incomplete definition, or definition reopened by drift or revision.
-2. Follow [backtest strategy](references/backtest-strategy.md) only after the
-   user selects **Backtest Strategy**.
-3. Follow [implement and activate](references/implement-and-activate.md) after
-   the user skips backtesting or chooses implementation from reviewed results.
-4. Use [project contract](references/project-contract.md) whenever the workflow
-   creates, migrates, or hands off project artifacts. New plans use the
-   [plan template](references/plan-template.md).
+## 3. Implement
 
-### Operate the strategy
+1. Obtain AlphaInsider API access using [credentials](references/credentials.md).
+   Accept deliberate chat entry and offer direct project `.env` editing.
+   Verify access before proceeding to implementation questions.
+2. Inspect compatible strategies the user owns. Recommend a new AlphaInsider
+   strategy and offer existing strategies as options, explaining relevant
+   existing state and effects of reuse. Ask the implementation questions that
+   matter, including self-healing and notification preferences.
+3. Build the program command and project-specific run instructions following
+   [run and recover](references/run-and-recover.md). Support the agreed division
+   of code and AI decisions, expected outcomes, persistent state, and one run
+   at a time. Choose the remaining project structure to suit the implementation.
+4. Verify the implementation with meaningful checks and a dry run that cannot
+   submit, change, or cancel AlphaInsider orders. Make the selected setup and
+   ongoing order, repair, and notification authority clear; use consent already
+   given rather than requiring a special approval phrase.
+5. Create or configure the selected AlphaInsider strategy and AI scheduled task,
+   [activating it during setup](references/workflow-contracts.md#schedule-activation).
+   Record resource identities and outcomes as they occur. Reconcile uncertain
+   results before retrying resource creation or another external action.
 
-1. Read [run and recover](references/run-and-recover.md) for every scheduled
-   run, scheduler **Run now**, chat run, dry run, operational error,
-   notification event, or confirmed self-heal attempt.
-2. Perform at most one run per trigger through the shared lock.
-3. Let generated project instructions run and self-heal without this installed
-   skill; use this skill again for strategy or automation changes.
-
-### Update the strategy
-
-1. Read [update strategy](references/update-strategy.md) for a requested
-   change, detected user edit, or external drift.
-2. Preserve the confirmed plan while proposed behavior remains Draft.
-3. Reopen and reauthorize only affected decisions and work.
-
-### Delete strategy resources
-
-1. Read [delete strategy](references/delete-strategy.md) only after an explicit
-   deletion request.
-2. Inventory and confirm exact resources before removing anything.
-3. Never infer deletion from failure, supersession, stopping, or poor results.
+Finish with the actual strategy and scheduler status, project location, useful
+results, next scheduled run, and any required next action.

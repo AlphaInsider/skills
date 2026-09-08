@@ -43,50 +43,41 @@ npx skills@latest add https://github.com/AlphaInsider/skills \
 
 ## How it works
 
-Strategy Creator stores its source of truth in a persistent project's root
-`plan.md`, with **Current status** first; former flat plans remain compatible.
-The journey is **Define
-Strategy**, optional **Backtest Strategy**, then **Implement Strategy on
-AlphaInsider**. During Define, it inspects the actual native AI scheduler and
-public AlphaInsider constraints and offers implementable timing choices.
-Explicit session guidance takes priority. When it is absent, stocks use the
-Strategy Creator fallback of US
-regular hours; cryptocurrency is available 24/7. Scheduler and data-cutoff
-limits still apply. It never fakes a faster cadence with a background loop.
-Decisions use fixed code, scheduled AI, or both.
+Strategy Creator guides **Define strategy → Backtest → Implement** using
+question rounds with options and recommendations. Required user actions get
+their own turn; questions resume after completion. The agent chooses relevant
+questions and guardrails for the strategy, considering actual AI scheduling,
+AlphaInsider, and data limits. Backtest feasibility comes first; users can
+choose the closest useful test or skip it after reviewing limitations. Results
+include charts and visuals when possible.
 
-Backtesting is always offered. Feasibility is assessed only after selection.
-Every run is a backtest with recorded future-information use, differences from
-intended automation, a Valid, Superseded, or Failed disposition, and
-recoverable source. Future-information use is warned before results and beside
-affected measurements. Only Valid evidence for the current strategy advances
-the outcome. Findings summaries embed or directly link two to four saved
-data-derived visuals; a detailed report alone is insufficient.
+A dedicated persistent project's root `plan.md` records high-level decisions,
+progress, open questions, resources, and the next action. Its outline is
+flexible so later chats can resume or update the work without a fixed field
+schema. Secrets stay in project `.env`; users may paste a new API key in chat
+for the non-echoing helper or edit `.env` themselves. Agents never inspect
+existing secret values.
 
-Implementation safely obtains missing API access and selects a compatible or
-new strategy. **Build, Configure, and Activate** authorizes reviewed work.
-Order-free checks precede creation and activation. It never installs cron or
-connects a broker. Creation is Complete only after the AlphaInsider strategy
-validates and native automation is active.
+Implementation recommends a new AlphaInsider strategy and offers compatible
+owned strategies. Users choose self-healing and notification settings. Trading
+decisions can use code, scheduled AI judgment, or both. The skill generates
+project-specific code and a runbook; AlphaInsider strategies use simulated funds.
 
-Generated instructions support strategy runs and confirmed self-healing without
-loading Strategy Creator. A shared lock prevents overlap. A run error ends
-that run's order work: automation stays Active and Degraded/Retrying, and
-the next trigger reconciles and retries. Unsafe, duplicate, missed, and same-run
-retry orders are prohibited. Only the user, setup, update, or deletion pauses
-automation. AlphaInsider uses simulated funds.
-Errors only is the default notification choice. Users can also include
-completed repairs, or completed repairs and warnings. Setup discovers
-notification support without sending test messages. Delivery during operation
-is best effort; failure never pauses trading or automation. Notification repair
-runs only inside enabled, confirmed self-healing scope.
+Each scheduled agent runs the program command and evaluates expected outcomes.
+Shared exclusivity prevents overlapping runs. On an error, execution blocks
+new orders and pauses the scheduler. Enabled self-healing may repair any
+implementation issue that preserves the plan's decisions and needs no human
+input or new authority. A dry run without orders verifies the fix before a
+suitable immediate rerun or resumption for the next scheduled run. Unresolved
+or interrupted recovery stays paused for the user. Notifications explain the
+issue, automation state, and next step through the selected events and channels.
 
-Explicit deletion inventories resources before selection. It never cancels
-orders or liquidates positions.
-
-After successful setup, the handoff links to
-[AlphaInsider broker automation resources](https://alphainsider.com/resources#automating-trades).
-The skill does not request broker credentials or create that connection.
+New schedules are enabled automatically during setup for the next scheduled
+run, without another activation prompt. Project access and agent-controlled
+pause/resume are checked through platform configuration and documentation;
+no prior scheduled run is required. Explicit user pauses or concrete setup
+failures leave automation inactive. Local checks and backtests never submit
+AlphaInsider orders.
 
 ## Development
 
