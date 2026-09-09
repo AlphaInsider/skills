@@ -87,12 +87,5 @@ inactive. Local checks and backtests never submit AlphaInsider orders.
 
 ## Development
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -e ".[dev]"
-npm ci
-python scripts/validate_catalog.py
-pytest
-npm run skills:list
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup and validation, and
+[Releases](CONTRIBUTING.md#releases) for the `NEW_RELEASE` workflow.

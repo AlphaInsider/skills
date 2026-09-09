@@ -4,7 +4,7 @@ REST base URL: `https://alphainsider.com/api`.
 
 Bot lifecycle, broker keys, settings, notifications, performance, allocations, and activities.
 
-Supported bot brokers are `alpaca`, `binance`, `bitfinex`, and `hyperliquid`. Broker keys are private credentials: never print, log, commit, quote, or summarize them, and send only the key fields required by the selected broker.
+Supported brokers for new bots are `alpaca`, `lighter`, `hyperliquid`, and `binance`. Broker keys are private credentials: never print, log, commit, quote, or summarize them, and send only the key fields required by the selected broker.
 
 Workflow rules:
 
@@ -13,7 +13,7 @@ Workflow rules:
 - Bot leverage is separate from allocation percent. Do not use leverage to make allocation sums exceed `1.0`.
 - `getBotInfo.broker_details`, `getBotPerformance.response[].portfolio_value`, broker cash, and broker positions are real broker values. Never apply `input_multiplier` to them.
 - `getBotAllocations.response[].positions` contains normalized strategy positions. For high-level target exposure, multiply the real broker portfolio value by the allocation percent and let AlphaInsider compute broker orders.
-- Use `updateBotBrokerKeys` to rotate credentials or switch paper/live mode, and confirm `getBotInfo.response.broker_status` before starting or restarting. To change broker type, create a new bot.
+- Use `updateBotBrokerKeys` to rotate credentials or switch paper/live mode where the broker supports it, and confirm `getBotInfo.response.broker_status` before starting or restarting. To change broker type, create a new bot.
 - Bot statuses include `on`, `scheduled_rebalance`, `rebalancing`, `scheduled_close`, `closing`, `stopping`, and `off`. Confirm status before assuming a lifecycle action completed.
 
 ## Endpoint Contents
@@ -126,17 +126,17 @@ Inputs:
 | Location | Name | Required | Type / values | Description |
 | --- | --- | --- | --- | --- |
 | header | `Authorization` | Yes | string (JWT) | AlphaInsider API token sent exactly as the header value; do not prepend `Bearer`. |
-| body | `broker` | Yes | string: `alpaca`, `binance`, `bitfinex`, `hyperliquid` | Bot broker. |
+| body | `broker` | Yes | string: `alpaca`, `lighter`, `hyperliquid`, `binance` | Bot broker.|
 | body | `broker_keys` | Yes | object | Broker keys. |
 | body | `broker_keys.live` | No | boolean | Live or paper account. |
-| body | `broker_keys.bitfinex_key` | No | string | Bitfinex key. |
-| body | `broker_keys.bitfinex_secret` | No | string | Bitfinex secret. |
-| body | `broker_keys.binance_key` | No | string | Binance key. |
-| body | `broker_keys.binance_secret` | No | string | Binance secret. |
 | body | `broker_keys.alpaca_key` | No | string | Alpaca key. |
 | body | `broker_keys.alpaca_secret` | No | string | Alpaca secret. |
-| body | `broker_keys.hyperliquid_key` | No | string | Hyperliquid key. |
+| body | `broker_keys.lighter_key` | No | string matching `^0x[a-fA-F0-9]{40}$` | Lighter key. |
+| body | `broker_keys.lighter_secret` | No | string matching `^(0x)?[a-fA-F0-9]{80}$` | Lighter secret. |
+| body | `broker_keys.hyperliquid_key` | No | string matching `^(HL:)?0x[a-fA-F0-9]{40}$` | Hyperliquid master-account or sub-account address. An optional leading `HL:` prefix is accepted and removed before use. |
 | body | `broker_keys.hyperliquid_secret` | No | string | Hyperliquid secret. |
+| body | `broker_keys.binance_key` | No | string | Binance key. |
+| body | `broker_keys.binance_secret` | No | string | Binance secret. |
 
 Outputs:
 
@@ -226,15 +226,17 @@ Inputs:
 | header | `Authorization` | Yes | string (JWT) | AlphaInsider API token sent exactly as the header value; do not prepend `Bearer`. |
 | body | `bot_id` | Yes | string | Bot ID. |
 | body | `broker_keys` | Yes | object | Broker keys. |
-| body | `broker_keys.live` | No | boolean | Live or paper account. |
-| body | `broker_keys.bitfinex_key` | No | string | Bitfinex key. |
-| body | `broker_keys.bitfinex_secret` | No | string | Bitfinex secret. |
-| body | `broker_keys.binance_key` | No | string | Binance key. |
-| body | `broker_keys.binance_secret` | No | string | Binance secret. |
+| body | `broker_keys.live` | No | boolean | Live or paper account. Must be `true` for Lighter. |
 | body | `broker_keys.alpaca_key` | No | string | Alpaca key. |
 | body | `broker_keys.alpaca_secret` | No | string | Alpaca secret. |
-| body | `broker_keys.hyperliquid_key` | No | string | Hyperliquid key. |
+| body | `broker_keys.lighter_key` | No | string matching `^0x[a-fA-F0-9]{40}$` | Ethereum L1 wallet address that owns the selected Lighter main account or sub-account. Required when rotating Lighter credentials. |
+| body | `broker_keys.lighter_secret` | No | string matching `^(0x)?[a-fA-F0-9]{80}$` | Private Lighter API key generated for the selected main account or sub-account. Required when rotating Lighter credentials. |
+| body | `broker_keys.hyperliquid_key` | No | string matching `^(HL:)?0x[a-fA-F0-9]{40}$` | Hyperliquid master-account or sub-account address. An optional leading `HL:` prefix is accepted and removed before use. |
 | body | `broker_keys.hyperliquid_secret` | No | string | Hyperliquid secret. |
+| body | `broker_keys.binance_key` | No | string | Binance key. |
+| body | `broker_keys.binance_secret` | No | string | Binance secret. |
+| body | `broker_keys.bitfinex_key` | No | string | Deprecated. Key rotation for an existing Bitfinex bot only. |
+| body | `broker_keys.bitfinex_secret` | No | string | Deprecated. Secret rotation for an existing Bitfinex bot only. |
 
 Outputs:
 
