@@ -64,6 +64,8 @@ workspace/runner binding and access evidence, and the next action. Its flexible
 outline supports later chats. Secrets stay in project `.env`; users may paste
 new API keys for the non-echoing helper or edit `.env` themselves. Agents never
 inspect existing secret values.
+Before requesting a key, create missing `.env` and `.env.example` files with an
+empty `ALPHAINSIDER_API_KEY=` entry.
 
 Implementation recommends a new public AlphaInsider strategy and offers compatible
 owned strategies. Users choose self-healing and notification settings. Trading
