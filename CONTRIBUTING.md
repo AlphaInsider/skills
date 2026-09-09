@@ -21,6 +21,17 @@ public specialist must also be added to
 caches, local plans, generated strategies, virtual environments, IDE files, or
 credentials into this catalog.
 
+## Development
+
+Set up the local environment:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+npm ci
+```
+
 Before opening a change, run:
 
 ```bash
@@ -31,3 +42,31 @@ npm run skills:list
 
 New skills must include realistic tests and must not expose credentials or
 perform unsafe external mutations during validation.
+
+## Releases
+
+One version covers the entire skills repository. After the release workflows
+are merged into `master`, open **Actions → NEW_RELEASE → Run workflow** on
+GitHub, select `master`, and enter a version such as `0.1.1`.
+
+Use `X.Y.Z` without a `v` prefix, leading zeros, prerelease suffix, or build
+metadata. The version must be at least the current `package.json` version,
+and neither its `vX.Y.Z` tag nor its release may already exist.
+
+The workflow always checks out `master`, synchronizes `package.json`,
+`package-lock.json`, and `pyproject.toml`, and commits any version changes
+together. It pushes the commit to `master`, then creates tag `vX.Y.Z` at
+that exact commit and publishes `Release vX.Y.Z` with generated release
+notes as the latest release. It does not publish to npm or PyPI.
+
+Release runs are serialized without cancelling an active run. Existing tags
+and releases are never deleted or replaced. If publication fails after the
+version commit was pushed, that commit remains; retry the same version only
+while neither its tag nor release exists. Unchanged versions do not create
+empty commits. If a tag or release exists, choose a new version.
+
+The workflows use the built-in `GITHUB_TOKEN` with `contents: write`; no
+additional secret is required. Repository and organization Actions settings,
+branch protection, and rulesets must permit this token to push version commits
+directly to `master` and create tags and releases. API or push failures stop
+the workflow.
