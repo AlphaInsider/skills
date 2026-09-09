@@ -54,8 +54,9 @@ metadata. The version must be at least the current `package.json` version,
 and neither its `vX.Y.Z` tag nor its release may already exist.
 
 The workflow always checks out `master`, synchronizes `package.json`,
-`package-lock.json`, and `pyproject.toml`, and commits any version changes
-together. It pushes the commit to `master`, then creates tag `vX.Y.Z` at
+`package-lock.json`, `pyproject.toml`, and the `Version:` line in every
+`skills/<name>/SKILL.md`, and commits these changes together.
+It pushes the commit to `master`, then creates tag `vX.Y.Z` at
 that exact commit and publishes `Release vX.Y.Z` with generated release
 notes as the latest release. It does not publish to npm or PyPI.
 

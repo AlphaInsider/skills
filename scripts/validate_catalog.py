@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import ast
+import json
 import re
 import sys
 from pathlib import Path
@@ -191,7 +192,7 @@ EXPECTED_STRATEGY_SCRIPTS = {
 }
 STRATEGY_SKILL_MAX_WORDS = 700
 # Count references too, so a compact entrypoint cannot hide a growing rulebook.
-STRATEGY_GUIDANCE_MAX_WORDS = 2800
+STRATEGY_GUIDANCE_MAX_WORDS = 2930
 STRATEGY_NOTIFICATION_LABELS = {
     "🚨 Error — Action Required",
     "🔄 Retrying — No Action Required",
@@ -391,6 +392,8 @@ def local_link_targets(
 def ranked_outline_errors(text: str) -> list[str]:
     """Check outline nesting and explicit sequences, allowing unordered notes."""
     text = re.sub(r"\A---\n.*?\n---\n", "", text, count=1, flags=re.DOTALL)
+    # Version metadata is separate from the workflow outline.
+    text = re.sub(r"^Version: .*$", "", text, flags=re.MULTILINE)
     errors: list[str] = []
     # Each active list item tracks its content column, marker, and step number.
     list_items: dict[int, tuple[int, str, int | None]] = {}
@@ -528,6 +531,7 @@ def function_calls(tree: ast.Module, function_name: str, called_name: str) -> bo
 
 def validate() -> list[str]:
     errors: list[str] = []
+    version = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["version"]
     agent_guide_text = " ".join(
         (ROOT / "AGENTS.md").read_text(encoding="utf-8").split()
     )
@@ -561,6 +565,11 @@ def validate() -> list[str]:
             errors.append(f"{name}: frontmatter name does not match directory")
         if len(fields.get("description", "")) < 40:
             errors.append(f"{name}: description is too short")
+        versions = re.findall(
+            r"^Version: (.*)$", skill_md.read_text(encoding="utf-8"), re.MULTILINE
+        )
+        if versions != [version]:
+            errors.append(f"{name}: expected one Version: {version} line matching package.json")
 
     wrapper = SKILLS_DIR / WRAPPER_NAME
     wrapper_skill = wrapper / "SKILL.md"
