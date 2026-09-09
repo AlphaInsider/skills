@@ -5,7 +5,7 @@ description: Navigate, use, debug, or document the AlphaInsider trading API, inc
 
 # AlphaInsider API
 
-Version: 0.1.0
+Version: 1.0.0
 
 ## Updates
 

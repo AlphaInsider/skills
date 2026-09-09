@@ -5,7 +5,7 @@ description: Define, backtest, implement, schedule, resume, and update AlphaInsi
 
 # AlphaInsider Strategy Creator
 
-Version: 0.1.0
+Version: 1.0.0
 
 ## Updates
 
