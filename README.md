@@ -43,22 +43,29 @@ npx skills@latest add https://github.com/AlphaInsider/skills \
 
 ## How it works
 
+The [access check](skills/alphainsider-strategy-creator/references/workflow-contracts.md#check-platform-and-automation-access)
+verifies that the scheduler can use the intended persistent storage independently
+of this chat. Unverified access blocks file creation; prefer connecting a project
+on the current platform.
+
 Strategy Creator guides **Define strategy → Backtest → Implement** using
-question rounds with options and recommendations. Required user actions get
-their own turn; questions resume after completion. The agent chooses relevant
-questions and guardrails for the strategy, considering actual AI scheduling,
-AlphaInsider, and data limits. Backtest feasibility comes first; users can
-choose the closest useful test or skip it after reviewing limitations. Results
-include charts and visuals when possible.
+ranked workflow outlines: number only operations that require sequence; use
+bullets and sub-bullets for other notes, ranked by importance. Question rounds
+offer options and recommendations. After strategy definition and backtest results,
+a summary and standalone next-step question let users backtest, implement on
+AlphaInsider, revise, or stop. Required user actions get their own turn; questions
+resume after completion. Questions and guardrails reflect actual AI scheduling,
+AlphaInsider, and data limits. Backtest planning starts with feasibility and
+useful alternatives; users can skip after reviewing limitations. Results include
+charts and visuals when possible.
 
-A dedicated persistent project's root `plan.md` records high-level decisions,
-progress, open questions, resources, and the next action. Its outline is
-flexible so later chats can resume or update the work without a fixed field
-schema. Secrets stay in project `.env`; users may paste a new API key in chat
-for the non-echoing helper or edit `.env` themselves. Agents never inspect
-existing secret values.
+The project's root `plan.md` records decisions, progress, resources, open questions,
+workspace/runner binding and access evidence, and the next action. Its flexible
+outline supports later chats. Secrets stay in project `.env`; users may paste
+new API keys for the non-echoing helper or edit `.env` themselves. Agents never
+inspect existing secret values.
 
-Implementation recommends a new AlphaInsider strategy and offers compatible
+Implementation recommends a new public AlphaInsider strategy and offers compatible
 owned strategies. Users choose self-healing and notification settings. Trading
 decisions can use code, scheduled AI judgment, or both. The skill generates
 project-specific code and a runbook; AlphaInsider strategies use simulated funds.
@@ -72,12 +79,11 @@ suitable immediate rerun or resumption for the next scheduled run. Unresolved
 or interrupted recovery stays paused for the user. Notifications explain the
 issue, automation state, and next step through the selected events and channels.
 
-New schedules are enabled automatically during setup for the next scheduled
-run, without another activation prompt. Project access and agent-controlled
-pause/resume are checked through platform configuration and documentation;
-no prior scheduled run is required. Explicit user pauses or concrete setup
-failures leave automation inactive. Local checks and backtests never submit
-AlphaInsider orders.
+New schedules activate automatically during setup for the next run, without
+another prompt. Access is rechecked for the actual task, alongside agent-controlled
+pause/resume, using configuration and documentation; no prior scheduled run is
+required. Explicit user pauses or concrete setup failures keep automation
+inactive. Local checks and backtests never submit AlphaInsider orders.
 
 ## Development
 

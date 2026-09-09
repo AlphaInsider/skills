@@ -5,6 +5,11 @@ Keep supporting references one level below the skill and include scripts only
 when deterministic behavior is valuable.
 Give each rule one canonical owner. Link every reference from `SKILL.md` or a
 reachable reference, and explain when to read it instead of repeating it.
+Strategy Creator uses ranked workflow outlines: number only operations that
+require sequence; use bullets and sub-bullets for other notes, ranked by
+importance. Preserve literal user-message and command examples within the
+relevant item. Validate structure and section links without freezing plan
+fields or heading names.
 Keep public skills and documentation agent-vendor agnostic; do not require
 vendor-specific metadata or behavior.
 

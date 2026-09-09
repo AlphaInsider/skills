@@ -1,51 +1,64 @@
 # Credentials
 
-Secrets belong in the selected project's `.env`. Agents never inspect or print
-existing API keys, `.env` values, or the process environment. Programs may load
-required values internally without exposing them. Public strategy IDs may be
-shown and recorded in `plan.md`.
+## Prepare protected access
 
-Use the bundled helpers as CLI tools; they keep secret handling out of the
-agent's output. Resolve their paths from the installed skill directory:
+- Store secrets in the selected project's `.env`; require root `plan.md`.
+  - Never inspect or print existing API keys, `.env` values, or the process
+    environment. Programs may load required values internally without exposure.
+  - Exclude `.env` from version control and exports; use this boundary for
+    notification and other project secrets too.
+  - Public strategy IDs may be shown and recorded in `plan.md`.
+- Resolve bundled CLI helpers from the installed skill directory.
+  - [set_env_value.py](../scripts/set_env_value.py): non-echoing writes, preserved
+    unrelated assignments, restricted permissions; required for deliberate
+    chat-supplied secrets.
+  - [alphainsider_setup_request.py](../scripts/alphainsider_setup_request.py):
+    project `.env` configuration, redacted setup requests, and an allowlist
+    excluding orders.
 
-- [set_env_value.py](../scripts/set_env_value.py) writes a value through
-  non-echoing input, preserving unrelated assignments and restricting file
-  permissions. Use it for all deliberate chat-supplied secret values.
-- [alphainsider_setup_request.py](../scripts/alphainsider_setup_request.py)
-  loads configuration from the selected project's `.env`, makes supported
-  setup requests, and redacts credentials. Its allowlist excludes orders.
+## Check existing access
 
-On resume, use the setup helper to verify configured access without opening
-`.env`; do not ask for a key again if access works. When a key is needed, follow
-the [user action rule](workflow-contracts.md#interview-and-communication) and send:
+- After implementation is chosen, verify access through the setup helper without
+  opening `.env`.
+  - If access works, continue without requesting the key again.
 
-```markdown
-👉 **Action — AlphaInsider API key:** Create an API key in AlphaInsider's
-Developer settings with the access needed for this strategy, and paste it
-here. I'll save it in your project's `.env` without repeating it.
+## Request a missing key
 
-↪️ **Alternative:** Add `ALPHAINSIDER_API_KEY=your_key` to `<project>/.env`
-yourself, then tell me when it is saved.
-```
+1. Follow the [user action rule](workflow-contracts.md#resolve-the-current-decisions)
+   and send:
 
-Wait for the pasted key or confirmation of the direct edit. Save chat input
-as below and verify access before continuing with implementation questions.
+   ```markdown
+   👉 **Action — AlphaInsider API key:** Create an API key in AlphaInsider's
+   Developer settings with the access needed for this strategy, and paste it
+   here. I'll save it in your project's `.env` without repeating it.
 
-For chat entry, run the writer with the variable name and `--project-root`,
-supplying the value through protected, non-echoing standard input. Never put
-it in command arguments, shell interpolation, logs, plans, or task prompts.
-If the tool cannot supply input without echoing, use direct editing instead.
+   ↪️ **Alternative:** Add `ALPHAINSIDER_API_KEY=your_key` to `<project>/.env`
+   yourself, then tell me when it is saved.
+   ```
 
-Agent-only command shapes (the writer receives the secret separately):
+2. Wait for the pasted key or confirmation of the direct edit before continuing.
 
-```bash
-python <skill>/scripts/set_env_value.py --project-root <project> ALPHAINSIDER_API_KEY
-python <skill>/scripts/alphainsider_setup_request.py --project-root <project> GET /verifyToken
-```
+## Save chat input
 
-The project must already contain `plan.md`. Keep `.env` out of version control
-and exports. Validate access through the helper, reporting only safe results.
-Use the same storage boundary for notification and other project secrets.
-Generated runtime code must load project `.env` privately and redact secret
-values from diagnostics; never expose an existing value to the agent to wire
-an API call.
+- Invoke the writer with the variable name and `--project-root`.
+  - Supply the value through protected, non-echoing standard input.
+  - Never put it in arguments, shell interpolation, logs, plans, or task prompts.
+  - If input would echo, use direct editing.
+  - Agent-only command shape:
+
+    ```bash
+    python <skill>/scripts/set_env_value.py --project-root <project> ALPHAINSIDER_API_KEY
+    ```
+
+## Verify access and continue
+
+- Verify saved access with the setup helper before implementation questions.
+  - Report only safe results.
+  - Agent-only command shape:
+
+    ```bash
+    python <skill>/scripts/alphainsider_setup_request.py --project-root <project> GET /verifyToken
+    ```
+
+- Runtime code must load project `.env` privately and redact secrets from diagnostics.
+  - Never expose existing secrets to wire API calls.

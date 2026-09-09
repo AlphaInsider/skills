@@ -1,76 +1,84 @@
 # Run and Recover
 
-Use this contract to generate the project's executable workflow and runbook.
-Choose mechanisms appropriate to the scheduler and implementation, and verify
-them before activation.
+## Prepare the runtime workflow
 
-## Scheduled run
+- Generate the executable workflow and runbook using mechanisms appropriate to
+  the scheduler and implementation; verify them before activation.
+  - Make dry runs technically unable to submit, change, or cancel orders or
+    advance trading state.
+  - Distinguish known results from uncertain order outcomes and prevent duplicate
+    execution, including sequential duplicate triggers.
+  - Choose and test these protections for the actual design.
 
-1. Read fresh `plan.md` and the project runbook. Respect saved pauses and
-   unresolved incidents before order work. Acquire shared exclusivity covering
-   the command, AI decisions, evaluation, repair, and any retry. All scheduled
-   and manual entry points must respect it; an overlapping invocation exits.
-2. Run the program command. When the strategy assigns judgment to the scheduled
-   AI, follow its recorded role and pass decisions through the program's
-   execution controls. Keep program entry points for execution and dry runs.
-3. Evaluate the command's result against expected outcomes in `plan.md`, using
-   saved evidence as well as exit status. A planned no-trade result is success;
-   poor returns alone are not an implementation failure.
-4. Record the outcome and apply the selected notification settings. Release
-   exclusivity after evaluation and any recovery are complete.
+## Run the strategy
 
-The program must distinguish a known result from an uncertain order outcome
-and prevent duplicate execution, including sequential duplicate triggers. A
-dry run must be technically unable to submit, change, or cancel orders or
-advance trading state. Choose and test these protections for the actual design.
+1. Read fresh `plan.md` and the project runbook; respect pauses and unresolved incidents.
+2. Acquire shared exclusivity before order work.
+   - Cover the command, AI decisions, evaluation, repair, and retries.
+   - All scheduled and manual entry points participate; overlapping invocations exit.
+3. Run the program command.
+   - Follow any recorded role for scheduled AI judgment and pass its decisions
+     through program execution controls.
+   - Keep program entry points for execution and dry runs.
+4. Evaluate expected outcomes from `plan.md` using saved evidence and exit status.
+   - A planned no-trade result is success; poor returns alone are not an
+     implementation failure.
+   - On error, follow recovery below.
+5. Record the outcome and apply selected notification settings.
+6. Release exclusivity after evaluation and any recovery finish.
 
-## Error and recovery
+## Recover from an error
 
-1. Stop further order work. Save the incident and block new executions in
-   project state, then pause the scheduler and verify it is paused. If pause
-   cannot be verified, keep execution blocked and report the required action.
-2. Diagnose the issue against the plan and saved evidence.
-3. If self-healing is enabled, a fix preserves the plan's high-level decisions,
-   and no human input or new authority is needed, repair the implementation.
-   Any implementation issue is eligible under those conditions; there is no
-   fixed list of repairable files or components. Update operational notes in
-   `plan.md` without rewriting decisions to justify a repair. Otherwise leave
-   automation paused, record what the user needs to resolve, and end recovery.
-4. Dry-run the fix and run meaningful checks without AlphaInsider orders.
-   Leave a coherent paused implementation if checks fail or recovery cannot
-   finish within the available execution time.
-5. After checks pass, reconcile uncertain previous actions before allowing
-   orders; leave automation paused if an outcome remains unresolved. Use
-   judgment to rerun now with current inputs or resume for the next suitable
-   scheduled run. An immediate retry keeps the scheduler paused and admits
-   only the recovery owner through this incident's execution block, under the
-   same exclusivity and all other plan/order checks. If it fails, keep the
-   scheduler paused and record the unresolved issue.
-6. Clear this incident's execution block and resume the scheduler only after
-   recovery succeeds. Verify and record the actual scheduler state. Never
-   override a later user pause. Send the selected incident/recovery notification.
+1. Stop order work, save the incident, and block new executions in project state.
+2. Pause the scheduler and verify the pause.
+   - If unverified, keep execution blocked and report the required action.
+3. Diagnose against the plan and saved evidence.
+4. Decide whether to self-heal and repair when eligible.
+   - Require self-healing enabled, preservation of the plan's high-level
+     decisions, and no human input or new authority.
+   - Any implementation issue is eligible; no fixed list limits repairable files
+     or components.
+   - Update operational notes in `plan.md` without rewriting decisions to justify
+     a repair.
+   - Otherwise leave paused, record what the user must resolve, and end recovery.
+5. Dry-run the fix and run meaningful checks without AlphaInsider orders.
+   - If checks fail or available execution time runs out, leave a coherent paused
+     implementation and save the diagnosis and next action.
+6. After checks pass, reconcile uncertain previous actions before allowing orders.
+   - Leave paused if an outcome remains unresolved.
+7. Choose an immediate rerun with current inputs or the next suitable scheduled run.
+   - An immediate retry keeps the scheduler paused and admits only the recovery
+     owner through this incident's execution block, under the same exclusivity
+     and all other plan/order checks.
+   - If the retry fails, keep paused and record the unresolved issue.
+8. After recovery succeeds, clear this incident's block and resume the scheduler.
+   - Never override a later user pause.
+   - Verify and record actual scheduler state.
+9. Record the outcome and send the selected incident/recovery notification.
+   - Hand off unfinished recovery for any later user chat.
+   - Leave paused when self-healing is disabled, needs human input, fails, or the
+     agent is interrupted after pausing; preserve diagnosis and next action.
+   - Do not rely on the paused scheduler for another attempt or create a separate
+     recovery task.
 
-If self-healing is disabled, needs human input, fails, or the agent is
-interrupted after pausing, leave automation paused. Save the diagnosis and
-next action so the user can resume recovery in any chat. Do not rely on the
-paused scheduler to launch another attempt or create a separate recovery task.
+## Send selected notifications
 
-## Notifications
-
-Use these strategy-run notification labels exactly, for selected events:
-
-- `🚨 Error — Action Required` — recovery is waiting for the user; explain the
-  issue, recommended next step, and any information or decision needed.
-- `🔄 Retrying — No Action Required` — an automatic retry is underway or has an
-  active scheduled trigger; explain what is being retried and what happens next.
-- `🛠️ Self-Healed — No Action Required` — a repair has passed verification;
-  safe operation is restored and no user action is needed. Explain what was
-  restored and report the actual scheduler state and next run.
-- `⚠️ Warning — No Action Required` — useful information that requires no
-  user action.
-
-Use the channels, destinations, and events agreed in `plan.md`. Keep messages
-short and understandable: identify the strategy, explain the effect and current
-automation state, and give the next step. Keep technical diagnostics in project
-artifacts and secrets in `.env`. Record delivery failures honestly in the plan;
-never claim that an unavailable channel notified the user.
+- Use the events, channels, and destinations agreed in `plan.md`.
+- Select the exact strategy-run label:
+  - `🚨 Error — Action Required`
+    - Recovery awaits the user: explain the issue, recommended next step, and
+      required information or decision.
+  - `🔄 Retrying — No Action Required`
+    - An automatic retry is underway or has an active scheduled trigger: explain
+      what is being retried and what happens next.
+  - `🛠️ Self-Healed — No Action Required`
+    - The repair passed verification, safe operation is restored, and no user
+      action is needed: explain what was restored, actual scheduler state, and
+      next run.
+  - `⚠️ Warning — No Action Required`
+    - Useful information requiring no user action.
+- Send a short, understandable message identifying the strategy, effect,
+  automation state, and next step.
+  - Keep technical diagnostics in project artifacts and secrets in `.env`.
+- Record delivery failures honestly in the plan.
+  - Never claim an unavailable channel notified the user.

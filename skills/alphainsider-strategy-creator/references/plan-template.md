@@ -1,42 +1,38 @@
 # Strategy Plan
 
-Adapt this outline as decisions emerge. Keep high-level decisions and enough
-operational context to resume; link detailed artifacts. Unanswered items stay
-open. Never put secret values here.
-
 ## Current state
 
-Where the work stands, last completed action, open questions, what is waiting,
-next step, and last update. Include actual scheduler state, any pause reason,
-and unresolved actions or incidents.
+- Keep enough high-level and operational context to resume.
+  - Never include secret values.
+  - Platform/session, persistent project location, automation runner and its
+    project binding/runtime path, access status/evidence, and outstanding setup.
+  - Actual scheduler state, pause reasons, and unresolved actions/incidents.
+  - Current work, last completed action, open questions and next-phase
+    choices, what is waiting, next step, and last update.
+  - Adapt as decisions emerge; keep unanswered items open and link detailed artifacts.
 
-## Strategy
+## Define strategy
 
-Objective, intended trading behavior, roles of code and AI, schedule, relevant
-constraints, and the guardrails chosen for this strategy. Distinguish agreed
-decisions from proposals and explain consequential tradeoffs.
+- Intended behavior and governing decisions.
+  - Objective, trading behavior, code/AI roles, schedule, constraints, and
+    chosen guardrails.
+  - Distinguish agreements from proposals; explain consequential tradeoffs.
 
 ## Backtest
 
-Feasibility, selected approach or decision to skip, methodology, assumptions,
-limitations, findings, and links to saved results, charts, and reproducible
-artifacts. Identify which strategy decisions each test evaluated.
+- Feasibility, selected approach, or decision to skip.
+- Methodology, assumptions, limitations, and findings.
+  - Identify strategy decisions evaluated by each test.
+  - Link saved results, charts, and reproducible artifacts.
 
-## Implementation
+## Implement
 
-Chosen AlphaInsider strategy and settings, public strategy ID and link,
-scheduler/task identity, timing, program and dry-run commands, expected
-outcomes, and runbook/artifact locations. Record agreed ongoing action
-authority, setup verification, and anything still incomplete.
-
-## Self-healing
-
-Enabled or disabled, relevant user decisions, and what preserving this plan
-means for repairs. Summarize the latest incident, repair, verification, and
-resume action; link detailed diagnostic history.
-
-## Notifications
-
-Enabled or disabled, selected events, channels, safe destination references,
-and delivery status or limitations. Private destination values and credentials
-belong in `.env`.
+- Chosen AlphaInsider strategy/settings, visibility, public ID/link, and agreed ongoing authority.
+- Program/dry-run commands, expected outcomes, and runbook/artifact locations.
+- Scheduler/task identity, timing, setup verification, and incomplete work.
+- Self-healing decisions and recovery state.
+  - Enabled/disabled, relevant user decisions, and what preserving this plan means.
+  - Latest incident, repair, verification, and resume action; link diagnostic history.
+- Notification decisions and delivery state.
+  - Enabled/disabled, selected events, channels, and safe destination references.
+  - Delivery status/limitations; keep private destinations and credentials in `.env`.

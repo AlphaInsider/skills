@@ -1,96 +1,125 @@
 # Workflow Contracts
 
-## Interview and communication
+## Check platform and automation access
 
-Work in rounds of decisions whose prerequisites are settled. Ask the current
-round together, then let the answers determine the next round. Research facts
-from available tools and documentation; ask the user about intent and choices.
-Skip settled questions and choose routine technical details yourself.
+1. Before creating the project folder or files, ask yourself: “Can a fresh
+   scheduled run find, read, and update this exact folder after this chat ends?”
+   - Identify the scheduler's execution context and verify its actual connection
+     to the intended persistent storage using configuration and documentation.
+     Current-chat file access or a planned future connection is not proof.
+     No test schedule is required.
+2. Proceed only when that connection is established. Otherwise, stop setup,
+   explain what is missing, and follow the
+   [user action rule](#resolve-the-current-decisions) to establish a supported
+   persistent project/workspace, preferably on the current platform.
+   Recheck before creating files.
 
-Use this format, with useful options and a recommendation for each question:
+## Start or resume the project
 
-```markdown
-❓ **Q1** - **Short title:** A question in plain language.
+1. After the access check passes, resolve a dedicated persistent project available
+   to later chats and scheduled runs.
+   - Honor selected locations; resume clear matches and ask when ambiguous.
+   - Keep projects, user plans, and secrets outside the skill repository and
+     temporary chat storage.
+2. Read or initialize root `plan.md` using the [plan template](plan-template.md).
+   - Keep high-level strategy, backtest, implementation, self-healing,
+     notification, and planning decisions authoritative here.
+   - Store secrets only in project `.env`, excluded from version control and reports.
+   - Adapt the outline; it is neither a fixed schema nor a transcript.
 
-A. First option
-B. Second option
+- Maintain the resume point as answers, findings, actions, or failures change.
+  - Record the current step, open decisions, last outcome, next action, resource
+    identities, and actual scheduler state.
+  - Save external action intentions before execution and results afterward for
+    interrupted chats to reconcile.
+  - Keep decisions and useful summaries in the plan; link code, detailed
+    procedures, reports, and run history.
 
-➡️ **Recommended:** A — a short reason.
+## Resolve the current decisions
 
----
+1. Research facts with tools and documentation; identify user choices.
+   - Honor existing answers and authority; revisit only changed or unclear
+     material decisions. Choose routine technical details.
+2. Request required user actions in a separate response and end the turn.
+   - Include no interview questions, even independent ones or questions through tools.
+   - Give instructions, alternatives, and a completion signal.
+   - Record the waiting point in an existing accessible `plan.md`; if no usable
+     project exists, provide a non-secret handoff in chat without creating files.
+     Resume questions after completion and successful verification.
+   - Use these markers:
+     - `👉 **Action — Short title:**` required action and completion signal.
+     - `↪️ **Alternative:**` another supported method.
+     - `➡️ **Next:**` what happens next.
+3. Ask the current round together, with prerequisites settled.
+   - Skip settled questions; let answers determine the next round.
+   - Give options and a recommendation per question:
 
-❓ **Q2** - **Short title:** The next independent question.
+     ```markdown
+     ❓ **Q1** - **Short title:** A question in plain language.
 
-A. First option
-B. Second option
+     A. First option
+     B. Second option
 
-➡️ **Recommended:** B — a short reason.
-```
+     ➡️ **Recommended:** A — a short reason.
 
-`Recommended all` accepts the recommendations in the current round. Summarize
-settled decisions at meaningful transitions and explain the next step. Honor
-existing answers and authorization; ask again only when a material decision
-changes or remains unclear.
+     ---
 
-A required user action gets its own response. Do not ask interview questions
-in that response, including through question tools, even when the questions
-are independent of the action. Give the action, any alternative, and how to
-signal completion, then end the turn. Record the waiting point in `plan.md`;
-resume questions after the action is complete and any necessary verification
-succeeds.
+     ❓ **Q2** - **Short title:** The next independent question.
 
-Use these markers for actions and next steps:
+     A. First option
+     B. Second option
 
-- `👉 **Action — Short title:**` what the user must do and how to signal completion.
-- `↪️ **Alternative:**` another supported way to complete that action.
-- `➡️ **Next:**` what happens next.
+     ➡️ **Recommended:** B — a short reason.
+     ```
 
-Keep questions, results, and notifications understandable without API names or
-implementation details unless those details help the user decide.
+   - `Recommended all` accepts recommendations in the current round.
+4. Summarize settled decisions at transitions and explain the next step.
+   - Keep questions, results, and notifications understandable; include technical
+     details only when useful to decisions.
 
-## Schedule activation
+## Choose the next phase
 
-Enable new schedules automatically for the next scheduled run as part of the
-agreed setup, without a separate activation confirmation. If creation returns
-a paused task, enable it during the same setup. Clear only setup-created
-execution blocks, verify the task is active, and record its identity and next
-run in `plan.md`.
+1. In a separate response, summarize the completed phase and ask one next-step question.
+   - After strategy definition: summarize agreed behavior; offer Backtest Strategy,
+     Skip Backtesting and Implement on AlphaInsider, Revise Strategy, or Save and Stop.
+   - After backtesting: summarize results and limitations; offer Implement on
+     AlphaInsider, Further/Corrected Backtesting, Revise and Retest, or Save and Stop.
+   - Use `❓ **Next step:** What would you like to do?`, lettered options, and
+     `➡️ **Recommended:**` with a reason.
+   - Recommend useful backtesting; base post-test recommendations on evidence.
+2. End the turn and wait for the choice; include no other questions or user actions.
+3. Record the choice in `plan.md`, then enter that phase.
+   - Choosing forward confirms the summary; require no separate agreement prompt.
 
-Check project and `.env` access, command execution, and pause/resume support
-using platform configuration and documented capabilities. A prior scheduled run
-is not required proof of access. Leave inactive only for an explicit user pause
-or a concrete setup failure; preserve user/error pauses and explain the blocker.
-Do not substitute scheduling infrastructure without the user's choice.
+## Prepare the implementation handoff
 
-## Persistent project and plan
+1. Generate a project runbook with the runner's project path, commands, expected
+   outcomes, scheduler controls, and recovery/notification procedures.
+   - Support fresh scheduled agents without chat history or this skill.
+   - Refer to `plan.md` for decisions instead of duplicating them.
+2. Link the runbook from `plan.md` and the scheduled task.
 
-Use a dedicated persistent project available to later chats and scheduled runs.
-Honor a selected location and resume a clear existing match; ask when the
-project is ambiguous. Never put projects, user plans, or secrets in the skill
-repository or temporary chat storage.
+## Activate the schedule
 
-Root `plan.md` is the source of truth for high-level strategy, backtest,
-implementation, self-healing, notification, and planning decisions. Use the
-[plan template](plan-template.md) as a starting outline, adapting its detail to
-the project. It is not a fixed field schema or a conversation transcript.
+1. Recheck [platform and automation access](#check-platform-and-automation-access)
+   for the actual project and task; verify pause/resume support.
+   - Leave inactive only for an explicit user pause or concrete setup failure;
+     preserve user/error pauses and explain the blocker.
+   - Do not substitute scheduling infrastructure without the user's choice.
+2. Enable new schedules automatically for the next scheduled run during agreed setup.
+   - Require no separate activation confirmation.
+   - If creation returns a paused task, enable it during the same setup.
+3. Clear only setup-created execution blocks and verify the task is active.
+4. Record task identity and next run in `plan.md`.
 
-Update the plan as answers, findings, actions, or failures change the work.
-Keep the current step, open decisions, last outcome, next action, resource
-identities, and actual scheduler state clear. Save an intended external action
-before attempting it and record its result afterward so an interrupted chat
-can reconcile it. Link code, detailed procedures, reports, and run history;
-keep the decisions and a useful summary in the plan itself. Store secrets only
-in project `.env`, excluded from version control and generated reports.
+## Stop, update, or resume at any point
 
-Generate a project runbook with commands, expected outcomes, scheduler controls,
-and the recovery/notification procedure. Link it from `plan.md` and the scheduled
-task. It must let a fresh scheduled agent operate without chat history or this
-installed skill; refer to the plan for decisions instead of duplicating them.
-
-The user can stop, resume, or update at any point. Record the exact handoff and
-whether automation is still running; clarify an ambiguous request to stop
-when existing automation would be affected. For changes to running behavior,
-pause automation and coordinate with the run lock before changing files in use.
-Preserve settled decisions and artifacts, revisit only affected questions, and
-identify backtest results that no longer describe the current strategy. Resume
-only when the user's intent and the verified project state permit it.
+1. Establish the user's intent and save the exact handoff.
+   - Record whether automation is still running; clarify an ambiguous stop
+     request when existing automation would be affected.
+2. For changes to running behavior, pause automation and coordinate with the
+   run lock before changing files in use.
+3. Apply the affected changes.
+   - Preserve settled decisions and artifacts; revisit only affected questions.
+   - Identify backtest results that no longer describe the current strategy.
+4. Resume only when user intent and verified project state permit it.

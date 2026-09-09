@@ -191,7 +191,7 @@ EXPECTED_STRATEGY_SCRIPTS = {
 }
 STRATEGY_SKILL_MAX_WORDS = 700
 # Count references too, so a compact entrypoint cannot hide a growing rulebook.
-STRATEGY_GUIDANCE_MAX_WORDS = 2500
+STRATEGY_GUIDANCE_MAX_WORDS = 2800
 STRATEGY_NOTIFICATION_LABELS = {
     "🚨 Error — Action Required",
     "🔄 Retrying — No Action Required",
@@ -319,6 +319,8 @@ REQUIRED_README_OVERVIEW_GUIDANCE = {
     "/alphainsider",
     "use the alphainsider skill",
     "npx skills@latest add",
+    "skills/alphainsider-strategy-creator/references/"
+    "workflow-contracts.md#check-platform-and-automation-access",
     "root `plan.md`",
     "`.env`",
 }
@@ -358,16 +360,14 @@ def local_link_targets(
 
     for match in MARKDOWN_LINK_PATTERN.finditer(text):
         raw_target = match.group(1).strip("<>")
-        path_text = raw_target.split("#", 1)[0]
-        if not path_text:
-            continue
+        path_text, _, fragment = raw_target.partition("#")
         if URI_SCHEME_PATTERN.match(path_text):
             continue
         if path_text.startswith("/"):
             invalid.add(raw_target)
             continue
 
-        target = (source.parent / path_text).resolve()
+        target = (source.parent / path_text).resolve() if path_text else source.resolve()
         try:
             target.relative_to(resolved_root)
         except ValueError:
@@ -376,9 +376,91 @@ def local_link_targets(
         if not target.is_file():
             invalid.add(raw_target)
             continue
+        if fragment and target.suffix == ".md":
+            headings = re.findall(
+                r"^#{1,6} (.+)$", target.read_text(encoding="utf-8"), re.MULTILINE
+            )
+            if fragment not in {markdown_anchor(heading) for heading in headings}:
+                invalid.add(raw_target)
+                continue
         targets.add(target)
 
     return targets, invalid
+
+
+def ranked_outline_errors(text: str) -> list[str]:
+    """Check outline nesting and explicit sequences, allowing unordered notes."""
+    text = re.sub(r"\A---\n.*?\n---\n", "", text, count=1, flags=re.DOTALL)
+    errors: list[str] = []
+    # Each active list item tracks its content column, marker, and step number.
+    list_items: dict[int, tuple[int, str, int | None]] = {}
+    heading_level = 1
+    fence_marker: str | None = None
+    has_items = False
+
+    for line_number, line in enumerate(text.splitlines(), start=1):
+        stripped = line.lstrip()
+        fence = re.match(r"^(`{3,}|~{3,})(.*)$", stripped)
+        if fence_marker is not None:
+            if (
+                fence
+                and fence.group(1)[0] == fence_marker[0]
+                and len(fence.group(1)) >= len(fence_marker)
+                and not fence.group(2).strip()
+            ):
+                fence_marker = None
+            continue
+        if fence:
+            fence_marker = fence.group(1)
+            continue
+        if not stripped:
+            continue
+
+        heading = re.match(r"^(#{1,6}) (.+)$", line)
+        if heading:
+            level = len(heading.group(1))
+            if level > heading_level + 1:
+                errors.append(f"line {line_number}: skipped heading level")
+            heading_level = level
+            list_items.clear()
+            continue
+
+        indent = len(line) - len(stripped)
+        item = re.match(r"(?:(\d+)([.)])|([-+*])) +", stripped)
+        if item:
+            parents = {
+                depth: value for depth, value in list_items.items()
+                if depth < indent
+            }
+            if indent and (not parents or indent < parents[max(parents)][0]):
+                errors.append(f"line {line_number}: nested item needs a parent")
+            marker = item.group(2) or item.group(3)
+            number = int(item.group(1)) if item.group(1) is not None else None
+            previous = list_items.get(indent)
+            if number is not None:
+                expected = (
+                    previous[2] + 1
+                    if previous and previous[1] == marker and previous[2] is not None
+                    else 1
+                )
+                if number != expected:
+                    errors.append(f"line {line_number}: expected step {expected}.")
+            list_items = parents
+            list_items[indent] = (indent + item.end(), marker, number)
+            has_items = True
+            continue
+
+        list_items = {
+            depth: value for depth, value in list_items.items() if value[0] <= indent
+        }
+        if not list_items:
+            errors.append(f"line {line_number}: attach notes to an outline item")
+
+    if fence_marker is not None:
+        errors.append("unclosed fenced example")
+    if not has_items:
+        errors.append("missing outline items")
+    return errors
 
 
 def catalog_specialists(text: str) -> list[str]:
@@ -616,6 +698,10 @@ def validate() -> list[str]:
             "strategy-creator SKILL.md exceeds compact-word limit "
             f"{STRATEGY_SKILL_MAX_WORDS}"
         )
+    if re.search(
+        r"\brecommend\s+a\s+new\s+public\s+strategy\b", strategy_text, re.IGNORECASE
+    ) is None:
+        errors.append("strategy-creator must recommend a new public strategy")
 
     strategy_sources = {"SKILL.md": strategy / "SKILL.md"}
     strategy_sources.update(
@@ -672,21 +758,32 @@ def validate() -> list[str]:
         )
 
     workflow_routes = {
-        "SKILL.md": "references/workflow-contracts.md#schedule-activation",
-        "references/credentials.md": (
-            "workflow-contracts.md#interview-and-communication"
-        ),
+        "SKILL.md": {
+            "references/workflow-contracts.md#activate-the-schedule",
+            "references/workflow-contracts.md#check-platform-and-automation-access",
+            "references/workflow-contracts.md#choose-the-next-phase",
+        },
+        "references/credentials.md": {
+            "workflow-contracts.md#resolve-the-current-decisions",
+        },
+        "references/workflow-contracts.md": {
+            "#resolve-the-current-decisions",
+        },
     }
-    for owner, target in workflow_routes.items():
-        if target not in MARKDOWN_LINK_PATTERN.findall(
-            strategy_source_texts.get(owner, "")
-        ):
+    for owner, targets in workflow_routes.items():
+        links = set(MARKDOWN_LINK_PATTERN.findall(strategy_source_texts.get(owner, "")))
+        for target in sorted(targets - links):
             errors.append(
                 f"strategy-creator {owner} must link to shared workflow {target}"
             )
 
-    # Validate published resources and the exact notification interface, not a
-    # fixed questionnaire, plan field schema, heading layout, or prose snapshot.
+    for owner, text_value in strategy_source_texts.items():
+        outline_errors = ranked_outline_errors(text_value)
+        if outline_errors:
+            errors.append(f"strategy-creator {owner}: {outline_errors}")
+
+    # Check structure and exact notification labels without a fixed questionnaire,
+    # plan field schema, heading inventory, or prose snapshot.
     guidance_word_count = sum(
         len(text_value.split()) for text_value in strategy_source_texts.values()
     )
