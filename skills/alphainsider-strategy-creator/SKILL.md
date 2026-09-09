@@ -65,8 +65,11 @@ description: Define, backtest, implement, schedule, resume, and update AlphaInsi
    - Accept deliberate chat entry or direct project `.env` editing.
    - Complete any required user-action turn before implementation questions.
 2. Ask relevant implementation questions.
-   - Recommend a new public strategy (`private: false`). Inspect and offer
-     compatible owned strategies, explaining their state and reuse effects.
+   - Recommend a new strategy and offer compatible owned strategies, explaining their state and reuse effects.
+   - Before creating a new strategy, check available API parameters. Ask about
+     options unresolved by prior answers or strategy context, recommending values
+     with reasons; wait for answers.
+     - Recommend a public strategy (`private: false`).
    - Resolve self-healing and notification preferences.
 3. Build the program command and runbook using
    [run and recover](references/run-and-recover.md).
