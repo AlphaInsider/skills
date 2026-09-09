@@ -191,7 +191,7 @@ EXPECTED_STRATEGY_SCRIPTS = {
 }
 STRATEGY_SKILL_MAX_WORDS = 700
 # Count references too, so a compact entrypoint cannot hide a growing rulebook.
-STRATEGY_GUIDANCE_MAX_WORDS = 2800
+STRATEGY_GUIDANCE_MAX_WORDS = 2850
 STRATEGY_NOTIFICATION_LABELS = {
     "🚨 Error — Action Required",
     "🔄 Retrying — No Action Required",

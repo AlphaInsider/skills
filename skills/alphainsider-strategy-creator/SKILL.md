@@ -43,6 +43,7 @@ description: Define, backtest, implement, schedule, resume, and update AlphaInsi
 
 1. Assess feasibility before asking backtest questions.
    - Check information availability at each historical decision time.
+   - Do not prefer `/getStockPriceHistory` as a data source; it may have gaps.
    - Explain material limitations. When faithful testing is unavailable, offer
      the closest useful alternatives (proxy, signal-only test, forward observation)
      and what each can establish.
@@ -69,6 +70,7 @@ description: Define, backtest, implement, schedule, resume, and update AlphaInsi
    - Resolve self-healing and notification preferences.
 3. Build the program command and runbook using
    [run and recover](references/run-and-recover.md).
+   - Do not prefer `/getStockPriceHistory` as a data source; it may have gaps.
    - Support agreed code/AI roles, expected outcomes, persistent state, and one
      run at a time; choose the remaining project structure.
 4. Verify implementation and establish setup scope.
