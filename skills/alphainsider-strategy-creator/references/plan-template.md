@@ -4,8 +4,9 @@
 
 - Keep enough high-level and operational context to resume.
   - Never include secret values.
-  - Platform/session, persistent project location/file references, automation
-    runner and its workspace binding, access status/evidence, and outstanding setup.
+  - Host/runtime/profile, persistent project location/file references, automation
+    runner and its workspace/backend binding,
+    [access status/evidence](workflow-contracts.md#check-platform-and-automation-access), and outstanding setup.
   - Actual scheduler state, pause reasons, and unresolved actions/incidents.
   - Current work, last completed action, open questions and next-phase
     choices, what is waiting, next step, and last update.

@@ -3,31 +3,31 @@
 ## Check platform and automation access
 
 1. Before creating files or starting strategy work, select persistent storage
-   and the current provider's native AI scheduler in every environment.
-   - Use cron or other external schedulers only if native scheduling is
-     unsupported or the user explicitly requests them. Missing scheduling
-     tools here do not establish unsupported scheduling; check the provider's
-     other interfaces.
-   - Web chats must use their persistent Projects workspace; reuse an attached
-     or user-confirmed Project.
-   - Match the execution mode, including cloud chats in desktop apps.
-     Sources checked 2026-09-09; verify account availability.
+   and native AI scheduling for the host runtime, independently of model
+   provider or browser/desktop interface.
+   - Native includes agent `cron`. Use OS cron/external schedulers only
+     if native scheduling is unsupported or the user explicitly requests them.
+     Missing tools warrant checking other host interfaces.
+   - Web products with Projects must use them; reuse attached/user-confirmed
+     Projects. Sources checked 2026-09-09; verify availability.
 
    | Runtime | Workspace and scheduler |
    | --- | --- |
-   | ChatGPT cloud chat | Project chat + [Scheduled](https://learn.chatgpt.com/docs/automations?surface=web); saved files/connectors. Execution folders are temporary. |
-   | Grok web | [Project](https://grok.com/project) + [Automation](https://grok.com/automations); verify project binding and scheduled file access. |
+   | ChatGPT cloud chat | Project + [Scheduled](https://learn.chatgpt.com/docs/automations?surface=web); saved files/connectors, temporary execution folders. |
+   | Grok web | [Project](https://grok.com/project) + [Automation](https://grok.com/automations); verify scheduled project file access. |
    | Claude cloud chat | Project + [Cowork schedule](https://support.claude.com/en/articles/13854387-schedule-recurring-tasks-in-claude-cowork); writable account files/connectors. [Cowork](https://support.claude.com/en/articles/15520349-use-claude-cowork-on-web-desktop-and-mobile) cannot edit Project knowledge. |
-   | Local CLI, IDE, desktop | Durable folder + native AI task ([OpenAI](https://learn.chatgpt.com/docs/automations?surface=app), [Claude Code](https://code.claude.com/docs/en/desktop-scheduled-tasks)); keep host/app running for local execution. Session loops, including [Grok Build](https://docs.x.ai/build/features/background-tasks), are temporary. |
-   | Hosted agents | Repository/persistent workspace + native tasks/routines; persist state beyond disposable checkouts. [Codex cloud](https://learn.chatgpt.com/docs/environments/cloud-environment), [Claude Routines](https://code.claude.com/docs/en/routines), [Grok Bot `/workspace`](https://docs.x.ai/grok-bot/computer-and-apps). |
+   | OpenClaw | [Automations](https://docs.openclaw.ai/automation/cron-jobs) + owning agent's [workspace](https://docs.openclaw.ai/concepts/agent-workspace); keep Gateway running; verify scheduled [sandbox write access](https://docs.openclaw.ai/gateway/sandboxing#workspace-access). |
+   | Hermes Agent | [`cronjob`](https://hermes-agent.nousresearch.com/docs/user-guide/features/cron) with absolute `workdir`; keep its profile's gateway running and [backend storage](https://hermes-agent.nousresearch.com/docs/user-guide/features/tools#terminal-backends) persistent. |
+   | Local CLI, IDE, desktop | Durable folder + native AI task ([OpenAI](https://learn.chatgpt.com/docs/automations?surface=app), [Claude Code](https://code.claude.com/docs/en/desktop-scheduled-tasks)); local execution needs host/app running. [Grok Build loops](https://docs.x.ai/build/features/background-tasks) are temporary. |
+   | Hosted agents | Native tasks/routines; persist repository/state beyond disposable checkouts. [Codex cloud](https://learn.chatgpt.com/docs/environments/cloud-environment), [Claude Routines](https://code.claude.com/docs/en/routines), [Grok Bot `/workspace`](https://docs.x.ai/grok-bot/computer-and-apps). |
 
-2. Confirm fresh scheduled runs can read/update plan, code, and state, execute with
-   protected credentials, and persist results. Verify workspace binding and
-   permissions using official guidance. Cloud Projects need no permanent local
-   folder or trial schedule.
-3. If access is missing or unverified, stop and give the current-platform remedy
-   using the [user action rule](#resolve-the-current-decisions). Recheck before
-   work; migration requires the user's choice.
+2. Verify fresh scheduled runs can read/update plan/code/state, execute
+   with protected credentials, persist results, and control pause/resume.
+   Check workspace bindings/permissions against official guidance. Cloud Projects
+   need no permanent local folder or trial schedule.
+3. Otherwise, stop and resolve access on the current platform using the
+   [user action rule](#resolve-the-current-decisions). Recheck before work;
+   migration requires user choice.
 
 ## Start or resume the project
 
@@ -67,7 +67,7 @@
      - `➡️ **Next:**` what happens next.
 3. Ask the current round together, with prerequisites settled.
    - Skip settled questions; let answers determine the next round.
-   - Give options and a recommendation per question:
+   - Give options on consecutive lines and a recommendation per question:
 
      ```markdown
      ❓ **Q1** - **Short title:** A question in plain language.
