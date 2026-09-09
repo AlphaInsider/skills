@@ -28,8 +28,8 @@ This repository publishes reusable AlphaInsider agent skills from `skills/`.
 - Put deterministic reusable code in `scripts/`; never place credentials,
   `.env`, user plans, or generated strategies in this repository.
 - When a design decision changes the strategy interview, plan schema, or
-  generated-workspace contract, update the skill references, catalog
-  validation, and repository documentation in the same change.
+  generated-workspace contract, update the skill references and repository
+  documentation in the same change.
 - Preserve the AlphaInsider credential boundary: agents never inspect or print
   existing API keys or `.env` values. Public strategy IDs may be shown.
   Strategy Creator may accept values the user deliberately pastes in chat and
@@ -47,7 +47,6 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
 npm ci
-python scripts/validate_catalog.py
 pytest
 npm run skills:list
 ```

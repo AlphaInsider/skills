@@ -13,8 +13,7 @@ fields or heading names.
 Keep public skills and documentation agent-vendor agnostic; do not require
 vendor-specific metadata or behavior.
 
-When adding a public skill, update `EXPECTED_SKILLS` in
-`scripts/validate_catalog.py`, add installation and behavior coverage, and
+When adding a public skill, add installation and behavior coverage, and
 document its separate and combined installation forms in `README.md`. A new
 public specialist must also be added to
 `skills/alphainsider/references/catalog.md`. Do not copy source-repository
@@ -35,7 +34,6 @@ npm ci
 Before opening a change, run:
 
 ```bash
-python scripts/validate_catalog.py
 pytest
 npm run skills:list
 ```
