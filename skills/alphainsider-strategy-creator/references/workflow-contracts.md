@@ -1,0 +1,139 @@
+# Workflow Contracts
+
+## Check platform and automation access
+
+1. Before creating files or starting strategy work, select persistent storage
+   and the current provider's native AI scheduler in every environment.
+   - Use cron or other external schedulers only if native scheduling is
+     unsupported or the user explicitly requests them. Missing scheduling
+     tools here do not establish unsupported scheduling; check the provider's
+     other interfaces.
+   - Web chats must use their persistent Projects workspace; reuse an attached
+     or user-confirmed Project.
+   - Match the execution mode, including cloud chats in desktop apps.
+     Sources checked 2026-09-09; verify account availability.
+
+   | Runtime | Workspace and scheduler |
+   | --- | --- |
+   | ChatGPT cloud chat | Project chat + [Scheduled](https://learn.chatgpt.com/docs/automations?surface=web); saved files/connectors. Execution folders are temporary. |
+   | Grok web | [Project](https://grok.com/project) + [Automation](https://grok.com/automations); verify project binding and scheduled file access. |
+   | Claude cloud chat | Project + [Cowork schedule](https://support.claude.com/en/articles/13854387-schedule-recurring-tasks-in-claude-cowork); writable account files/connectors. [Cowork](https://support.claude.com/en/articles/15520349-use-claude-cowork-on-web-desktop-and-mobile) cannot edit Project knowledge. |
+   | Local CLI, IDE, desktop | Durable folder + native AI task ([OpenAI](https://learn.chatgpt.com/docs/automations?surface=app), [Claude Code](https://code.claude.com/docs/en/desktop-scheduled-tasks)); keep host/app running for local execution. Session loops, including [Grok Build](https://docs.x.ai/build/features/background-tasks), are temporary. |
+   | Hosted agents | Repository/persistent workspace + native tasks/routines; persist state beyond disposable checkouts. [Codex cloud](https://learn.chatgpt.com/docs/environments/cloud-environment), [Claude Routines](https://code.claude.com/docs/en/routines), [Grok Bot `/workspace`](https://docs.x.ai/grok-bot/computer-and-apps). |
+
+2. Confirm fresh scheduled runs can read/update plan, code, and state, execute with
+   protected credentials, and persist results. Verify workspace binding and
+   permissions using official guidance. Cloud Projects need no permanent local
+   folder or trial schedule.
+3. If access is missing or unverified, stop and give the current-platform remedy
+   using the [user action rule](#resolve-the-current-decisions). Recheck before
+   work; migration requires the user's choice.
+
+## Start or resume the project
+
+1. After the access check passes, resolve a dedicated persistent project available
+   to later chats and scheduled runs.
+   - Honor selected locations; resume clear matches and ask when ambiguous.
+   - Keep authoritative files, user plans, and secrets outside the skill
+     repository and temporary chat storage.
+2. Read or initialize root `plan.md` using the [plan template](plan-template.md).
+   - Keep high-level strategy, backtest, implementation, self-healing,
+     notification, and planning decisions authoritative here.
+   - Store secrets only in project `.env`, excluded from version control and reports.
+   - Adapt the outline; it is neither a fixed schema nor a transcript.
+
+- Maintain the resume point as answers, findings, actions, or failures change.
+  - Record the current step, open decisions, last outcome, next action, resource
+    identities, and actual scheduler state.
+  - Save external action intentions before execution and results afterward for
+    interrupted chats to reconcile.
+  - Keep decisions and useful summaries in the plan; link code, detailed
+    procedures, reports, and run history.
+
+## Resolve the current decisions
+
+1. Research facts with tools and documentation; identify user choices.
+   - Honor existing answers and authority; revisit only changed or unclear
+     material decisions. Choose routine technical details.
+2. Request required user actions in a separate response and end the turn.
+   - Include no interview questions, even independent ones or questions through tools.
+   - Give instructions, alternatives, and a completion signal.
+   - Record the waiting point in an existing accessible `plan.md`; if no usable
+     project exists, provide a non-secret handoff in chat without creating files.
+     Resume questions after completion and successful verification.
+   - Use these markers:
+     - `👉 **Action — Short title:**` required action and completion signal.
+     - `↪️ **Alternative:**` another supported method.
+     - `➡️ **Next:**` what happens next.
+3. Ask the current round together, with prerequisites settled.
+   - Skip settled questions; let answers determine the next round.
+   - Give options and a recommendation per question:
+
+     ```markdown
+     ❓ **Q1** - **Short title:** A question in plain language.
+
+     A. First option
+     B. Second option
+
+     ➡️ **Recommended:** A — a short reason.
+
+     ---
+
+     ❓ **Q2** - **Short title:** The next independent question.
+
+     A. First option
+     B. Second option
+
+     ➡️ **Recommended:** B — a short reason.
+     ```
+
+   - `Recommended all` accepts recommendations in the current round.
+4. Summarize settled decisions at transitions and explain the next step.
+   - Keep questions, results, and notifications understandable; include technical
+     details only when useful to decisions.
+
+## Choose the next phase
+
+1. In a separate response, summarize the completed phase and ask one next-step question.
+   - After strategy definition: summarize agreed behavior; offer Backtest Strategy,
+     Skip Backtesting and Implement on AlphaInsider, Revise Strategy, or Save and Stop.
+   - After backtesting: summarize results and limitations; offer Implement on
+     AlphaInsider, Further/Corrected Backtesting, Revise and Retest, or Save and Stop.
+   - Use `❓ **Next step:** What would you like to do?`, lettered options, and
+     `➡️ **Recommended:**` with a reason.
+   - Recommend useful backtesting; base post-test recommendations on evidence.
+2. End the turn and wait for the choice; include no other questions or user actions.
+3. Record the choice in `plan.md`, then enter that phase.
+   - Choosing forward confirms the summary; require no separate agreement prompt.
+
+## Prepare the implementation handoff
+
+1. Generate a project runbook with the project location, file access methods,
+   commands, expected outcomes, scheduler controls, and recovery/notification procedures.
+   - Support fresh scheduled agents without chat history or this skill.
+   - Refer to `plan.md` for decisions instead of duplicating them.
+2. Link the runbook from `plan.md` and the scheduled task.
+
+## Activate the schedule
+
+1. Recheck [platform and automation access](#check-platform-and-automation-access)
+   for the actual project and task; verify pause/resume support.
+   - Leave inactive only for an explicit user pause or concrete setup failure;
+     preserve user/error pauses and explain the blocker.
+2. Enable new schedules automatically for the next scheduled run during agreed setup.
+   - Require no separate activation confirmation.
+   - If creation returns a paused task, enable it during the same setup.
+3. Clear only setup-created execution blocks and verify the task is active.
+4. Record task identity and next run in `plan.md`.
+
+## Stop, update, or resume at any point
+
+1. Establish the user's intent and save the exact handoff.
+   - Record whether automation is still running; clarify an ambiguous stop
+     request when existing automation would be affected.
+2. For changes to running behavior, pause automation and coordinate with the
+   run lock before changing files in use.
+3. Apply the affected changes.
+   - Preserve settled decisions and artifacts; revisit only affected questions.
+   - Identify backtest results that no longer describe the current strategy.
+4. Resume only when user intent and verified project state permit it.

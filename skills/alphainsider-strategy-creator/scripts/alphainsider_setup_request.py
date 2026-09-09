@@ -9,7 +9,6 @@ if __name__ != "__main__":
 import argparse
 import json
 import math
-import os
 import sys
 import urllib.error
 import urllib.parse
@@ -85,12 +84,9 @@ class _SafeArgumentParser(argparse.ArgumentParser):
 
 
 def _configured_value(name: str, project_root: str) -> str | None:
+    """Resolve project configuration without falling back to ambient credentials."""
     if name not in _READABLE_NAMES:
         raise _SetupRequestError(f"unsupported AlphaInsider setting: {name}")
-
-    environment_value = os.environ.get(name)
-    if environment_value:
-        return environment_value
 
     path = Path(project_root) / ".env"
     if path.is_symlink():
