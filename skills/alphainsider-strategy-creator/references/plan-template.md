@@ -4,8 +4,8 @@
 
 - Keep enough high-level and operational context to resume.
   - Never include secret values.
-  - Platform/session, persistent project location, automation runner and its
-    project binding/runtime path, access status/evidence, and outstanding setup.
+  - Platform/session, persistent project location/file references, automation
+    runner and its workspace binding, access status/evidence, and outstanding setup.
   - Actual scheduler state, pause reasons, and unresolved actions/incidents.
   - Current work, last completed action, open questions and next-phase
     choices, what is waiting, next step, and last update.
@@ -29,7 +29,7 @@
 
 - Chosen AlphaInsider strategy/settings, visibility, public ID/link, and agreed ongoing authority.
 - Program/dry-run commands, expected outcomes, and runbook/artifact locations.
-- Scheduler/task identity, timing, setup verification, and incomplete work.
+- Scheduler/task identity and selection reason, timing, setup verification, and incomplete work.
 - Self-healing decisions and recovery state.
   - Enabled/disabled, relevant user decisions, and what preserving this plan means.
   - Latest incident, repair, verification, and resume action; link diagnostic history.

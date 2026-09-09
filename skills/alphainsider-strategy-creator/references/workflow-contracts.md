@@ -2,25 +2,40 @@
 
 ## Check platform and automation access
 
-1. Before creating the project folder or files, ask yourself: “Can a fresh
-   scheduled run find, read, and update this exact folder after this chat ends?”
-   - Identify the scheduler's execution context and verify its actual connection
-     to the intended persistent storage using configuration and documentation.
-     Current-chat file access or a planned future connection is not proof.
-     No test schedule is required.
-2. Proceed only when that connection is established. Otherwise, stop setup,
-   explain what is missing, and follow the
-   [user action rule](#resolve-the-current-decisions) to establish a supported
-   persistent project/workspace, preferably on the current platform.
-   Recheck before creating files.
+1. Before creating files or starting strategy work, select persistent storage
+   and the current provider's native AI scheduler in every environment.
+   - Use cron or other external schedulers only if native scheduling is
+     unsupported or the user explicitly requests them. Missing scheduling
+     tools here do not establish unsupported scheduling; check the provider's
+     other interfaces.
+   - Web chats must use their persistent Projects workspace; reuse an attached
+     or user-confirmed Project.
+   - Match the execution mode, including cloud chats in desktop apps.
+     Sources checked 2026-09-09; verify account availability.
+
+   | Runtime | Workspace and scheduler |
+   | --- | --- |
+   | ChatGPT cloud chat | Project chat + [Scheduled](https://learn.chatgpt.com/docs/automations?surface=web); saved files/connectors. Execution folders are temporary. |
+   | Grok web | [Project](https://grok.com/project) + [Automation](https://grok.com/automations); verify project binding and scheduled file access. |
+   | Claude cloud chat | Project + [Cowork schedule](https://support.claude.com/en/articles/13854387-schedule-recurring-tasks-in-claude-cowork); writable account files/connectors. [Cowork](https://support.claude.com/en/articles/15520349-use-claude-cowork-on-web-desktop-and-mobile) cannot edit Project knowledge. |
+   | Local CLI, IDE, desktop | Durable folder + native AI task ([OpenAI](https://learn.chatgpt.com/docs/automations?surface=app), [Claude Code](https://code.claude.com/docs/en/desktop-scheduled-tasks)); keep host/app running for local execution. Session loops, including [Grok Build](https://docs.x.ai/build/features/background-tasks), are temporary. |
+   | Hosted agents | Repository/persistent workspace + native tasks/routines; persist state beyond disposable checkouts. [Codex cloud](https://learn.chatgpt.com/docs/environments/cloud-environment), [Claude Routines](https://code.claude.com/docs/en/routines), [Grok Bot `/workspace`](https://docs.x.ai/grok-bot/computer-and-apps). |
+
+2. Confirm fresh scheduled runs can read/update plan, code, and state, execute with
+   protected credentials, and persist results. Verify workspace binding and
+   permissions using official guidance. Cloud Projects need no permanent local
+   folder or trial schedule.
+3. If access is missing or unverified, stop and give the current-platform remedy
+   using the [user action rule](#resolve-the-current-decisions). Recheck before
+   work; migration requires the user's choice.
 
 ## Start or resume the project
 
 1. After the access check passes, resolve a dedicated persistent project available
    to later chats and scheduled runs.
    - Honor selected locations; resume clear matches and ask when ambiguous.
-   - Keep projects, user plans, and secrets outside the skill repository and
-     temporary chat storage.
+   - Keep authoritative files, user plans, and secrets outside the skill
+     repository and temporary chat storage.
 2. Read or initialize root `plan.md` using the [plan template](plan-template.md).
    - Keep high-level strategy, backtest, implementation, self-healing,
      notification, and planning decisions authoritative here.
@@ -93,8 +108,8 @@
 
 ## Prepare the implementation handoff
 
-1. Generate a project runbook with the runner's project path, commands, expected
-   outcomes, scheduler controls, and recovery/notification procedures.
+1. Generate a project runbook with the project location, file access methods,
+   commands, expected outcomes, scheduler controls, and recovery/notification procedures.
    - Support fresh scheduled agents without chat history or this skill.
    - Refer to `plan.md` for decisions instead of duplicating them.
 2. Link the runbook from `plan.md` and the scheduled task.
@@ -105,7 +120,6 @@
    for the actual project and task; verify pause/resume support.
    - Leave inactive only for an explicit user pause or concrete setup failure;
      preserve user/error pauses and explain the blocker.
-   - Do not substitute scheduling infrastructure without the user's choice.
 2. Enable new schedules automatically for the next scheduled run during agreed setup.
    - Require no separate activation confirmation.
    - If creation returns a paused task, enable it during the same setup.

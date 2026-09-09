@@ -8,7 +8,8 @@ description: Define, backtest, implement, schedule, resume, and update AlphaInsi
 ## Start or resume
 
 1. Run the [platform and automation access check](references/workflow-contracts.md#check-platform-and-automation-access)
-   before [project setup](references/workflow-contracts.md#start-or-resume-the-project).
+   before [project setup](references/workflow-contracts.md#start-or-resume-the-project)
+   or strategy work.
    - Resume from its `plan.md` before new work; keep generated artifacts outside
      this skill repository.
    - Let user decisions govern AlphaInsider paper automation.
@@ -73,7 +74,7 @@ description: Define, backtest, implement, schedule, resume, and update AlphaInsi
    - Use meaningful checks and a dry run unable to submit, change, or cancel orders.
    - Clarify setup and ongoing order, repair, and notification authority; honor
      existing consent without a special approval phrase.
-5. Create or configure the AlphaInsider strategy and AI scheduled task.
+5. Create or configure the AlphaInsider strategy and selected scheduled task.
    - [Activate during setup](references/workflow-contracts.md#activate-the-schedule).
    - Record identities and outcomes as they occur; reconcile uncertain results
      before retrying resource creation or another external action.
