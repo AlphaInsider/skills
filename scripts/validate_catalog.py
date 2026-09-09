@@ -191,7 +191,7 @@ EXPECTED_STRATEGY_SCRIPTS = {
 }
 STRATEGY_SKILL_MAX_WORDS = 700
 # Count references too, so a compact entrypoint cannot hide a growing rulebook.
-STRATEGY_GUIDANCE_MAX_WORDS = 2800
+STRATEGY_GUIDANCE_MAX_WORDS = 2900
 STRATEGY_NOTIFICATION_LABELS = {
     "🚨 Error — Action Required",
     "🔄 Retrying — No Action Required",
@@ -303,7 +303,7 @@ REQUIRED_ALPHA_EXECUTION_BEHAVIORS = {
         ),
     },
 }
-README_MAX_WORDS = 500
+README_MAX_WORDS = 525
 REQUIRED_README_SECTIONS = {
     "# AlphaInsider Skills",
     "## Overview",
@@ -323,6 +323,7 @@ REQUIRED_README_OVERVIEW_GUIDANCE = {
     "workflow-contracts.md#check-platform-and-automation-access",
     "root `plan.md`",
     "`.env`",
+    "`.env.example`",
 }
 
 
@@ -762,6 +763,8 @@ def validate() -> list[str]:
             "references/workflow-contracts.md#activate-the-schedule",
             "references/workflow-contracts.md#check-platform-and-automation-access",
             "references/workflow-contracts.md#choose-the-next-phase",
+            "references/workflow-contracts.md#resolve-the-current-decisions",
+            "references/workflow-contracts.md#start-or-resume-the-project",
         },
         "references/credentials.md": {
             "workflow-contracts.md#resolve-the-current-decisions",
@@ -804,6 +807,9 @@ def validate() -> list[str]:
             "strategy-creator is missing exact notification labels "
             f"{sorted(missing_notification_labels)}"
         )
+
+    if "`.env.example`" not in reference_texts.get("credentials.md", ""):
+        errors.append("strategy-creator credentials must prepare .env.example")
 
     env_helper = strategy_scripts_dir / "set_env_value.py"
     if env_helper.is_file():

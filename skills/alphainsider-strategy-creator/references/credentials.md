@@ -24,19 +24,22 @@
 
 ## Request a missing key
 
-1. Follow the [user action rule](workflow-contracts.md#resolve-the-current-decisions)
+1. Create missing project `.env` and `.env.example` files
+   containing `ALPHAINSIDER_API_KEY=`. Preserve existing files without reading
+   them; never copy `.env` into `.env.example`.
+2. Follow the [user action rule](workflow-contracts.md#resolve-the-current-decisions)
    and send:
 
    ```markdown
-   👉 **Action — AlphaInsider API key:** Create an API key in AlphaInsider's
-   Developer settings with the access needed for this strategy, and paste it
-   here. I'll save it in your project's `.env` without repeating it.
+   👉 **Action — AlphaInsider API key:** Open the [AlphaInsider developer page](https://alphainsider.com/settings/developers),
+   select the **AI Agent** preset permissions button, and create an API key.
+   Paste it here. I'll save it in your project's `.env` without repeating it.
 
-   ↪️ **Alternative:** Add `ALPHAINSIDER_API_KEY=your_key` to `<project>/.env`
+   ↪️ **Alternative:** Set `ALPHAINSIDER_API_KEY` in `<project>/.env`
    yourself, then tell me when it is saved.
    ```
 
-2. Wait for the pasted key or confirmation of the direct edit before continuing.
+3. Wait for the pasted key or confirmation of the direct edit before continuing.
 
 ## Save chat input
 

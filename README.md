@@ -44,15 +44,15 @@ npx skills@latest add https://github.com/AlphaInsider/skills \
 ## How it works
 
 The [access check](skills/alphainsider-strategy-creator/references/workflow-contracts.md#check-platform-and-automation-access)
-verifies execution and persistent file access before project work. Use the provider's
-native AI scheduler unless unsupported or the user explicitly requests an external
-scheduler.
+verifies execution and persistent file access before project work. Use the host
+application's native AI scheduler unless unsupported or the user explicitly requests
+external scheduling.
 
 Strategy Creator guides **Define strategy → Backtest → Implement** using
 ranked workflow outlines: number only operations that require sequence; use
 bullets and sub-bullets for other notes, ranked by importance. Question rounds
-offer options and recommendations. After strategy definition and backtest results,
-a summary and standalone next-step question let users backtest, implement on
+present options on consecutive lines, with recommendations. After strategy definition
+and backtesting, a summary and standalone next-step question let users backtest, implement on
 AlphaInsider, revise, or stop. Required user actions get their own turn; questions
 resume after completion. Questions and guardrails reflect actual AI scheduling,
 AlphaInsider, and data limits. Backtest planning starts with feasibility and
@@ -64,6 +64,8 @@ workspace/runner binding and access evidence, and the next action. Its flexible
 outline supports later chats. Secrets stay in project `.env`; users may paste
 new API keys for the non-echoing helper or edit `.env` themselves. Agents never
 inspect existing secret values.
+Before requesting a key, create missing `.env` and `.env.example` files with an
+empty `ALPHAINSIDER_API_KEY=` entry.
 
 Implementation recommends a new public AlphaInsider strategy and offers compatible
 owned strategies. Users choose self-healing and notification settings. Trading

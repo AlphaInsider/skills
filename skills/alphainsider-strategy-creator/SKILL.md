@@ -33,7 +33,8 @@ description: Define, backtest, implement, schedule, resume, and update AlphaInsi
        [AsyncAPI](https://api.alphainsider.com/asyncapi.yaml) sections.
      - Verify intended actions' limits and side effects; do not invent rules or
        copy endpoint catalogs.
-2. Ask high-level questions until behavior is clear enough to test and implement.
+2. [Ask high-level questions](references/workflow-contracts.md#resolve-the-current-decisions)
+   until behavior is clear enough to test and implement.
    - Choose which details require user answers.
    - Use fixed code, scheduled AI judgment, or both; record their roles.
 3. [Review the strategy and choose the next phase](references/workflow-contracts.md#choose-the-next-phase).
@@ -42,6 +43,7 @@ description: Define, backtest, implement, schedule, resume, and update AlphaInsi
 
 1. Assess feasibility before asking backtest questions.
    - Check information availability at each historical decision time.
+   - Do not prefer `/getStockPriceHistory` as a data source; it may have gaps.
    - Explain material limitations. When faithful testing is unavailable, offer
      the closest useful alternatives (proxy, signal-only test, forward observation)
      and what each can establish.
@@ -63,11 +65,15 @@ description: Define, backtest, implement, schedule, resume, and update AlphaInsi
    - Accept deliberate chat entry or direct project `.env` editing.
    - Complete any required user-action turn before implementation questions.
 2. Ask relevant implementation questions.
-   - Recommend a new public strategy (`private: false`). Inspect and offer
-     compatible owned strategies, explaining their state and reuse effects.
+   - Recommend a new strategy and offer compatible owned strategies, explaining their state and reuse effects.
+   - Before creating a new strategy, check available API parameters. Ask about
+     options unresolved by prior answers or strategy context, recommending values
+     with reasons; wait for answers.
+     - Recommend a public strategy (`private: false`).
    - Resolve self-healing and notification preferences.
 3. Build the program command and runbook using
    [run and recover](references/run-and-recover.md).
+   - Do not prefer `/getStockPriceHistory` as a data source; it may have gaps.
    - Support agreed code/AI roles, expected outcomes, persistent state, and one
      run at a time; choose the remaining project structure.
 4. Verify implementation and establish setup scope.
