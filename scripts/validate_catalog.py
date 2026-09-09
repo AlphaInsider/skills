@@ -762,6 +762,7 @@ def validate() -> list[str]:
             "references/workflow-contracts.md#activate-the-schedule",
             "references/workflow-contracts.md#check-platform-and-automation-access",
             "references/workflow-contracts.md#choose-the-next-phase",
+            "references/workflow-contracts.md#resolve-the-current-decisions",
             "references/workflow-contracts.md#start-or-resume-the-project",
         },
         "references/credentials.md": {

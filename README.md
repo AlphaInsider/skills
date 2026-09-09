@@ -51,8 +51,8 @@ external scheduling.
 Strategy Creator guides **Define strategy → Backtest → Implement** using
 ranked workflow outlines: number only operations that require sequence; use
 bullets and sub-bullets for other notes, ranked by importance. Question rounds
-offer options and recommendations. After strategy definition and backtest results,
-a summary and standalone next-step question let users backtest, implement on
+present options on consecutive lines, with recommendations. After strategy definition
+and backtesting, a summary and standalone next-step question let users backtest, implement on
 AlphaInsider, revise, or stop. Required user actions get their own turn; questions
 resume after completion. Questions and guardrails reflect actual AI scheduling,
 AlphaInsider, and data limits. Backtest planning starts with feasibility and

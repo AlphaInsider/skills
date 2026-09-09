@@ -67,7 +67,7 @@
      - `➡️ **Next:**` what happens next.
 3. Ask the current round together, with prerequisites settled.
    - Skip settled questions; let answers determine the next round.
-   - Give options and a recommendation per question:
+   - Give options on consecutive lines and a recommendation per question:
 
      ```markdown
      ❓ **Q1** - **Short title:** A question in plain language.

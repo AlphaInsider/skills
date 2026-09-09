@@ -33,7 +33,8 @@ description: Define, backtest, implement, schedule, resume, and update AlphaInsi
        [AsyncAPI](https://api.alphainsider.com/asyncapi.yaml) sections.
      - Verify intended actions' limits and side effects; do not invent rules or
        copy endpoint catalogs.
-2. Ask high-level questions until behavior is clear enough to test and implement.
+2. [Ask high-level questions](references/workflow-contracts.md#resolve-the-current-decisions)
+   until behavior is clear enough to test and implement.
    - Choose which details require user answers.
    - Use fixed code, scheduled AI judgment, or both; record their roles.
 3. [Review the strategy and choose the next phase](references/workflow-contracts.md#choose-the-next-phase).
