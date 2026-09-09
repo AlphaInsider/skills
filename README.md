@@ -44,9 +44,9 @@ npx skills@latest add https://github.com/AlphaInsider/skills \
 ## How it works
 
 The [access check](skills/alphainsider-strategy-creator/references/workflow-contracts.md#check-platform-and-automation-access)
-verifies execution and persistent file access before project work. Use the provider's
-native AI scheduler unless unsupported or the user explicitly requests an external
-scheduler.
+verifies execution and persistent file access before project work. Use the host
+application's native AI scheduler unless unsupported or the user explicitly requests
+external scheduling.
 
 Strategy Creator guides **Define strategy → Backtest → Implement** using
 ranked workflow outlines: number only operations that require sequence; use
