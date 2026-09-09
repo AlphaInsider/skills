@@ -1,95 +1,88 @@
 ---
 name: alphainsider-strategy-creator
-description: Create, resume, backtest, implement, automate, update, or explicitly delete one plan-driven AlphaInsider strategy. Use for stock or cryptocurrency strategies that run through a native AI scheduler and may use code, the scheduled AI agent, or both.
+description: Define, backtest, implement, schedule, resume, and update AlphaInsider paper strategies with a persistent project plan and optional automatic recovery.
 ---
 
 # AlphaInsider Strategy Creator
 
-Guide one strategy to verified AlphaInsider automation. Keep this skill
-read-only; store artifacts in one persistent project.
+## Start or resume
 
-## Core contract
+1. Run the [platform and automation access check](references/workflow-contracts.md#check-platform-and-automation-access)
+   before [project setup](references/workflow-contracts.md#start-or-resume-the-project)
+   or strategy work.
+   - Resume from its `plan.md` before new work; keep generated artifacts outside
+     this skill repository.
+   - Let user decisions govern AlphaInsider paper automation.
+   - Use judgment for questions, guardrails, implementation, and checks.
+2. Continue from recorded state.
+   - Handle stops and updates whenever requested.
+   - Number required sequences; use bullets for other notes, ranked by importance
+     at each level.
 
-- `plan.md` is the readable source of truth; tests, code, strategy, and
-  automation must conform to it.
-- One project contains one strategy with one strict `stock` or
-  `cryptocurrency` type.
-- Check applicable AlphaInsider limits before proposing an action and recheck
-  changeable facts immediately before it.
-- Send orders only to AlphaInsider paper strategies. Never create a broker
-  client, connect a broker, or request broker credentials.
-- Never inspect or expose an existing API key, secret store, or complete
-  `.env`. Accept pasted values only through the non-echoing credential flow.
-- Use only the platform's native AI automation or scheduler. Never install a
-  host scheduler, service, daemon, or background process, and never keep a run
-  alive to poll faster than the native scheduler.
-- Before confirming a strategy, inspect the actual native scheduler, current
-  public AlphaInsider constraints, and planned execution operation. Offer only
-  complete implementable timing. Prefer explicit current session guidance;
-  when absent, use the Strategy Creator stock fallback. Cryptocurrency is 24/7
-  subject to scheduler and data-cutoff limits.
-- Generated instructions must support runs and confirmed self-healing without
-  this skill. Use it for changes to strategy or automation.
-- Poor performance never makes a plan-compliant run unhealthy or authorizes a
-  strategy change.
-- Backtest findings summaries pair metrics with saved, data-derived visuals.
-  Embed them when supported or link directly to their named files; the detailed
-  report is additional, not a substitute. State when some planned visuals
-  remain unavailable after a safe rendering repair attempt.
-- Build and pass offline, order-free checks before creating a new AlphaInsider
-  strategy.
-- Never pause active automation automatically for an operational error. Mark
-  health Degraded/Retrying, withhold unsafe orders, and retry checks next
-  trigger. Only the user, update, deletion, or setup workflow pauses it.
-- Creation is Complete only after the AlphaInsider strategy validates and its
-  native automation is active. Stops and blockers remain resumable and never
-  authorize deletion.
+## Define strategy
 
-## Begin or resume
+1. Research strategy and cadence constraints.
+   - Check actual AI scheduling capabilities, AlphaInsider constraints, data
+     availability, and other relevant limits before recommending choices.
+   - Explain conflicts, tradeoffs, and feasible alternatives.
+   - Resolve relevant API behavior.
+     - Read `alphainsider-api` when installed.
+     - Otherwise use the live [documentation index](https://api.alphainsider.com/llms.txt),
+       focused Markdown pages, and applicable
+       [OpenAPI](https://api.alphainsider.com/openapi.yaml) or
+       [AsyncAPI](https://api.alphainsider.com/asyncapi.yaml) sections.
+     - Verify intended actions' limits and side effects; do not invent rules or
+       copy endpoint catalogs.
+2. Ask high-level questions until behavior is clear enough to test and implement.
+   - Choose which details require user answers.
+   - Use fixed code, scheduled AI judgment, or both; record their roles.
+3. [Review the strategy and choose the next phase](references/workflow-contracts.md#choose-the-next-phase).
 
-1. Read [user communication](references/user-communication.md) before the first
-   user-facing message.
-2. Read [persistent project](references/project-root.md). Resume a clear match
-   or create one safe, durable project.
-3. Read `plan.md` and **Current status** when a project exists. Never open
-   `.env` to discover configuration.
-4. Route the requested work:
-   - For creation or incomplete setup, read the
-     [strategy interview](references/interview.md).
-   - For a run, operational error, notification, or repair, read
-     [scheduled and user-triggered runs](references/scheduled-runs.md).
-   - For an update, detected edit, external drift, or explicit deletion, read
-     [changes and explicit deletion](references/changes-and-deletion.md).
+## Backtest
 
-Follow links from the selected workflow only when their phase begins.
+1. Assess feasibility before asking backtest questions.
+   - Check information availability at each historical decision time.
+   - Explain material limitations. When faithful testing is unavailable, offer
+     the closest useful alternatives (proxy, signal-only test, forward observation)
+     and what each can establish.
+2. Ask backtest questions; let the user choose a test, revise, or skip testing.
+3. Build and run the chosen test.
+   - Submit no AlphaInsider orders.
+   - Identify approximations and future information; do not portray them as
+     faithful historical results.
+4. Save and present results.
+   - Save methodology, assumptions, limitations, results, reproducible outputs,
+     reports including failures, and artifact links; summarize them in `plan.md`.
+   - Explain results clearly with useful data-derived charts and visuals when
+     possible; avoid a fixed chart count.
+5. [Review the results and choose the next phase](references/workflow-contracts.md#choose-the-next-phase).
 
-## Confirmation and authority
+## Implement
 
-A Draft strategy permits interviewing and read-only discovery. A reviewed
-next-step choice confirms the strategy; there is no separate agreement prompt.
-Require a Confirmed strategy before planning a backtest or AlphaInsider
-setup.
+1. Obtain and verify API access through [credentials](references/credentials.md).
+   - Accept deliberate chat entry or direct project `.env` editing.
+   - Complete any required user-action turn before implementation questions.
+2. Ask relevant implementation questions.
+   - Recommend a new public strategy (`private: false`). Inspect and offer
+     compatible owned strategies, explaining their state and reuse effects.
+   - Resolve self-healing and notification preferences.
+3. Build the program command and runbook using
+   [run and recover](references/run-and-recover.md).
+   - Support agreed code/AI roles, expected outcomes, persistent state, and one
+     run at a time; choose the remaining project structure.
+4. Verify implementation and establish setup scope.
+   - Use meaningful checks and a dry run unable to submit, change, or cancel orders.
+   - Clarify setup and ongoing order, repair, and notification authority; honor
+     existing consent without a special approval phrase.
+5. Create or configure the AlphaInsider strategy and selected scheduled task.
+   - [Activate during setup](references/workflow-contracts.md#activate-the-schedule).
+   - Record identities and outcomes as they occur; reconcile uncertain results
+     before retrying resource creation or another external action.
+6. Hand off actual strategy/scheduler status, project location, useful results,
+   next scheduled run, and any required next action.
 
-Only **Build and Run** makes the reviewed backtest plan Authorized for its
-listed build and data access; a results-stage rerun can authorize a displayed
-mechanical correction in that plan. Only **Build, Configure, and Activate**
-makes the reviewed AlphaInsider setup Authorized for its listed actions,
-scheduler activation, and later plan-compliant paper orders.
+## Run and recover
 
-Keep `plan.md` current after every answer, material finding, completed action,
-failure, or next-step change. If a build reveals a required strategy,
-permission, schedule, or AlphaInsider change, return the affected stage to
-Draft and review it again. Apply a mechanical compatible fix without reopening
-unaffected decisions.
-
-Future paper-order authority never permits an unlisted AlphaInsider change,
-broker action, or strategy change.
-
-## AlphaInsider API behavior
-
-When installed, read `alphainsider-api` and only needed API sections. Otherwise,
-use the current `https://api.alphainsider.com` index and contracts. During
-Define, also check live schedule-critical pages. Follow stricter compatible
-focused prose, record discrepancies, and never infer sessions from an example
-status. Explicit session guidance overrides the fallback for new or revised
-schedules, never silently expanding a confirmed schedule.
+- Follow current `plan.md` and the generated runbook for scheduled or manual runs.
+  - The [runtime workflow](references/run-and-recover.md) covers execution,
+    evaluation, recovery, and notifications.
