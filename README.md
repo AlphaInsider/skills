@@ -89,5 +89,5 @@ inactive. Local checks and backtests never submit AlphaInsider orders.
 
 ## Development
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for setup and validation, and
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup and testing, and
 [Releases](CONTRIBUTING.md#releases) for the `NEW_RELEASE` workflow.

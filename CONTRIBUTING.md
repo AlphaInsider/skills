@@ -13,8 +13,7 @@ fields or heading names.
 Keep public skills and documentation agent-vendor agnostic; do not require
 vendor-specific metadata or behavior.
 
-When adding a public skill, update `EXPECTED_SKILLS` in
-`scripts/validate_catalog.py`, add installation and behavior coverage, and
+When adding a public skill, add installation and behavior coverage, and
 document its separate and combined installation forms in `README.md`. A new
 public specialist must also be added to
 `skills/alphainsider/references/catalog.md`. Do not copy source-repository
@@ -35,7 +34,6 @@ npm ci
 Before opening a change, run:
 
 ```bash
-python scripts/validate_catalog.py
 pytest
 npm run skills:list
 ```
@@ -54,8 +52,9 @@ metadata. The version must be at least the current `package.json` version,
 and neither its `vX.Y.Z` tag nor its release may already exist.
 
 The workflow always checks out `master`, synchronizes `package.json`,
-`package-lock.json`, and `pyproject.toml`, and commits any version changes
-together. It pushes the commit to `master`, then creates tag `vX.Y.Z` at
+`package-lock.json`, `pyproject.toml`, and the `Version:` line in every
+`skills/<name>/SKILL.md`, and commits these changes together.
+It pushes the commit to `master`, then creates tag `vX.Y.Z` at
 that exact commit and publishes `Release vX.Y.Z` with generated release
 notes as the latest release. It does not publish to npm or PyPI.
 

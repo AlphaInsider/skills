@@ -5,6 +5,25 @@ description: Define, backtest, implement, schedule, resume, and update AlphaInsi
 
 # AlphaInsider Strategy Creator
 
+Version: 0.1.0
+
+## Updates
+
+1. On first interactive use per conversation, inspect this environment's installed
+   AlphaInsider versions and read all pages of [public GitHub releases](https://api.github.com/repos/AlphaInsider/skills/releases?per_page=100)
+   without authentication. Compare numerically with the highest published stable
+   `vX.Y.Z`; ignore drafts, prereleases, bare tags, and Latest. For older/unknown
+   copies, show installed/available versions, label unknowns, and pause:
+   **Update all** or **Continue**. Share results/choices across skills; recheck
+   on request. Skip unattended runs. Continue quietly on automatic lookup failure
+   or no releases; explain explicit-check failures.
+
+2. On **Update all**, use available capabilities to update existing older/unknown
+   copies from the selected release, preserving installation scope. Keep current/newer
+   copies; install no missing skills. Reload updated instructions when supported
+   and resume. If unable to update, report outcomes, link the release, and give
+   suitable manual instructions; continue with available versions.
+
 ## Start or resume
 
 1. Run the [platform and automation access check](references/workflow-contracts.md#check-platform-and-automation-access)

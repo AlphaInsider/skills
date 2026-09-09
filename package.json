@@ -4,7 +4,6 @@
   "private": true,
   "description": "Official AlphaInsider agent skills",
   "scripts": {
-    "validate": "python3 scripts/validate_catalog.py",
     "skills:list": "skills add . --list"
   },
   "devDependencies": {
