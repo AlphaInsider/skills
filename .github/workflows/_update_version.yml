@@ -1,0 +1,99 @@
+name: _update_version
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        required: true
+        description: 'Version Number (eg: 0.0.0)'
+    outputs:
+      commit_sha:
+        description: 'Commit containing the release version'
+        value: ${{ jobs.update_version.outputs.commit_sha }}
+
+permissions:
+  contents: write
+
+jobs:
+  update_version:
+    runs-on: ubuntu-latest
+    outputs:
+      commit_sha: ${{ steps.commit.outputs.commit_sha }}
+    env:
+      NEW_VERSION: ${{ inputs.version }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      # checkout master
+      - name: Checkout master
+        uses: actions/checkout@v7
+        with:
+          ref: master
+
+      # verify version before making changes
+      - name: Verify version
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          version = os.environ['NEW_VERSION']
+          if not re.fullmatch(r'(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)', version):
+              raise SystemExit('Error: Version must be X.Y.Z without leading zeros or suffixes.')
+          current = json.loads(Path('package.json').read_text())['version']
+          if tuple(map(int, version.split('.'))) < tuple(map(int, current.split('.'))):
+              raise SystemExit(f'Error: New version ({version}) is less than the current version ({current}).')
+          PY
+
+      # preserve existing tags and releases
+      - name: Verify version is unpublished
+        shell: bash
+        run: |
+          TAG_REFS=$(gh api "repos/$GITHUB_REPOSITORY/git/matching-refs/tags/v$NEW_VERSION" --jq '.[].ref')
+          RELEASE_TAGS=$(gh api --paginate "repos/$GITHUB_REPOSITORY/releases?per_page=100" --jq '.[].tag_name')
+          if grep -Fxq "refs/tags/v$NEW_VERSION" <<< "$TAG_REFS" ||
+             grep -Fxq "v$NEW_VERSION" <<< "$RELEASE_TAGS"; then
+            echo "Error: Tag or release v$NEW_VERSION already exists."
+            exit 1
+          fi
+
+      # synchronize repository versions
+      - name: Update package versions
+        shell: bash
+        run: |
+          npm version "$NEW_VERSION" --no-git-tag-version --allow-same-version --ignore-scripts
+          python3 - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          path = Path('pyproject.toml')
+          text, count = re.subn(
+              r'^version = "[^"]+"$',
+              f'version = "{os.environ["NEW_VERSION"]}"',
+              path.read_text(),
+              flags=re.MULTILINE,
+          )
+          if count != 1:
+              raise SystemExit('Error: Expected exactly one Python project version.')
+          path.write_text(text)
+          PY
+
+      # push the version commit before publishing
+      - name: Push changes master
+        id: commit
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package.json package-lock.json pyproject.toml
+          if git diff --staged --quiet; then
+            echo 'Skipping, no changes to commit.'
+          else
+            git commit -m "Updated version to $NEW_VERSION"
+            git push origin HEAD:master
+          fi
+          echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"

@@ -1,0 +1,47 @@
+name: NEW_RELEASE
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        required: true
+        description: 'Version Number (eg: 0.0.0)'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: skills-release
+  cancel-in-progress: false
+
+jobs:
+  # update version
+  update_version:
+    uses: ./.github/workflows/_update_version.yml
+    with:
+      version: ${{ inputs.version }}
+
+  # create new release
+  create_new_release:
+    needs: update_version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create new release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEW_VERSION: ${{ inputs.version }}
+          RELEASE_SHA: ${{ needs.update_version.outputs.commit_sha }}
+        run: |
+          TAG_REFS=$(gh api "repos/$GITHUB_REPOSITORY/git/matching-refs/tags/v$NEW_VERSION" --jq '.[].ref')
+          if grep -Fxq "refs/tags/v$NEW_VERSION" <<< "$TAG_REFS"; then
+            echo "Error: Tag v$NEW_VERSION already exists."
+            exit 1
+          fi
+          gh release create "v$NEW_VERSION" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$RELEASE_SHA" \
+            --title "Release v$NEW_VERSION" \
+            --generate-notes \
+            --latest

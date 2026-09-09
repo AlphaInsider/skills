@@ -169,14 +169,7 @@ Content-Type: application/json
 
 Get exchange status.
 
-Note: Use this to observe current exchange status, but do not treat a status
-string by itself as permission to place a stock order. The local OpenAPI
-snapshot does not enumerate the response values or map them to accepted stock
-order sessions. Its `extended-hours` example is illustrative, not an
-eligibility rule. Check the current `llms.txt` index for session guidance, then
-the focused exchange-status and selected order-operation pages for an explicit
-mapping. If they do not provide one, stock-session eligibility remains
-unresolved.
+Note: Use this to check whether exchanges are currently open before placing stock orders.
 
 Inputs:
 
