@@ -6,13 +6,21 @@ Vendor-neutral skills for AlphaInsider API work and strategy automation.
 
 ## Skills
 
-- `alphainsider` routes an explicit request to a published specialist.
-- `alphainsider-api` provides current REST, WebSocket, authentication, sizing,
-  and order guidance.
-- `alphainsider-strategy-creator` creates and maintains plan-driven strategies,
+- [`alphainsider`](skills/alphainsider) routes an explicit request to a published specialist.
+- [`alphainsider-api`](https://api.alphainsider.com/skill.md) is hosted by Mintlify
+  and provides current REST, WebSocket, authentication, sizing, and order guidance.
+- [`alphainsider-strategy-creator`](skills/alphainsider-strategy-creator) creates and maintains plan-driven strategies,
   backtests, implementations, and native AI automation.
 
+For web assistants, share this page and name the skill. The
+[agent guide](AGENTS.md#published-skills) provides direct raw skill-file links.
+
 ## Install
+
+Use a supported installer or the environment's supported skill-file storage.
+Preserve the complete package layout, including linked references and scripts.
+If persistent installation is unavailable, report that limitation and distinguish
+loading the skill for this conversation from installing it.
 
 Install the optional router:
 
@@ -24,22 +32,21 @@ npx skills@latest add https://github.com/AlphaInsider/skills \
 Invoke it with `/alphainsider`, “use the alphainsider skill,” “route this with
 alphainsider,” or “which AlphaInsider skill.”
 
-Install the API specialist:
+Install the hosted API specialist:
 
 ```bash
-npx skills@latest add https://github.com/AlphaInsider/skills \
-  --skill alphainsider-api
+npx skills@latest add https://api.alphainsider.com --skill alphainsider-api
 ```
 
-Install both specialists:
+Install Strategy Creator:
 
 ```bash
 npx skills@latest add https://github.com/AlphaInsider/skills \
-  --skill alphainsider-api \
   --skill alphainsider-strategy-creator
 ```
 
-`alphainsider-api` is optional.
+Strategy Creator reads the hosted API skill as needed; installing it is optional.
+If an older GitHub API skill is installed, replace it with the hosted version.
 
 ## How it works
 

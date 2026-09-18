@@ -28,14 +28,13 @@ Set up the local environment:
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
-npm ci
 ```
 
 Before opening a change, run:
 
 ```bash
 pytest
-npm run skills:list
+npx skills@latest add . --list
 ```
 
 New skills must include realistic tests and must not expose credentials or
@@ -48,11 +47,11 @@ are merged into `master`, open **Actions → NEW_RELEASE → Run workflow** on
 GitHub, select `master`, and enter a version such as `0.1.1`.
 
 Use `X.Y.Z` without a `v` prefix, leading zeros, prerelease suffix, or build
-metadata. The version must be at least the current `package.json` version,
+metadata. The version must be at least the current `pyproject.toml` version,
 and neither its `vX.Y.Z` tag nor its release may already exist.
 
-The workflow always checks out `master`, synchronizes `package.json`,
-`package-lock.json`, `pyproject.toml`, and the `Version:` line in every
+The workflow always checks out `master`, synchronizes `pyproject.toml`
+and the `Version:` line in every
 `skills/<name>/SKILL.md`, and commits these changes together.
 It pushes the commit to `master`, then creates tag `vX.Y.Z` at
 that exact commit and publishes `Release vX.Y.Z` with generated release
