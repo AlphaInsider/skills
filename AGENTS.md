@@ -2,21 +2,32 @@
 
 This repository publishes reusable AlphaInsider agent skills from `skills/`.
 
+## Published skills
+
+- [AlphaInsider router](https://raw.githubusercontent.com/AlphaInsider/skills/master/skills/alphainsider/SKILL.md)
+- [Strategy Creator](https://raw.githubusercontent.com/AlphaInsider/skills/master/skills/alphainsider-strategy-creator/SKILL.md)
+- [AlphaInsider API](https://api.alphainsider.com/skill.md)
+
+For web-loaded files, resolve relative links against each fetched file's URL,
+retaining the same Git ref (`master` above, or the selected release).
+Human-facing documentation links to skill folders; agent-facing source links
+use raw `SKILL.md` URLs. Keep installed package references relative.
+
 ## Rules
 
 - Keep each public skill self-contained. `alphainsider` is the optional
   explicit router to published specialists; specialists stay self-contained.
-  When `alphainsider-api` and `alphainsider-strategy-creator` are both
-  installed, Strategy Creator should read `alphainsider-api` for API behavior.
+  API behavior comes from the hosted `alphainsider-api` skill at
+  `https://api.alphainsider.com/skill.md`, including for Strategy Creator.
+  Do not prefer an older installed GitHub copy.
 - Expose public skills only as `skills/<name>/SKILL.md`.
 - Keep public skills and documentation agent-vendor agnostic; do not require
   vendor-specific metadata or behavior.
 - Keep `SKILL.md` concise and route detailed material to one-level-deep
   `references/` files.
-- Keep `skills/alphainsider-api/SKILL.md` and its `references/` aligned with the
-  AlphaInsider API docs at `https://api.alphainsider.com`, including the
-  current OpenAPI and AsyncAPI contracts.
-- Before finalizing any change under `skills/alphainsider-api/`, read the live
+- The API skill and endpoint references are maintained in Mintlify; do not
+  recreate a local API skill or copy its endpoint catalog into this repository.
+- Before finalizing API-dependent guidance changes, read the hosted skill, the live
   `https://api.alphainsider.com/llms.txt` index and the relevant focused
   Markdown pages, then verify REST operations against
   `https://api.alphainsider.com/openapi.yaml` and WebSocket messages against
@@ -46,7 +57,6 @@ This repository publishes reusable AlphaInsider agent skills from `skills/`.
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
-npm ci
 pytest
-npm run skills:list
+npx skills@latest add . --list
 ```

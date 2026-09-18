@@ -9,14 +9,16 @@ Version: 1.0.0
 
 ## Updates
 
-1. On first interactive use per conversation, inspect this environment's installed
-   AlphaInsider versions and read all pages of [public GitHub releases](https://api.github.com/repos/AlphaInsider/skills/releases?per_page=100)
+1. On first interactive use per conversation, inspect installed versions of this
+   repository's `alphainsider` and `alphainsider-strategy-creator` skills, and read
+   all pages of [public GitHub releases](https://api.github.com/repos/AlphaInsider/skills/releases?per_page=100)
    without authentication. Compare numerically with the highest published stable
    `vX.Y.Z`; ignore drafts, prereleases, bare tags, and Latest. For older/unknown
    copies, show installed/available versions, label unknowns, and pause:
    **Update all** or **Continue**. Share results/choices across skills; recheck
    on request. Skip unattended runs. Continue quietly on automatic lookup failure
-   or no releases; explain explicit-check failures.
+   or no releases; explain explicit-check failures. The hosted API skill is
+   maintained by Mintlify and is excluded from this GitHub release check.
 
 2. On **Update all**, use available capabilities to update existing older/unknown
    copies from the selected release, preserving installation scope. Keep current/newer
@@ -45,11 +47,11 @@ Version: 1.0.0
      availability, and other relevant limits before recommending choices.
    - Explain conflicts, tradeoffs, and feasible alternatives.
    - Resolve relevant API behavior.
-     - Read `alphainsider-api` when installed.
-     - Otherwise use the live [documentation index](https://api.alphainsider.com/llms.txt),
-       focused Markdown pages, and applicable
-       [OpenAPI](https://api.alphainsider.com/openapi.yaml) or
-       [AsyncAPI](https://api.alphainsider.com/asyncapi.yaml) sections.
+     - Read the live [AlphaInsider API skill](https://api.alphainsider.com/skill.md),
+       then follow its navigation, prerequisite guides, and exact operation pages.
+       Use this source even if an older GitHub API skill is installed.
+     - If required API guidance cannot be fetched, pause the dependent API work
+       and report the missing source.
      - Verify intended actions' limits and side effects; do not invent rules or
        copy endpoint catalogs.
 2. [Ask high-level questions](references/workflow-contracts.md#resolve-the-current-decisions)
