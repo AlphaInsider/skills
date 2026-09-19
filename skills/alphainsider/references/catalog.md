@@ -3,6 +3,11 @@
 Routable specialists and their canonical sources. The API skill is hosted by
 Mintlify; Strategy Creator is published from this repository.
 
+The commands below are for assistants with terminal access. For web clients,
+follow the [ZIP upload guide](https://github.com/AlphaInsider/skills#web-clients):
+upload each complete skill folder separately, then enable it. The guide also
+explains how to package the hosted API skill when a website requires a ZIP.
+
 ## alphainsider-api
 
 - When to use: REST or WebSocket API behavior, request examples,
