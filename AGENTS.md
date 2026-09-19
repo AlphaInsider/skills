@@ -13,6 +13,10 @@ retaining the same Git ref (`master` above, or the selected release).
 Human-facing documentation links to skill folders; agent-facing source links
 use raw `SKILL.md` URLs. Keep installed package references relative.
 
+For web installation, follow the [README upload steps](README.md#web-clients):
+one ZIP per complete skill folder, uploaded and enabled through the site's skill
+manager. Reading a GitHub link or attaching a ZIP to a chat is not proof of installation.
+
 ## Rules
 
 - Keep each public skill self-contained. `alphainsider` is the optional
