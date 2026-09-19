@@ -27,6 +27,37 @@ jobs:
     needs: update_version
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout release commit
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.update_version.outputs.commit_sha }}
+
+      - name: Package skill ZIPs
+        shell: bash
+        env:
+          NEW_VERSION: ${{ inputs.version }}
+        run: |
+          mkdir release-assets
+          cat > release-notes.md <<'EOF'
+          ## Skill downloads
+
+          Download one skill ZIP below for each skill you want to install in your agent harness.
+          Upload the ZIP directly through its skill upload/import feature, then enable the skill.
+          No extraction or recompression is needed: each ZIP contains the skill folder with
+          its SKILL.md, references, and scripts. GitHub's Source code archives contain the
+          whole repository and are not individual skill uploads.
+
+          See the [installation guide](https://github.com/AlphaInsider/skills#web-clients).
+          The [AlphaInsider API skill](https://api.alphainsider.com/skill.md) is hosted separately.
+
+          EOF
+          for entrypoint in skills/*/SKILL.md; do
+            skill=$(basename "$(dirname "$entrypoint")")
+            git archive --format=zip --output="release-assets/$skill.zip" HEAD:skills "$skill"
+            printf -- '- [%s.zip](https://github.com/%s/releases/download/v%s/%s.zip)\n' \
+              "$skill" "$GITHUB_REPOSITORY" "$NEW_VERSION" "$skill" >> release-notes.md
+          done
+
       - name: Create new release
         shell: bash
         env:
@@ -39,9 +70,10 @@ jobs:
             echo "Error: Tag v$NEW_VERSION already exists."
             exit 1
           fi
-          gh release create "v$NEW_VERSION" \
+          gh release create "v$NEW_VERSION" release-assets/*.zip \
             --repo "$GITHUB_REPOSITORY" \
             --target "$RELEASE_SHA" \
             --title "Release v$NEW_VERSION" \
+            --notes-file release-notes.md \
             --generate-notes \
             --latest

@@ -5,8 +5,9 @@ Mintlify; Strategy Creator is published from this repository.
 
 The commands below are for assistants with terminal access. For web clients,
 follow the [ZIP upload guide](https://github.com/AlphaInsider/skills#web-clients):
-upload each complete skill folder separately, then enable it. The guide also
-explains how to package the hosted API skill when a website requires a ZIP.
+download individual skill ZIPs from GitHub release Assets, upload them directly,
+then enable them. The guide covers manual packaging when assets are unavailable
+and ZIP imports for the separately hosted API skill.
 
 ## alphainsider-api
 

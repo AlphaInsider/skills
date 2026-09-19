@@ -21,18 +21,20 @@ website's skill upload/import feature.
 Sharing a GitHub link or attaching files to an ordinary chat does not by itself
 install a reusable skill. Skill uploads must be available for your account.
 
-1. Download **Source code (zip)** from a [GitHub release](https://github.com/AlphaInsider/skills/releases),
-   or choose **Code → Download ZIP** on the [repository](https://github.com/AlphaInsider/skills)
-   for the current branch.
-2. Extract the repository download and open its `skills/` directory. Choose
-   `alphainsider-strategy-creator` for strategy work, `alphainsider` for the optional
-   router, or both.
-3. Compress each selected folder separately, keeping its name, `SKILL.md`, and all
-   bundled references and scripts. In Finder, right-click the folder and choose
-   **Compress**; in Windows File Explorer, use **Compress to ZIP file**. Upload the
-   resulting `alphainsider-strategy-creator.zip` and/or `alphainsider.zip`.
-4. Use the website's upload flow below, complete installation, and enable the skill.
+1. Open a [GitHub release](https://github.com/AlphaInsider/skills/releases) and
+   download `alphainsider-strategy-creator.zip` for strategy work and/or
+   `alphainsider.zip` for the optional router from **Assets**. Release notes link
+   to these individual skill ZIPs.
+2. Upload each downloaded ZIP directly using the website's upload flow below;
+   no extraction or recompression is needed.
+3. Complete installation and enable the skill.
    Start a new conversation and name the skill in your request.
+
+For an older release without skill ZIPs or an unreleased branch, download
+**Source code (zip)** or use **Code → Download ZIP**, extract it, and open `skills/`.
+Compress each selected skill folder separately, including `SKILL.md` and all its
+references and scripts. Use **Compress** in macOS Finder or **Compress to ZIP file**
+in Windows File Explorer.
 
 Each ZIP must contain a single skill folder, for example:
 
@@ -113,8 +115,8 @@ Ask the assistant to confirm it can load `SKILL.md` and the bundled references a
 scripts. Installation alone does not provide the execution, persistent storage,
 or scheduling access needed for strategy automation; the skill checks these first.
 
-For web uploads, download the desired release again, rebuild each installed
-skill's ZIP, and replace its uploaded copy using the website's update/import flow.
+For web uploads, download each installed skill's ZIP from the desired release's
+**Assets** and replace its uploaded copy using the website's update/import flow.
 Confirm the new copy is enabled and start a fresh conversation. Uploaded copies do
 not automatically track GitHub. For terminal or filesystem installations, update
 through the same installer or replace the complete skill folder. Refresh the API
