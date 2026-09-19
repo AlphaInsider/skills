@@ -57,6 +57,14 @@ It pushes the commit to `master`, then creates tag `vX.Y.Z` at
 that exact commit and publishes `Release vX.Y.Z` with generated release
 notes as the latest release. It does not publish to npm or PyPI.
 
+The release job checks out that same version commit and attaches one ZIP for
+every `skills/<name>/SKILL.md`: currently `alphainsider.zip` and
+`alphainsider-strategy-creator.zip`. Each archive contains the complete tracked
+`<name>/` folder with its entrypoint, references, and scripts, ready to upload
+directly to an agent harness. The release notes include download links and upload
+instructions before the generated changelog. GitHub's automatic source archives
+remain available; the separately hosted API skill is not packaged by this workflow.
+
 Release runs are serialized without cancelling an active run. Existing tags
 and releases are never deleted or replaced. If publication fails after the
 version commit was pushed, that commit remains; retry the same version only
