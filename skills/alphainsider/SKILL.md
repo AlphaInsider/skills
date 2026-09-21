@@ -5,7 +5,7 @@ description: Route an explicit AlphaInsider skill request to the matching publis
 
 # AlphaInsider
 
-Version: 1.0.2
+Version: 1.0.3
 
 ## Updates
 
