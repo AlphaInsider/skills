@@ -90,7 +90,7 @@ incomplete and give you the ZIP upload steps above.
 For the optional router:
 
 ```text
-Install the alphainsider skill from the latest release at https://github.com/AlphaInsider/skills/releases/latest for use in future conversations. Confirm where it was installed and whether it is ready to use.
+Install the alphainsider skill from https://github.com/AlphaInsider/skills/releases/latest/download/alphainsider.zip for use in future conversations. Confirm where it was installed and whether it is ready to use.
 ```
 
 Invoke it with `/alphainsider`, “use the alphainsider skill,” “route this with
@@ -105,7 +105,7 @@ Install the alphainsider-api skill from https://api.alphainsider.com/skill.md fo
 For Strategy Creator:
 
 ```text
-Install the alphainsider-strategy-creator skill from the latest release at https://github.com/AlphaInsider/skills/releases/latest for use in future conversations. Confirm where it was installed and whether it is ready to use.
+Install the alphainsider-strategy-creator skill from https://github.com/AlphaInsider/skills/releases/latest/download/alphainsider-strategy-creator.zip for use in future conversations. Confirm where it was installed and whether it is ready to use.
 ```
 
 Strategy Creator reads the hosted API skill when needed, so you can use it
@@ -134,7 +134,7 @@ automatically from GitHub. Get API skill updates from its hosted source.
 To have your agent update an installed skill, copy the matching prompt:
 
 ```text
-Update my installed alphainsider skill from the latest release at https://github.com/AlphaInsider/skills/releases/latest. Preserve its current installation scope and report what changed.
+Update my installed alphainsider skill from https://github.com/AlphaInsider/skills/releases/latest/download/alphainsider.zip. Preserve its current installation scope and report what changed.
 ```
 
 ```text
@@ -142,7 +142,7 @@ Update my installed alphainsider-api skill from https://api.alphainsider.com/ski
 ```
 
 ```text
-Update my installed alphainsider-strategy-creator skill from the latest release at https://github.com/AlphaInsider/skills/releases/latest. Preserve its current installation scope and report what changed.
+Update my installed alphainsider-strategy-creator skill from https://github.com/AlphaInsider/skills/releases/latest/download/alphainsider-strategy-creator.zip. Preserve its current installation scope and report what changed.
 ```
 
 ## How it works
