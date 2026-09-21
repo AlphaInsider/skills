@@ -39,24 +39,35 @@ jobs:
         run: |
           mkdir release-assets
           cat > release-notes.md <<'EOF'
-          ## Skill downloads
+          ## Install or update skills
 
-          Download one skill ZIP below for each skill you want to install in your agent harness.
-          Upload the ZIP directly through its skill upload/import feature, then enable the skill.
-          No extraction or recompression is needed: each ZIP contains the skill folder with
-          its SKILL.md, references, and scripts. GitHub's Source code archives contain the
-          whole repository and are not individual skill uploads.
+          Choose a skill below. Download its ZIP for a web upload, or copy its prompt into your agent.
 
-          See the [installation guide](https://github.com/AlphaInsider/skills#web-clients).
-          The [AlphaInsider API skill](https://api.alphainsider.com/skill.md) is hosted separately.
+          Upload the ZIP through your website's skill manager, enable the skill, and start a new
+          conversation. To update an uploaded skill, replace the installed copy with this version's
+          ZIP. Each archive includes the skill folder with its SKILL.md, references, and scripts.
+          No extraction or recompression is needed. GitHub's Source code archives contain the whole
+          repository; use the individual skill ZIPs below for uploads.
+
+          Your agent needs a skill manager or skills directory to install or update a skill.
+          Choose this project or a global installation when prompted.
+
+          The [AlphaInsider API skill](https://api.alphainsider.com/skill.md) is hosted separately
+          and is not part of this versioned release.
 
           EOF
+          printf 'For setup details, see the [installation guide](https://github.com/%s/blob/v%s/README.md#install).\n\n' \
+            "$GITHUB_REPOSITORY" "$NEW_VERSION" >> release-notes.md
           for entrypoint in skills/*/SKILL.md; do
             skill=$(basename "$(dirname "$entrypoint")")
             git archive --format=zip --output="release-assets/$skill.zip" HEAD:skills "$skill"
-            printf -- '- [%s.zip](https://github.com/%s/releases/download/v%s/%s.zip)\n' \
-              "$skill" "$GITHUB_REPOSITORY" "$NEW_VERSION" "$skill" >> release-notes.md
-          done
+            download_url="https://github.com/$GITHUB_REPOSITORY/releases/download/v$NEW_VERSION/$skill.zip"
+            printf '### %s\n\n[%s.zip](%s)\n\n' "$skill" "$skill" "$download_url"
+            printf 'Install with your agent:\n\n```text\nInstall the %s skill version %s from %s for use in future conversations. Confirm where it was installed and whether it is ready to use.\n```\n\n' \
+              "$skill" "$NEW_VERSION" "$download_url"
+            printf 'Update an installed copy:\n\n```text\nUpdate my installed %s skill to version %s from %s. Preserve its current installation scope and report what changed.\n```\n\n' \
+              "$skill" "$NEW_VERSION" "$download_url"
+          done >> release-notes.md
 
       - name: Create new release
         shell: bash
