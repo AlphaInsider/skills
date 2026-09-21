@@ -51,34 +51,34 @@ report the missing source and pause dependent API work.
 
 For Strategy Creator:
 
-1. Use available discovery tools to find an installed specialist, such as
-   `npx skills list` when supported. Follow its `SKILL.md`, references, and scripts.
-2. Otherwise, if the skills CLI is available, temp-use the full package from GitHub.
-   Never pass `--agent`:
-
-   ```bash
-   npx skills@latest use https://github.com/AlphaInsider/skills --skill alphainsider-strategy-creator
-   ```
-
-   Parse the support-directory path from stdout and follow that `SKILL.md`.
-   Relative scripts and references come from that directory.
-3. If the package tool is unavailable or temp-use fails, read
+1. Use the environment's discovery tools to find an installed specialist.
+   Follow its `SKILL.md`, references, and scripts.
+2. Otherwise, when downloads and extraction are available, load the complete
+   package from the selected release in the [catalog](references/catalog.md)
+   into temporary storage. Use the latest release unless the user selected a
+   version. Follow that package's `SKILL.md` and retain its relative references
+   and scripts. This loads it for the conversation without installing it.
+3. If package access is unavailable, read
    [Strategy Creator](https://raw.githubusercontent.com/AlphaInsider/skills/master/skills/alphainsider-strategy-creator/SKILL.md)
-   directly, then its required references. Use raw GitHub file URLs instead of folder pages or the GitHub Raw
-   button. Report any required file that cannot be fetched and stop dependent work.
+   directly, then its required references. For a selected release, resolve its
+   tag and use that tag in all raw URLs instead of `master`. Do not silently
+   substitute another version if retrieval fails. Report any required file
+   that cannot be fetched and stop dependent work.
 
 ## Persist
 
-Install a specialist only when the user asks, using its source and install
-command in the [catalog](references/catalog.md). Never install the API skill
-from the GitHub repository. For the skills CLI, if the user does not say global
-vs this project, ask and recommend global. Append `-g -y` for global installation
-or `-y` for this project; let the CLI detect agents. After a successful install,
-load the skill using the source rules above.
+Install a specialist only when the user asks, using its source in the
+[catalog](references/catalog.md) and the environment's supported skill manager
+or skill-file storage. Never install the API skill from the GitHub repository.
+For filesystem installation, if the user does not say global vs this project,
+ask and recommend global. Respect an already selected scope.
 
-For installation through supported skill-file storage, download the complete
-package, including linked references and scripts, preserving its directory layout
-and Git ref. If persistent installation is unavailable, report that limitation;
+For Strategy Creator, download the complete selected release package, including
+references and scripts, preserving its directory layout and Git ref. For the API
+skill, save the hosted file as described in the catalog. After installation, confirm the
+location, version when available, and whether the agent can discover and load
+the skill. Load it using the source rules above. If installation is unavailable
+or incomplete, report that outcome and provide the catalog's ZIP/upload steps;
 describe a web-loaded skill as loaded for this conversation, not installed.
 
 Do not require any specialist to be preinstalled. Do not install specialists

@@ -10,12 +10,16 @@ This repository publishes reusable AlphaInsider agent skills from `skills/`.
 
 For web-loaded files, resolve relative links against each fetched file's URL,
 retaining the same Git ref (`master` above, or the selected release).
-Human-facing documentation links to skill folders; agent-facing source links
-use raw `SKILL.md` URLs. Keep installed package references relative.
+Human-facing source links point to skill folders; downloads point to release ZIPs.
+Agent-facing raw `SKILL.md` links support conversation-only fallback. Keep
+installed package references relative.
 
-For web installation, follow the [README upload steps](README.md#web-clients):
-download individual skill ZIPs from the selected GitHub release's Assets, then
-upload and enable them through the site's skill manager. Package folders manually
+For requested installation, follow [Ask your agent to install](README.md#ask-your-agent-to-install)
+using the environment's supported skill manager or skill-file storage. Confirm
+the installed location and readiness. If installation is unavailable, report it
+as incomplete and provide the [README upload steps](README.md#web-clients):
+download the latest individual skill ZIP, or the selected version's asset, then
+upload and enable it through the site's skill manager. Package folders manually
 only when release assets are unavailable. Reading a GitHub link or attaching a ZIP
 to a chat is not proof of installation.
 

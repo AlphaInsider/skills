@@ -14,29 +14,34 @@ Vendor-neutral skills for AlphaInsider API work and strategy automation.
 
 ## Install
 
+Upload a ZIP through your website's skill manager, or use the prompts below to
+ask your agent to install a skill.
+
 ### Web clients
 
-For Claude, ChatGPT, and Grok (xAI), upload **one ZIP per skill** through the
-website's skill upload/import feature.
-Sharing a GitHub link or attaching files to an ordinary chat does not by itself
-install a reusable skill. Skill uploads must be available for your account.
+For Claude, ChatGPT, and Grok (xAI), your account must support skill uploads.
+Upload one ZIP per skill through the website's skill manager. Pasting a GitHub
+link or attaching files to an ordinary chat does not install a reusable skill.
 
-1. Open a [GitHub release](https://github.com/AlphaInsider/skills/releases) and
-   download `alphainsider-strategy-creator.zip` for strategy work and/or
-   `alphainsider.zip` for the optional router from **Assets**. Release notes link
-   to these individual skill ZIPs.
-2. Upload each downloaded ZIP directly using the website's upload flow below;
-   no extraction or recompression is needed.
-3. Complete installation and enable the skill.
-   Start a new conversation and name the skill in your request.
+1. Download the latest [Strategy Creator ZIP](https://github.com/AlphaInsider/skills/releases/latest/download/alphainsider-strategy-creator.zip)
+   for strategy work or [AlphaInsider ZIP](https://github.com/AlphaInsider/skills/releases/latest/download/alphainsider.zip)
+   for the optional router. Download both if you want both skills.
+2. Upload each ZIP using the steps for your website in the table below. Use the
+   downloaded file as is, without extracting or repackaging it.
+3. Finish installation and enable the skill. Start a new conversation and name
+   the skill in your request.
 
-For an older release without skill ZIPs or an unreleased branch, download
-**Source code (zip)** or use **Code → Download ZIP**, extract it, and open `skills/`.
-Compress each selected skill folder separately, including `SKILL.md` and all its
-references and scripts. Use **Compress** in macOS Finder or **Compress to ZIP file**
-in Windows File Explorer.
+The links above download the latest release. To use a specific version, open
+[GitHub releases](https://github.com/AlphaInsider/skills/releases) and choose the
+skill ZIP under that release's **Assets**.
 
-Each ZIP must contain a single skill folder, for example:
+If an older release has no skill ZIPs, or you need an unreleased branch, download
+**Source code (zip)** or use **Code → Download ZIP**. Extract the download and open
+`skills/`. Compress each skill folder separately with **Compress** in macOS Finder
+or **Compress to ZIP file** in Windows File Explorer. Include its `SKILL.md` and
+all references and scripts.
+
+Each ZIP must contain one skill folder at the top level:
 
 ```text
 alphainsider-strategy-creator.zip
@@ -46,9 +51,9 @@ alphainsider-strategy-creator.zip
     └── scripts/
 ```
 
-Do not upload the entire repository ZIP, the parent `skills/` folder, or only
-`SKILL.md`. Package a clean download; keep `.env`, API keys, and strategy projects
-out of skill archives.
+Use a clean download and keep `.env`, API keys, and strategy projects out of the
+archive. Upload the individual skill ZIP, not the entire repository ZIP, the
+parent `skills/` folder, or only `SKILL.md`.
 
 | Web client | Upload location |
 | --- | --- |
@@ -56,52 +61,56 @@ out of skill archives.
 | ChatGPT | **Plugins → Skills → Create → Upload from your computer**. Complete the upload review and installation. Access depends on your workspace; see [Skills in ChatGPT](https://help.openai.com/en/articles/20001066-skills-in-chatgpt). |
 | Grok (xAI) | Open [Skills](https://grok.com/skills) and use the available skill upload/import flow, then save and enable the skill. See [Grok Skills](https://x.ai/news/grok-skills). |
 
-If the upload control is missing, check the site's account and workspace settings.
-For conversation-only use, share this README and name the skill; an assistant with
-web access can follow the [raw skill links](AGENTS.md#published-skills). Ask it to
-confirm that it loaded the required files and to report any unavailable references
-or scripts. This does not create a persistent installation.
+If you cannot find the upload option, check the site's account and workspace
+settings. You can also share this README with an assistant that has web access
+and name the skill you want to use. It can follow the
+[raw skill links](AGENTS.md#published-skills) for that conversation. Ask it to
+confirm which files it loaded and report any missing references or scripts.
+You will need to load the skill again in a future conversation.
 
-The API skill is [hosted separately](https://api.alphainsider.com/skill.md), so there
-is no `alphainsider-api` folder in this repository. Give that URL to your assistant.
-For a website that requires a ZIP, save the hosted file as `alphainsider-api/SKILL.md`
-inside a new `alphainsider-api` folder, then compress and upload that folder. Its
-linked documentation still requires web access.
+The API skill is [hosted separately](https://api.alphainsider.com/skill.md). This
+repository has no `alphainsider-api` folder. Your assistant can read the hosted
+file directly. If your website requires a ZIP, save the file as
+`alphainsider-api/SKILL.md` inside a new `alphainsider-api` folder, then compress
+and upload that folder. The linked documentation still requires web access.
 
-### Coding assistants and terminal installation
+<a id="coding-assistants-and-terminal-installation"></a>
 
-Run these commands in a terminal with Node.js/npm available. The installer asks
-which supported assistant and installation scope to use. Run from your project
-for a project installation, or choose a global installation for reuse across projects.
-For manual filesystem installation, copy the complete skill folder into your
-assistant's supported skills directory. A local install does not install the skill
-in a separate web account.
+### Ask your agent to install
 
-Install the optional router:
+Copy the prompt for your skill into your agent. To install the skill for future
+conversations, the agent needs access to a supported skill manager or skills
+directory. When asked, choose whether to install it for this project or globally
+across projects. Installing it on your computer does not add it to a separate web
+account.
 
-```bash
-npx skills@latest add https://github.com/AlphaInsider/skills \
-  --skill alphainsider
+If the agent cannot finish installing the skill, it should tell you what remains
+incomplete and give you the ZIP upload steps above.
+
+For the optional router:
+
+```text
+Install the alphainsider skill from the latest release at https://github.com/AlphaInsider/skills/releases/latest for use in future conversations. Confirm where it was installed and whether it is ready to use.
 ```
 
 Invoke it with `/alphainsider`, “use the alphainsider skill,” “route this with
 alphainsider,” or “which AlphaInsider skill.”
 
-Install the hosted API specialist:
+For the hosted API skill:
 
-```bash
-npx skills@latest add https://api.alphainsider.com --skill alphainsider-api
+```text
+Install the alphainsider-api skill from https://api.alphainsider.com/skill.md for use in future conversations. Confirm where it was installed and whether it is ready to use.
 ```
 
-Install Strategy Creator:
+For Strategy Creator:
 
-```bash
-npx skills@latest add https://github.com/AlphaInsider/skills \
-  --skill alphainsider-strategy-creator
+```text
+Install the alphainsider-strategy-creator skill from the latest release at https://github.com/AlphaInsider/skills/releases/latest for use in future conversations. Confirm where it was installed and whether it is ready to use.
 ```
 
-Strategy Creator reads the hosted API skill as needed; installing it is optional.
-If an older GitHub API skill is installed, replace it with the hosted version.
+Strategy Creator reads the hosted API skill when needed, so you can use it
+without installing the API skill separately. If you have an older GitHub copy of
+the API skill, replace it with the hosted version.
 
 ## Use and update
 
@@ -111,16 +120,30 @@ After installation, try:
 Using the alphainsider-strategy-creator skill, help me turn this idea into an automated AlphaInsider paper-trading strategy: [describe your idea].
 ```
 
-Ask the assistant to confirm it can load `SKILL.md` and the bundled references and
-scripts. Installation alone does not provide the execution, persistent storage,
-or scheduling access needed for strategy automation; the skill checks these first.
+Ask the assistant to confirm it can read `SKILL.md` and the bundled references and
+scripts. Installing a skill does not give your assistant execution, persistent
+storage, or scheduling access. Strategy Creator checks these before starting
+strategy work.
 
-For web uploads, download each installed skill's ZIP from the desired release's
-**Assets** and replace its uploaded copy using the website's update/import flow.
-Confirm the new copy is enabled and start a fresh conversation. Uploaded copies do
-not automatically track GitHub. For terminal or filesystem installations, update
-through the same installer or replace the complete skill folder. Refresh the API
-skill from its hosted source.
+To update a skill you uploaded, download the latest [Strategy Creator ZIP](https://github.com/AlphaInsider/skills/releases/latest/download/alphainsider-strategy-creator.zip)
+or [AlphaInsider ZIP](https://github.com/AlphaInsider/skills/releases/latest/download/alphainsider.zip)
+and replace your installed copy through the website's update/import flow. Enable
+the new copy and start a fresh conversation. Uploaded skills do not update
+automatically from GitHub. Get API skill updates from its hosted source.
+
+To have your agent update an installed skill, copy the matching prompt:
+
+```text
+Update my installed alphainsider skill from the latest release at https://github.com/AlphaInsider/skills/releases/latest. Preserve its current installation scope and report what changed.
+```
+
+```text
+Update my installed alphainsider-api skill from https://api.alphainsider.com/skill.md. Preserve its current installation scope and report what changed.
+```
+
+```text
+Update my installed alphainsider-strategy-creator skill from the latest release at https://github.com/AlphaInsider/skills/releases/latest. Preserve its current installation scope and report what changed.
+```
 
 ## How it works
 
