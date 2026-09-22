@@ -1,6 +1,6 @@
 ---
 name: alphainsider
-description: Route an explicit AlphaInsider skill request to the matching published specialist. Use only when the user runs /alphainsider, says "use the alphainsider skill", "route this with alphainsider", or "which AlphaInsider skill".
+description: All-in-one access to AlphaInsider skills for API work, strategy creation, backtesting, and automation. Loads the matching specialist on request. Use only when the user runs /alphainsider, says "use the alphainsider skill", "route this with alphainsider", or "which AlphaInsider skill".
 ---
 
 # AlphaInsider
@@ -26,8 +26,10 @@ Version: 1.0.3
    and resume. If unable to update, report outcomes, link the release, and give
    suitable manual instructions; continue with available versions.
 
-Optional facade for published AlphaInsider skills. Specialists stay
-independently installable.
+The all-in-one AlphaInsider skill provides one entry point for API work, strategy
+creation, backtesting, and automation. Load the matching specialist as needed;
+users do not need to install each one separately. Specialists also remain
+available on their own.
 
 ## Start
 

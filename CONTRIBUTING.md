@@ -62,10 +62,10 @@ every `skills/<name>/SKILL.md`: currently `alphainsider.zip` and
 `alphainsider-strategy-creator.zip`. Each archive contains the complete tracked
 `<name>/` folder with its entrypoint, references, and scripts, ready to upload
 directly to an agent harness. Before the generated changelog, each skill has a ZIP
-download and copyable install and update prompts. These links and the setup guide
-use the release's exact version tag. Each prompt stays on one line and names that
-version. GitHub's automatic source archives remain available; the separately hosted
-API skill is not packaged by this workflow.
+download and copyable install and update prompts. ZIP links and the setup guide
+use the release's exact version tag. Each prompt stays on one line, points to the
+GitHub repository, and names that version. GitHub's automatic source archives
+remain available; the separately hosted API skill is not packaged by this workflow.
 
 Release runs are serialized without cancelling an active run. Existing tags
 and releases are never deleted or replaced. If publication fails after the
