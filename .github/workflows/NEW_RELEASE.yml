@@ -58,8 +58,11 @@ jobs:
           EOF
           printf 'For setup details, see the [installation guide](https://github.com/%s/blob/v%s/README.md#install).\n\n' \
             "$GITHUB_REPOSITORY" "$NEW_VERSION" >> release-notes.md
-          for entrypoint in skills/*/SKILL.md; do
-            skill=$(basename "$(dirname "$entrypoint")")
+          printf '> [!WARNING]\n> If the prompt does not complete the installation, use [Download and Install](https://github.com/%s/blob/v%s/README.md#download-and-install) to download the skill and install it manually.\n\n' \
+            "$GITHUB_REPOSITORY" "$NEW_VERSION" >> release-notes.md
+          for skill_dir in skills/*; do
+            [ -f "$skill_dir/SKILL.md" ] || continue
+            skill=$(basename "$skill_dir")
             git archive --format=zip --output="release-assets/$skill.zip" HEAD:skills "$skill"
             download_url="https://github.com/$GITHUB_REPOSITORY/releases/download/v$NEW_VERSION/$skill.zip"
             printf '### %s\n\n[%s.zip](%s)\n\n' "$skill" "$skill" "$download_url"
@@ -67,8 +70,6 @@ jobs:
               "$skill" "$NEW_VERSION" "https://github.com/$GITHUB_REPOSITORY"
             printf 'Update an installed copy:\n\n```text\nUpdate my installed %s skill to version %s from %s. Preserve its current installation scope and report what changed.\n```\n\n' \
               "$skill" "$NEW_VERSION" "https://github.com/$GITHUB_REPOSITORY"
-            printf '> [!WARNING]\n> If the prompt does not complete the installation, use [Download and Install](https://github.com/%s/blob/v%s/README.md#download-and-install) to download the skill and install it manually.\n\n' \
-              "$GITHUB_REPOSITORY" "$NEW_VERSION"
           done >> release-notes.md
 
       - name: Create new release
