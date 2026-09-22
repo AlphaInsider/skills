@@ -22,11 +22,14 @@
    | Local CLI, IDE, desktop | Durable folder + native AI task ([OpenAI](https://learn.chatgpt.com/docs/automations?surface=app), [Claude Code](https://code.claude.com/docs/en/desktop-scheduled-tasks)); local execution needs host/app running. [Grok Build loops](https://docs.x.ai/build/features/background-tasks) are temporary. |
    | Hosted agents | Native tasks/routines; persist repository/state beyond disposable checkouts. [Codex cloud](https://learn.chatgpt.com/docs/environments/cloud-environment), [Claude Routines](https://code.claude.com/docs/en/routines), [Grok Bot `/workspace`](https://docs.x.ai/grok-bot/computer-and-apps). |
 
-2. Verify fresh scheduled runs can read/update plan/code/state, execute
-   with protected credentials, persist results, and control pause/resume.
-   Check workspace bindings/permissions against official guidance. Cloud Projects
-   need no permanent local folder or trial schedule.
-3. Otherwise, stop and resolve access on the current platform using the
+2. Verify plan/code/state and saved results survive the current chat and remain
+   readable/writable from later chats and fresh scheduled runs. Verify scheduled
+   runs can execute with protected credentials and control pause/resume.
+   Check actual storage and workspace bindings/permissions against official guidance.
+   Cloud Projects may use durable writable storage without a permanent local folder 
+   or trial schedule.
+3. If persistence or any required access is unavailable or unverified, stop and
+   resolve access on the current platform using the
    [user action rule](#resolve-the-current-decisions). Recheck before work;
    migration requires user choice.
 

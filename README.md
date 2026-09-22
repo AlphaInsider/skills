@@ -151,9 +151,10 @@ Update my installed alphainsider-strategy-creator skill to the latest version fr
 ## How it works
 
 The [access check](skills/alphainsider-strategy-creator/references/workflow-contracts.md#check-platform-and-automation-access)
-verifies execution and persistent file access before project work. Use the host
-application's native AI scheduler unless unsupported or the user explicitly requests
-external scheduling.
+verifies execution and read/write file access across chats and scheduled runs before
+project work. If persistence is unavailable or unverified, the agent stops until
+access is resolved. Use the host application's native AI scheduler unless unsupported
+or the user explicitly requests external scheduling.
 
 Strategy Creator guides **Define strategy → Backtest → Implement** using
 ranked workflow outlines: number only operations that require sequence; use
