@@ -41,7 +41,7 @@ jobs:
           cat > release-notes.md <<'EOF'
           ## Install or update skills
 
-          Choose a skill below. Download its ZIP for a web upload, or copy its prompt into your agent.
+          Choose a skill below. Copy its prompt into your agent, or download its ZIP for manual installation.
 
           Upload the ZIP through your website's skill manager, enable the skill, and start a new
           conversation. To update an uploaded skill, replace the installed copy with this version's
@@ -64,9 +64,11 @@ jobs:
             download_url="https://github.com/$GITHUB_REPOSITORY/releases/download/v$NEW_VERSION/$skill.zip"
             printf '### %s\n\n[%s.zip](%s)\n\n' "$skill" "$skill" "$download_url"
             printf 'Install with your agent:\n\n```text\nInstall the %s skill version %s from %s for use in future conversations. Confirm where it was installed and whether it is ready to use.\n```\n\n' \
-              "$skill" "$NEW_VERSION" "$download_url"
+              "$skill" "$NEW_VERSION" "https://github.com/$GITHUB_REPOSITORY"
             printf 'Update an installed copy:\n\n```text\nUpdate my installed %s skill to version %s from %s. Preserve its current installation scope and report what changed.\n```\n\n' \
-              "$skill" "$NEW_VERSION" "$download_url"
+              "$skill" "$NEW_VERSION" "https://github.com/$GITHUB_REPOSITORY"
+            printf '> [!WARNING]\n> If the prompt does not complete the installation, use [Download and Install](https://github.com/%s/blob/v%s/README.md#download-and-install) to download the skill and install it manually.\n\n' \
+              "$GITHUB_REPOSITORY" "$NEW_VERSION"
           done >> release-notes.md
 
       - name: Create new release

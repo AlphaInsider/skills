@@ -5,7 +5,7 @@ Mintlify; Strategy Creator is published from this repository.
 
 For requested installation, use the environment's supported skill manager or
 skill-file storage. If unavailable, provide the
-[ZIP upload guide](https://github.com/AlphaInsider/skills#web-clients) and report
+[Download and Install guide](https://github.com/AlphaInsider/skills#download-and-install) and report
 that installation is incomplete. The guide covers direct skill ZIP downloads,
 manual packaging when assets are unavailable, and the separately hosted API skill.
 

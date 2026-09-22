@@ -4,7 +4,7 @@ This repository publishes reusable AlphaInsider agent skills from `skills/`.
 
 ## Published skills
 
-- [AlphaInsider router](https://raw.githubusercontent.com/AlphaInsider/skills/master/skills/alphainsider/SKILL.md)
+- [AlphaInsider all-in-one skill](https://raw.githubusercontent.com/AlphaInsider/skills/master/skills/alphainsider/SKILL.md)
 - [Strategy Creator](https://raw.githubusercontent.com/AlphaInsider/skills/master/skills/alphainsider-strategy-creator/SKILL.md)
 - [AlphaInsider API](https://api.alphainsider.com/skill.md)
 
@@ -17,7 +17,7 @@ installed package references relative.
 For requested installation, follow [Ask your agent to install](README.md#ask-your-agent-to-install)
 using the environment's supported skill manager or skill-file storage. Confirm
 the installed location and readiness. If installation is unavailable, report it
-as incomplete and provide the [README upload steps](README.md#web-clients):
+as incomplete and provide the [Download and Install guide](README.md#download-and-install):
 download the latest individual skill ZIP, or the selected version's asset, then
 upload and enable it through the site's skill manager. Package folders manually
 only when release assets are unavailable. Reading a GitHub link or attaching a ZIP
@@ -25,8 +25,8 @@ to a chat is not proof of installation.
 
 ## Rules
 
-- Keep each public skill self-contained. `alphainsider` is the optional
-  explicit router to published specialists; specialists stay self-contained.
+- Keep each public skill self-contained. `alphainsider` is the all-in-one
+  entry point that loads published specialists on explicit request; specialists stay self-contained.
   API behavior comes from the hosted `alphainsider-api` skill at
   `https://api.alphainsider.com/skill.md`, including for Strategy Creator.
   Do not prefer an older installed GitHub copy.

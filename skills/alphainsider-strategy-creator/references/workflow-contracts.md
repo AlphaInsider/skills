@@ -9,13 +9,14 @@
      if native scheduling is unsupported or the user explicitly requests them.
      Missing tools warrant checking other host interfaces.
    - Web products with Projects must use them; reuse attached/user-confirmed
-     Projects. Sources checked 2026-09-09; verify availability.
+     Projects. Verify availability for the current account.
 
    | Runtime | Workspace and scheduler |
    | --- | --- |
    | ChatGPT cloud chat | Project + [Scheduled](https://learn.chatgpt.com/docs/automations?surface=web); saved files/connectors, temporary execution folders. |
    | Grok web | [Project](https://grok.com/project) + [Automation](https://grok.com/automations); verify scheduled project file access. |
-   | Claude cloud chat | Project + [Cowork schedule](https://support.claude.com/en/articles/13854387-schedule-recurring-tasks-in-claude-cowork); writable account files/connectors. [Cowork](https://support.claude.com/en/articles/15520349-use-claude-cowork-on-web-desktop-and-mobile) cannot edit Project knowledge. |
+   | Claude cloud chat | Project + [Cowork schedule](https://support.claude.com/en/articles/13854387-schedule-recurring-tasks-in-claude-cowork); writable account files/connectors. |
+   | Claude Code cloud | [Claude Code Projects](https://code.claude.com/docs/en/claude-projects) + Library files + project memory + [project Routines](https://code.claude.com/docs/en/claude-projects#how-projects-relate-to-other-claude-code-features). |
    | OpenClaw | [Automations](https://docs.openclaw.ai/automation/cron-jobs) + owning agent's [workspace](https://docs.openclaw.ai/concepts/agent-workspace); keep Gateway running; verify scheduled [sandbox write access](https://docs.openclaw.ai/gateway/sandboxing#workspace-access). |
    | Hermes Agent | [`cronjob`](https://hermes-agent.nousresearch.com/docs/user-guide/features/cron) with absolute `workdir`; keep its profile's gateway running and [backend storage](https://hermes-agent.nousresearch.com/docs/user-guide/features/tools#terminal-backends) persistent. |
    | Local CLI, IDE, desktop | Durable folder + native AI task ([OpenAI](https://learn.chatgpt.com/docs/automations?surface=app), [Claude Code](https://code.claude.com/docs/en/desktop-scheduled-tasks)); local execution needs host/app running. [Grok Build loops](https://docs.x.ai/build/features/background-tasks) are temporary. |
