@@ -1,88 +1,96 @@
+<p align="center">
+  <a href="https://alphainsider.com">
+    <img src="https://api.alphainsider.com/img/logo.svg" alt="AlphaInsider" width="320">
+  </a>
+</p>
+
 # AlphaInsider Skills
 
-## Overview
+Give your AI assistant the instructions to work with [AlphaInsider](https://alphainsider.com),
+research trading ideas, and build automated paper-trading strategies.
 
-Vendor-neutral skills for AlphaInsider API work and strategy automation.
+A skill is a reusable set of instructions, references, and optional scripts that
+your assistant follows. These skills work within your assistant's tools and
+permissions, from answering API questions to creating a strategy project you can
+revisit in later conversations.
+
+[Choose a skill](#skills) · [Install](#install) · [Try it](#use-the-skills) · [How it works](#how-it-works)
 
 ## Skills
 
-- [`alphainsider`](skills/alphainsider) is the all-in-one AlphaInsider skill. It loads
-  the right specialist for API work, strategy creation, backtesting, and automation,
-  so you can use all AlphaInsider skills without installing each one separately.
-- [`alphainsider-api`](https://api.alphainsider.com/skill.md) is hosted by Mintlify
-  and provides current REST, WebSocket, authentication, sizing, and order guidance.
-- [`alphainsider-strategy-creator`](skills/alphainsider-strategy-creator) creates and maintains plan-driven strategies,
-  backtests, implementations, and native AI automation.
+| Skill | What it helps you do |
+| --- | --- |
+| [**AlphaInsider**](skills/alphainsider) (`alphainsider`) | Start with one entry point. It loads the appropriate specialist for API work or strategy creation, backtesting, and automation. |
+| [**Strategy Creator**](skills/alphainsider-strategy-creator) (`alphainsider-strategy-creator`) | Turn an idea into a defined strategy, evaluate it with backtests, and implement and schedule it on AlphaInsider using simulated funds. Resume or update the project later. |
+| [**AlphaInsider API**](https://api.alphainsider.com/skill.md) (`alphainsider-api`) | Work with the REST and WebSocket APIs, including authentication, market data, strategies, orders, positions, and bots. Follow current documentation for requests and trading calculations. |
+
+**Start with `alphainsider` if you want access to everything.** It loads specialists
+as needed without requiring separate installation. You can also install a
+specialist directly. Strategy Creator reads the hosted API skill when needed.
+
+This repository publishes AlphaInsider and Strategy Creator. The API skill is
+[hosted separately](https://api.alphainsider.com/skill.md) and maintained with the
+API documentation.
 
 ## Install
 
-Ask your agent to install a skill with a prompt below, or download a ZIP for
-manual installation.
+Use an assistant that can load skills and read online documentation. Installation
+for future conversations requires a supported skill manager or skills directory;
+availability depends on your application and account.
 
 <a id="coding-assistants-and-terminal-installation"></a>
 
 ### Ask your agent to install
 
-Copy the prompt for your skill into your agent. To install the skill for future
-conversations, the agent needs access to a supported skill manager or skills
-directory. When asked, choose whether to install it for this project or globally
-across projects. Installing it on your computer does not add it to a separate web
-account.
+Copy one prompt into your assistant. When prompted, choose installation for this
+project or globally across projects. A local installation applies to that
+assistant environment; a separate web account needs its own installation.
 
-> [!WARNING]
-> If the prompt does not complete the installation, use [Download and Install](#download-and-install)
-> to download the skill and install it manually.
-
-For the all-in-one AlphaInsider skill:
+**AlphaInsider — all-in-one:**
 
 ```text
 Install the latest alphainsider skill from https://github.com/AlphaInsider/skills for use in future conversations. Confirm where it was installed and whether it is ready to use.
 ```
 
-Invoke it with `/alphainsider`, “use the alphainsider skill,” “route this with
-alphainsider,” or “which AlphaInsider skill.”
-
-For the hosted API skill:
-
-```text
-Install the latest alphainsider-api skill from https://api.alphainsider.com/skill.md for use in future conversations. Confirm where it was installed and whether it is ready to use.
-```
-
-For Strategy Creator:
+**Strategy Creator:**
 
 ```text
 Install the latest alphainsider-strategy-creator skill from https://github.com/AlphaInsider/skills for use in future conversations. Confirm where it was installed and whether it is ready to use.
 ```
 
-Strategy Creator reads the hosted API skill when needed, so you can use it
-without installing the API skill separately. If you have an older GitHub copy of
-the API skill, replace it with the hosted version.
+**AlphaInsider API:**
+
+```text
+Install the latest alphainsider-api skill from https://api.alphainsider.com/skill.md for use in future conversations. Confirm where it was installed and whether it is ready to use.
+```
+
+> [!WARNING]
+> If the prompt does not complete installation, use [Download and Install](#download-and-install).
+> Reading a link or attaching a ZIP to an ordinary chat does not install a reusable skill.
 
 ### Download and Install
 
-For Claude, ChatGPT, and Grok (xAI), your account must support skill uploads.
-Upload one ZIP per skill through the website's skill manager. Pasting a GitHub
-link or attaching files to an ordinary chat does not install a reusable skill.
+If your assistant supports skill uploads:
 
-1. Download the latest [AlphaInsider ZIP](https://github.com/AlphaInsider/skills/releases/latest/download/alphainsider.zip)
-   for the all-in-one skill, or [Strategy Creator ZIP](https://github.com/AlphaInsider/skills/releases/latest/download/alphainsider-strategy-creator.zip)
-   for a dedicated strategy skill. Download both if you want to invoke either skill directly.
-2. Upload each ZIP using the steps for your website in the table below. Use the
-   downloaded file as is, without extracting or repackaging it.
-3. Finish installation and enable the skill. Start a new conversation and name
-   the skill in your request.
+1. Download the [AlphaInsider ZIP](https://github.com/AlphaInsider/skills/releases/latest/download/alphainsider.zip)
+   or [Strategy Creator ZIP](https://github.com/AlphaInsider/skills/releases/latest/download/alphainsider-strategy-creator.zip).
+   Install both if you want to invoke either directly.
+2. Upload each ZIP through your application's skill manager, then finish
+   installation and enable it. Use the downloaded file as is.
+3. Start a new conversation and ask the assistant to confirm it can load the
+   skill and its supporting files.
 
-The links above download the latest release. To use a specific version, open
-[GitHub releases](https://github.com/AlphaInsider/skills/releases) and choose the
-skill ZIP under that release's **Assets**.
+For a specific version, choose its skill ZIP under **Assets** in
+[GitHub releases](https://github.com/AlphaInsider/skills/releases).
+See the [installation guide](https://api.alphainsider.com/resources/agent-skill)
+for web-client instructions.
 
-If an older release has no skill ZIPs, or you need an unreleased branch, download
-**Source code (zip)** or use **Code → Download ZIP**. Extract the download and open
-`skills/`. Compress each skill folder separately with **Compress** in macOS Finder
-or **Compress to ZIP file** in Windows File Explorer. Include its `SKILL.md` and
-all references and scripts.
+<details>
+<summary>Manual packaging and the hosted API skill</summary>
 
-Each ZIP must contain one skill folder at the top level:
+If a release has no skill ZIPs, or you need an unreleased branch, download the
+repository's source ZIP, extract it, and open `skills/`. Compress the individual
+skill folder with its `SKILL.md`, references, and scripts:
 
 ```text
 alphainsider-strategy-creator.zip
@@ -92,110 +100,111 @@ alphainsider-strategy-creator.zip
     └── scripts/
 ```
 
-Use a clean download and keep `.env`, API keys, and strategy projects out of the
-archive. Upload the individual skill ZIP, not the entire repository ZIP, the
-parent `skills/` folder, or only `SKILL.md`.
+Keep `.env`, API keys, and generated projects out of the archive. Upload one skill
+folder per ZIP.
 
-| Web client | Upload location |
-| --- | --- |
-| Claude | **Customize → Skills → + → Create skill → Upload a skill**, then enable it. Code execution and file creation must be enabled. See [Claude's instructions](https://support.claude.com/en/articles/12512180-use-skills-in-claude). |
-| ChatGPT | **Plugins → Skills → Create → Upload from your computer**. Complete the upload review and installation. Access depends on your workspace; see [Skills in ChatGPT](https://help.openai.com/en/articles/20001066-skills-in-chatgpt). |
-| Grok (xAI) | Open [Skills](https://grok.com/skills) and use the available skill upload/import flow, then save and enable the skill. See [Grok Skills](https://x.ai/news/grok-skills). |
+For the API skill, save the [hosted file](https://api.alphainsider.com/skill.md)
+as `alphainsider-api/SKILL.md`, then compress and upload that folder. Its linked
+documentation still requires web access. Use this hosted source for API skill
+updates as well.
 
-If you cannot find the upload option, check the site's account and workspace
-settings. You can also share this README with an assistant that has web access
-and name the skill you want to use. It can follow the
-[raw skill links](AGENTS.md#published-skills) for that conversation. Ask it to
-confirm which files it loaded and report any missing references or scripts.
-You will need to load the skill again in a future conversation.
+</details>
 
-The API skill is [hosted separately](https://api.alphainsider.com/skill.md). This
-repository has no `alphainsider-api` folder. Your assistant can read the hosted
-file directly. If your website requires a ZIP, save the file as
-`alphainsider-api/SKILL.md` inside a new `alphainsider-api` folder, then compress
-and upload that folder. The linked documentation still requires web access.
+If installation is unavailable, an assistant with web access can follow the
+[raw skill links](AGENTS.md#published-skills) for the current conversation. Ask it
+to confirm which files it loaded and report any missing references or scripts.
+You will need to load the skill again in future conversations.
 
-## Use and update
+<a id="use-and-update"></a>
 
-After installation, try:
+## Use the skills
+
+Name the skill and describe what you want to do. With the all-in-one skill:
 
 ```text
-Using the alphainsider-strategy-creator skill, help me turn this idea into an automated AlphaInsider paper-trading strategy: [describe your idea].
+Use the alphainsider skill to help me turn this idea into an automated AlphaInsider paper-trading strategy: [describe your idea].
 ```
 
-Ask the assistant to confirm it can read `SKILL.md` and the bundled references and
-scripts. Installing a skill does not give your assistant execution, persistent
-storage, or scheduling access. Strategy Creator checks these before starting
-strategy work.
+With the API skill installed directly:
 
-To update a skill you uploaded, download the latest [Strategy Creator ZIP](https://github.com/AlphaInsider/skills/releases/latest/download/alphainsider-strategy-creator.zip)
-or [AlphaInsider ZIP](https://github.com/AlphaInsider/skills/releases/latest/download/alphainsider.zip)
-and replace your installed copy through the website's update/import flow. Enable
-the new copy and start a fresh conversation. Uploaded skills do not update
-automatically from GitHub. Get API skill updates from its hosted source.
+```text
+Use the alphainsider-api skill to explain how to retrieve my strategy's positions and display their dollar values correctly.
+```
 
-To have your agent update an installed skill, copy the matching prompt:
+If you installed Strategy Creator directly:
+
+```text
+Using the alphainsider-strategy-creator skill, help me define and backtest this paper-trading idea: [describe your idea].
+```
+
+You can ask to revise an idea, run another backtest, pause automation, or change
+an existing strategy. To resume later, give the assistant your project location
+and ask it to continue from `plan.md`.
+
+## How it works
+
+The all-in-one skill matches your request to a specialist and asks you to choose
+if the request fits more than one. For Strategy Creator, it uses an installed
+copy or loads the published files for the conversation. For API work, it reads
+the live hosted skill. Routing does not install additional skills.
+
+The API skill guides the assistant through the current documentation for your
+task. Strategy Creator takes you through a longer workflow:
+
+1. **Check the environment.** Verify code execution, persistent file access, and
+   scheduling capabilities before starting project work. Files must remain
+   readable and writable in later chats and scheduled runs. If required access
+   is unavailable or unverified, setup stops until it is resolved.
+2. **Define the strategy.** Describe your idea and answer questions about trading
+   rules, data, timing, and constraints. The assistant checks feasibility and
+   records your decisions in `plan.md`.
+3. **Evaluate it.** Choose a backtest, revise the idea, or skip testing after
+   reviewing limitations. Results include assumptions, reports, and useful
+   charts. Backtests and local checks submit no AlphaInsider orders.
+4. **Implement and schedule.** The assistant verifies API access, helps you select
+   a new or compatible existing AlphaInsider strategy, and builds the program
+   and operating instructions. You choose the schedule, notifications, and
+   whether to enable automatic recovery. Agreed setup activates the schedule
+   for its next run unless you have paused it or setup is blocked.
+5. **Run and maintain.** Each scheduled run follows the saved plan, executes the
+   program, and records its outcome. Errors block new orders and pause
+   automation. If enabled, automatic recovery can repair implementation issues
+   within your agreed decisions and permissions, verify the fix without orders,
+   and resume. Issues that need your input stay paused for your attention.
+
+You choose whether to continue, revise, or save and stop after strategy definition
+and backtesting. Trading decisions can use fixed code, scheduled AI judgment, or both.
+
+Your project keeps the plan, code, backtest results, run history, and operating
+instructions outside the installed skill. Credentials stay in the project's
+`.env`, excluded from version control and reports; agents do not inspect or print
+existing secret values. Implementation requires an AlphaInsider account and API
+key, which the assistant helps you configure when needed.
+
+> [!IMPORTANT]
+> Installing a skill does not provide hosting, persistent storage, or a scheduler.
+> Strategy Creator uses your application's native AI scheduling unless unsupported
+> or you request an external scheduler. Local execution requires the host and
+> necessary application to remain running.
+
+## Update installed skills
+
+Ask your assistant to update the installed copy while preserving its scope:
 
 ```text
 Update my installed alphainsider skill to the latest version from https://github.com/AlphaInsider/skills. Preserve its current installation scope and report what changed.
 ```
 
 ```text
-Update my installed alphainsider-api skill from https://api.alphainsider.com/skill.md. Preserve its current installation scope and report what changed.
-```
-
-```text
 Update my installed alphainsider-strategy-creator skill to the latest version from https://github.com/AlphaInsider/skills. Preserve its current installation scope and report what changed.
 ```
 
-## How it works
+```text
+Update my installed alphainsider-api skill from https://api.alphainsider.com/skill.md. Preserve its current installation scope and report what changed.
+```
 
-The [access check](skills/alphainsider-strategy-creator/references/workflow-contracts.md#check-platform-and-automation-access)
-verifies execution and read/write file access across chats and scheduled runs before
-project work. If persistence is unavailable or unverified, the agent stops until
-access is resolved. Use the host application's native AI scheduler unless unsupported
-or the user explicitly requests external scheduling.
-
-Strategy Creator guides **Define strategy → Backtest → Implement** using
-ranked workflow outlines: number only operations that require sequence; use
-bullets and sub-bullets for other notes, ranked by importance. Question rounds
-present options on consecutive lines, with recommendations. After strategy definition
-and backtesting, a summary and standalone next-step question let users backtest, implement on
-AlphaInsider, revise, or stop. Required user actions get their own turn; questions
-resume after completion. Questions and guardrails reflect actual AI scheduling,
-AlphaInsider, and data limits. Backtest planning starts with feasibility and
-useful alternatives; users can skip after reviewing limitations. Results include
-charts and visuals when possible.
-
-The project's root `plan.md` records decisions, progress, resources, open questions,
-workspace/runner binding and access evidence, and the next action. Its flexible
-outline supports later chats. Secrets stay in project `.env`; users may paste
-new API keys for the non-echoing helper or edit `.env` themselves. Agents never
-inspect existing secret values.
-Before requesting a key, create missing `.env` and `.env.example` files with an
-empty `ALPHAINSIDER_API_KEY=` entry.
-
-Implementation recommends a new public AlphaInsider strategy and offers compatible
-owned strategies. Users choose self-healing and notification settings. Trading
-decisions can use code, scheduled AI judgment, or both. The skill generates
-project-specific code and a runbook; AlphaInsider strategies use simulated funds.
-
-Each scheduled agent runs the program command and evaluates expected outcomes.
-Shared exclusivity prevents overlapping runs. On an error, execution blocks
-new orders and pauses the scheduler. Enabled self-healing may repair any
-implementation issue that preserves the plan's decisions and needs no human
-input or new authority. A dry run without orders verifies the fix before a
-suitable immediate rerun or resumption for the next scheduled run. Unresolved
-or interrupted recovery stays paused for the user. Notifications explain the
-issue, automation state, and next step through the selected events and channels.
-
-New schedules activate automatically during setup for the next run, without
-another prompt. Access is rechecked for the actual task, alongside agent-controlled
-pause/resume, using configuration and documentation; no prior scheduled run is
-required. Explicit user pauses or concrete setup failures keep automation
-inactive. Local checks and backtests never submit AlphaInsider orders.
-
-## Development
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for setup and testing, and
-[Releases](CONTRIBUTING.md#releases) for the `NEW_RELEASE` workflow.
+For uploaded skills, download a fresh ZIP and replace the installed copy through
+your application's update or import flow. Enable it and start a fresh conversation.
+Uploaded copies do not update automatically from GitHub. AlphaInsider and Strategy
+Creator also check for newer stable releases on first interactive use and offer
+to update existing installations; unattended runs skip that check.
