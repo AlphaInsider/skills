@@ -7,7 +7,7 @@
 # AlphaInsider Skills
 
 Give your AI assistant the instructions to work with [AlphaInsider](https://alphainsider.com),
-research trading ideas, and build automated paper-trading strategies.
+research trading ideas, and build automated trading strategies.
 
 A skill is a reusable set of instructions, references, and optional scripts that
 your assistant follows. These skills work within your assistant's tools and
@@ -21,7 +21,7 @@ revisit in later conversations.
 | Skill | What it helps you do |
 | --- | --- |
 | [**AlphaInsider**](skills/alphainsider) (`alphainsider`) | Start with one entry point. It loads the appropriate specialist for API work or strategy creation, backtesting, and automation. |
-| [**Strategy Creator**](skills/alphainsider-strategy-creator) (`alphainsider-strategy-creator`) | Turn an idea into a defined strategy, evaluate it with backtests, and implement and schedule it on AlphaInsider using simulated funds. Resume or update the project later. |
+| [**Strategy Creator**](skills/alphainsider-strategy-creator) (`alphainsider-strategy-creator`) | Turn an idea into a defined strategy, evaluate it with backtests, and implement and schedule it for AlphaInsider forward testing using simulated funds. Resume or update the project later. |
 | [**AlphaInsider API**](https://api.alphainsider.com/skill.md) (`alphainsider-api`) | Work with the REST and WebSocket APIs, including authentication, market data, strategies, orders, positions, and bots. Follow current documentation for requests and trading calculations. |
 
 **Start with `alphainsider` if you want access to everything.** It loads specialists
@@ -160,12 +160,13 @@ task. Strategy Creator takes you through a longer workflow:
    records your decisions in `plan.md`.
 3. **Evaluate it.** Choose a backtest, revise the idea, or skip testing after
    reviewing limitations. Results include assumptions, reports, and useful
-   charts. Backtests and local checks submit no AlphaInsider orders.
-4. **Implement and schedule.** The assistant verifies API access, helps you select
-   a new or compatible existing AlphaInsider strategy, and builds the program
-   and operating instructions. You choose the schedule, notifications, and
-   whether to enable automatic recovery. Agreed setup activates the schedule
-   for its next run unless you have paused it or setup is blocked.
+   charts. Backtests and local checks submit no orders.
+4. **Implement and schedule.** The assistant builds the program and operating
+   instructions. It verifies API access and helps you select a new or compatible
+   existing AlphaInsider strategy.
+   You choose the schedule, notifications, and whether to enable automatic recovery.
+   Agreed setup activates the schedule for its next run unless you have paused it
+   or setup is blocked.
 5. **Run and maintain.** Each scheduled run follows the saved plan, executes the
    program, and records its outcome. Errors block new orders and pause
    automation. If enabled, automatic recovery can repair implementation issues
@@ -178,8 +179,8 @@ and backtesting. Trading decisions can use fixed code, scheduled AI judgment, or
 Your project keeps the plan, code, backtest results, run history, and operating
 instructions outside the installed skill. Credentials stay in the project's
 `.env`, excluded from version control and reports; agents do not inspect or print
-existing secret values. Implementation requires an AlphaInsider account and API
-key, which the assistant helps you configure when needed.
+existing secret values. AlphaInsider forward testing requires an account and API
+key, which the assistant helps you configure.
 
 > [!IMPORTANT]
 > Installing a skill does not provide hosting, persistent storage, or a scheduler.

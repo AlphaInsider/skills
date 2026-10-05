@@ -28,7 +28,8 @@
 
 ## Implement
 
-- Chosen AlphaInsider strategy/settings, visibility, public ID/link, and agreed ongoing authority.
+- AlphaInsider strategy/settings, visibility, and public ID/link.
+- Agreed setup and ongoing authority.
 - Program/dry-run commands, expected outcomes, and runbook/artifact locations.
 - Scheduler/task identity and selection reason, timing, setup verification, and incomplete work.
 - Self-healing decisions and recovery state.
