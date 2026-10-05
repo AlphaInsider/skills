@@ -100,9 +100,9 @@
 
 1. In a separate response, summarize the completed phase and ask one next-step question.
    - After strategy definition: summarize agreed behavior; offer Backtest Strategy,
-     Skip Backtesting and Implement on AlphaInsider, Revise Strategy, or Save and Stop.
-   - After backtesting: summarize results and limitations; offer Implement on
-     AlphaInsider, Further/Corrected Backtesting, Revise and Retest, or Save and Stop.
+     Skip Backtesting and Implement Strategy, Revise Strategy, or Save and Stop.
+   - After backtesting: summarize results and limitations; offer Implement Strategy,
+     Further/Corrected Backtesting, Revise and Retest, or Save and Stop.
    - Use `❓ **Next step:** What would you like to do?`, lettered options, and
      `➡️ **Recommended:**` with a reason.
    - Recommend useful backtesting; base post-test recommendations on evidence.

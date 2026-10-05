@@ -22,7 +22,8 @@ manual packaging when assets are unavailable, and the separately hosted API skil
 ## alphainsider-strategy-creator
 
 - When to use: define, backtest, implement, schedule, run, resume, recover,
-  or update an AlphaInsider paper strategy with a persistent project plan.
+  or update a trading strategy with a persistent project plan and
+  AlphaInsider forward testing.
 - Source: the [latest release](https://github.com/AlphaInsider/skills/releases/latest)
   and its [Strategy Creator ZIP](https://github.com/AlphaInsider/skills/releases/latest/download/alphainsider-strategy-creator.zip).
   Use the selected version's assets instead when the user specifies a release.

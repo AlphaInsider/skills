@@ -1,6 +1,6 @@
 ---
 name: alphainsider-strategy-creator
-description: Define, backtest, implement, schedule, resume, and update AlphaInsider paper strategies with a persistent project plan and optional automatic recovery.
+description: Define, backtest, implement, schedule, resume, and update trading strategies with a persistent project plan, AlphaInsider forward testing, and optional automatic recovery.
 ---
 
 # AlphaInsider Strategy Creator
@@ -33,7 +33,7 @@ Version: 1.0.5
    or strategy work.
    - Resume from its `plan.md` before new work; keep generated artifacts outside
      this skill repository.
-   - Let user decisions govern AlphaInsider paper automation.
+   - Let user decisions govern strategy automation.
    - Use judgment for questions, guardrails, implementation, and checks.
 2. Continue from recorded state.
    - Handle stops and updates whenever requested.
@@ -43,10 +43,10 @@ Version: 1.0.5
 ## Define strategy
 
 1. Research strategy and cadence constraints.
-   - Check actual AI scheduling capabilities, AlphaInsider constraints, data
-     availability, and other relevant limits before recommending choices.
+   - Check actual AI scheduling capabilities, data availability, and other
+     relevant limits before recommending choices.
    - Explain conflicts, tradeoffs, and feasible alternatives.
-   - Resolve relevant API behavior.
+   - For AlphaInsider API work, resolve its constraints and relevant API behavior.
      - Read the live [AlphaInsider API skill](https://api.alphainsider.com/skill.md),
        then follow its navigation, prerequisite guides, and exact operation pages.
        Use this source even if an older GitHub API skill is installed.
@@ -70,7 +70,7 @@ Version: 1.0.5
      and what each can establish.
 2. Ask backtest questions; let the user choose a test, revise, or skip testing.
 3. Build and run the chosen test.
-   - Submit no AlphaInsider orders.
+   - Submit no orders.
    - Identify approximations and future information; do not portray them as
      faithful historical results.
 4. Save and present results.
@@ -82,15 +82,16 @@ Version: 1.0.5
 
 ## Implement
 
-1. Obtain and verify API access through [credentials](references/credentials.md).
+1. Obtain and verify AlphaInsider API access through [credentials](references/credentials.md).
    - Accept deliberate chat entry or direct project `.env` editing.
    - Complete any required user-action turn before implementation questions.
 2. Ask relevant implementation questions.
-   - Recommend a new strategy and offer compatible owned strategies, explaining their state and reuse effects.
-   - Before creating a new strategy, check available API parameters. Ask about
-     options unresolved by prior answers or strategy context, recommending values
-     with reasons; wait for answers.
-     - Recommend a public strategy (`private: false`).
+   - Recommend a new AlphaInsider strategy and offer compatible
+     owned strategies, explaining their state and reuse effects.
+     - Before creating a new strategy, check available API parameters. Ask about
+       options unresolved by prior answers or strategy context, recommending values
+       with reasons; wait for answers.
+       - Recommend a public strategy (`private: false`).
    - Resolve self-healing and notification preferences.
 3. Build the program command and runbook using
    [run and recover](references/run-and-recover.md).
@@ -101,7 +102,7 @@ Version: 1.0.5
    - Use meaningful checks and a dry run unable to submit, change, or cancel orders.
    - Clarify setup and ongoing order, repair, and notification authority; honor
      existing consent without a special approval phrase.
-5. Create or configure the AlphaInsider strategy and selected scheduled task.
+5. Create or configure the AlphaInsider strategy, then the selected scheduled task.
    - [Activate during setup](references/workflow-contracts.md#activate-the-schedule).
    - Record identities and outcomes as they occur; reconcile uncertain results
      before retrying resource creation or another external action.

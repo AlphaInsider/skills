@@ -41,7 +41,7 @@
    - Update operational notes in `plan.md` without rewriting decisions to justify
      a repair.
    - Otherwise leave paused, record what the user must resolve, and end recovery.
-5. Dry-run the fix and run meaningful checks without AlphaInsider orders.
+5. Dry-run the fix and run meaningful checks without orders.
    - If checks fail or available execution time runs out, leave a coherent paused
      implementation and save the diagnosis and next action.
 6. After checks pass, reconcile uncertain previous actions before allowing orders.
