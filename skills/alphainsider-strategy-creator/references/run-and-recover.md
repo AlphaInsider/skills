@@ -4,6 +4,8 @@
 
 - Generate the executable workflow and runbook using mechanisms appropriate to
   the scheduler and implementation; verify them before activation.
+  - Load required secrets privately through the recorded storage references and
+    access methods; verify access from a fresh scheduled run.
   - Make dry runs technically unable to submit, change, or cancel orders or
     advance trading state.
   - Distinguish known results from uncertain order outcomes and prevent duplicate
@@ -79,6 +81,7 @@
     - Useful information requiring no user action.
 - Send a short, understandable message identifying the strategy, effect,
   automation state, and next step.
-  - Keep technical diagnostics in project artifacts and secrets in `.env`.
+  - Keep technical diagnostics in project artifacts and secrets in the selected
+    protected storage, with project `.env` as fallback.
 - Record delivery failures honestly in the plan.
   - Never claim an unavailable channel notified the user.

@@ -24,7 +24,8 @@
 
 2. Verify plan/code/state and saved results survive the current chat and remain
    readable/writable from later chats and fresh scheduled runs. Verify scheduled
-   runs can execute with protected credentials and control pause/resume.
+   runs can execute with protected credentials through the recorded storage
+   references and access methods, and control pause/resume.
    Check actual storage and workspace bindings/permissions against official guidance.
    Cloud Projects may use durable writable storage without a permanent local folder 
    or trial schedule.
@@ -43,7 +44,9 @@
 2. Read or initialize root `plan.md` using the [plan template](plan-template.md).
    - Keep high-level strategy, backtest, implementation, self-healing,
      notification, and planning decisions authoritative here.
-   - Store secrets only in project `.env`, excluded from version control and reports.
+   - Use [protected credential storage](credentials.md#prepare-protected-access)
+     for all setup secrets, with project `.env` as fallback. Record only storage
+     references and access methods; exclude secret values from plans and reports.
    - Adapt the outline; it is neither a fixed schema nor a transcript.
 
 - Maintain the resume point as answers, findings, actions, or failures change.
@@ -113,7 +116,8 @@
 ## Prepare the implementation handoff
 
 1. Generate a project runbook with the project location, file access methods,
-   commands, expected outcomes, scheduler controls, and recovery/notification procedures.
+   protected credential access methods, commands, expected outcomes, scheduler
+   controls, and recovery/notification procedures.
    - Support fresh scheduled agents without chat history or this skill.
    - Refer to `plan.md` for decisions instead of duplicating them.
 2. Link the runbook from `plan.md` and the scheduled task.
