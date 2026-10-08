@@ -5,7 +5,7 @@ description: Define, backtest, implement, schedule, resume, and update trading s
 
 # AlphaInsider Strategy Creator
 
-Version: 1.0.8
+Version: 1.0.9
 
 ## Updates
 
