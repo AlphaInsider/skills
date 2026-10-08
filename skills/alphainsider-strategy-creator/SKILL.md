@@ -93,7 +93,8 @@ Version: 1.0.8
      - Before creating a new strategy, check available API parameters. Ask about
        options unresolved by prior answers or strategy context, recommending values
        with reasons; wait for answers.
-       - Recommend a public strategy (`private: false`).
+       - Ask about strategy access: public, private, or paid (cryptocurrency only),
+         subject to account eligibility; confirm the monthly price if paid.
    - Resolve self-healing and notification preferences.
 3. Build the program command and runbook using
    [run and recover](references/run-and-recover.md).
