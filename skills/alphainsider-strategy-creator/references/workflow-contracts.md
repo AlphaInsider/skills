@@ -44,9 +44,10 @@
 2. Read or initialize root `plan.md` using the [plan template](plan-template.md).
    - Keep high-level strategy, backtest, implementation, self-healing,
      notification, and planning decisions authoritative here.
-   - Use [protected credential storage](credentials.md#prepare-protected-access)
-     for all setup secrets, with project `.env` as fallback. Record only storage
-     references and access methods; exclude secret values from plans and reports.
+   - Follow [protected credential storage](credentials.md#prepare-protected-access)
+     for all setup secrets. Reuse each credential's authoritative store without
+     additional project copies. Record only storage references and runtime
+     access methods; exclude secret values from plans and reports.
    - Adapt the outline; it is neither a fixed schema nor a transcript.
 
 - Maintain the resume point as answers, findings, actions, or failures change.

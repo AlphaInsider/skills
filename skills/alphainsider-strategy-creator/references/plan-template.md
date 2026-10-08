@@ -31,8 +31,9 @@
 - AlphaInsider strategy/settings, visibility, and public ID/link.
 - Agreed setup and ongoing authority.
 - Program/dry-run commands, expected outcomes, and runbook/artifact locations.
-- Credential storage references and access methods for future chats and scheduled
-  runs, verification status, and missing access; never secret values.
+- Each credential's authoritative storage reference and runtime access method
+  for future chats and scheduled runs, verification status, and missing access;
+  never secret values.
 - Scheduler/task identity and selection reason, timing, setup verification, and incomplete work.
 - Self-healing decisions and recovery state.
   - Enabled/disabled, relevant user decisions, and what preserving this plan means.
@@ -40,4 +41,4 @@
 - Notification decisions and delivery state.
   - Enabled/disabled, selected events, channels, and safe destination references.
   - Delivery status/limitations; keep private destinations and credentials in
-    the selected protected storage, with project `.env` as fallback.
+    the selected authoritative storage following [credentials](credentials.md).

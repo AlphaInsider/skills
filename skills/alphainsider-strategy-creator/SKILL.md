@@ -84,7 +84,8 @@ Version: 1.0.6
 
 1. Configure and verify AlphaInsider API access and other required secrets through
    [credentials](references/credentials.md).
-   - Prefer secure, persistent storage; use project `.env` as fallback.
+   - Reuse the runtime's supported credential store without additional copies;
+     use protected project `.env` only when no suitable storage/access method exists.
    - Complete any required user-action turn before implementation questions.
 2. Ask relevant implementation questions.
    - Recommend a new AlphaInsider strategy and offer compatible
