@@ -177,9 +177,12 @@ You choose whether to continue, revise, or save and stop after strategy definiti
 and backtesting. Trading decisions can use fixed code, scheduled AI judgment, or both.
 
 Your project keeps the plan, code, backtest results, run history, and operating
-instructions outside the installed skill. Credentials use secure, persistent
-storage, with the project's `.env` as fallback, and are reused in future chats
-and scheduled runs. Keep secrets out of version control and reports.
+instructions outside the installed skill. Credentials use the runtime's supported
+secure entry and persistent storage, and are reused in future chats and scheduled
+runs without extra project copies. The plan records only where each credential
+lives and how the runtime accesses it. Use a protected project `.env` only when
+no suitable supported storage and access method is available. Keep secrets out
+of version control and reports.
 AlphaInsider forward testing requires an account and API key.
 
 > [!IMPORTANT]

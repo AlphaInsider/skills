@@ -2,15 +2,23 @@
 
 ## Prepare protected access
 
-- For every API key or secret needed during setup, find the easiest supported way
-  for the user to paste it in. Prefer secure, persistent storage that future chats
-  and scheduled runs can access. If no suitable storage or easy paste-in method
-  is available, ask the user to add it under the required variable name in the
-  strategy project's `.env`. Reuse saved credentials without requesting them
-  again while access works.
+- Reuse working credentials through the current runtime's supported storage and
+  access mechanism. When a credential is missing or needs replacement, use the
+  easiest supported secure entry method, such as a masked secret card or settings
+  form. A protected input displayed within chat is appropriate when the value
+  stays outside the conversation transcript and model context. Never request the
+  value in an ordinary chat message.
+  - Keep one authoritative storage location for each credential. Prefer secure,
+    persistent storage that future chats and scheduled runs can access.
   - Require root `plan.md`; record storage references and access methods there
     and in the runbook, never secret values. Verify protected access from future
-    chats and scheduled runs.
+    chats and scheduled runs; a saved secret alone does not prove runtime access.
+  - Use supported credential injection or private runtime loading without
+    creating additional persistent copies. Do not copy a working stored
+    credential into `secrets/.env` or each project's `.env`.
+  - Use a protected project `.env` only when no suitable supported credential
+    storage and access method is available. Create fallback files only when that
+    method is selected.
   - Never inspect or print existing API keys, `.env` values, or the process
     environment. Programs may load required values internally without exposure.
   - Use supported entry and storage without echoing values. Keep secrets out of
@@ -36,20 +44,18 @@
 1. Choose the supported entry method and persistent storage for each missing
    secret. Give the user the actual entry method, storage location, required
    variable name, and completion signal.
-   - For `.env` fallback, create missing `.env` and `.env.example` files with
-     empty assignments for the required names. Preserve existing files without
-     reading them; never copy `.env` into `.env.example`.
+   - Only when `.env` fallback is selected, create missing `.env` and
+     `.env.example` files with empty assignments for the required names. Preserve
+     existing files without reading them; never copy `.env` into `.env.example`.
 2. Follow the [user action rule](workflow-contracts.md#resolve-the-current-decisions).
-   For a missing AlphaInsider key, adapt this message to the chosen method:
+   For a missing AlphaInsider key, adapt this message to the chosen secure entry
+   method. Offer project `.env` only when fallback is needed:
 
    ```markdown
    👉 **Action — AlphaInsider API key:** Open the [AlphaInsider developer page](https://alphainsider.com/settings/developers),
    select the **AI Agent** preset permissions button, and create an API key.
    Use <selected entry method> to paste it into <selected persistent storage>.
    Tell me when it is saved.
-
-   ↪️ **Alternative:** Set `ALPHAINSIDER_API_KEY` in `<project>/.env`
-   yourself, then tell me when it is saved.
    ```
 
 3. Wait for completion, then verify saved access before continuing.
@@ -64,6 +70,17 @@
     python <skill>/scripts/alphainsider_setup_request.py --project-root <project> GET /verifyToken
     ```
 
-- Runtime code must load only required secrets privately through the recorded
-  access method, with project `.env` as fallback, and redact diagnostics.
-  - Resolve authentication inside the request process without exposing secrets.
+- Runtime code must use only required credentials through the recorded injection
+  or private loading method, without additional persistent copies, and redact
+  diagnostics.
+  - Resolve authentication through the supported runtime mechanism without
+    exposing secrets.
+
+## Rotate credentials
+
+- For a requested rotation, replace the credential through its authoritative
+  store's supported entry method. Refresh or restart the affected runtime as
+  required, then verify replacement access from the actual runtime, including
+  scheduled runs, before continuing or retiring the previous key.
+  - Keep the plan and runbook limited to storage references, access methods, and
+    verification status; do not synchronize credential copies.
