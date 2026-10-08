@@ -9,6 +9,7 @@ if __name__ != "__main__":
 import argparse
 import json
 import math
+import os
 import sys
 import urllib.error
 import urllib.parse
@@ -508,7 +509,8 @@ def _main(argv: list[str] | None = None) -> int:
 
     try:
         api_key = _validated_api_key(
-            _configured_value("ALPHAINSIDER_API_KEY", project_root)
+            os.environ.get("ALPHAINSIDER_API_KEY")
+            or _configured_value("ALPHAINSIDER_API_KEY", project_root)
         )
         prepared, prepared_body, secrets = _build_request(
             args.method,

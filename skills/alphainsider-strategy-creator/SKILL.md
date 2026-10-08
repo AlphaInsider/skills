@@ -82,8 +82,9 @@ Version: 1.0.5
 
 ## Implement
 
-1. Obtain and verify AlphaInsider API access through [credentials](references/credentials.md).
-   - Accept deliberate chat entry or direct project `.env` editing.
+1. Configure and verify AlphaInsider API access and other required secrets through
+   [credentials](references/credentials.md).
+   - Prefer secure, persistent storage; use project `.env` as fallback.
    - Complete any required user-action turn before implementation questions.
 2. Ask relevant implementation questions.
    - Recommend a new AlphaInsider strategy and offer compatible
