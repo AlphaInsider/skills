@@ -54,6 +54,8 @@ Version: 1.0.9
        and report the missing source.
      - Verify intended actions' limits and side effects; do not invent rules or
        copy endpoint catalogs.
+     - Apply AlphaInsider's [margin and liquidation](https://api.alphainsider.com/resources/trading.md#margin-and-liquidation)
+       limits when designing and backtesting leveraged or short strategies.
 2. [Ask high-level questions](references/workflow-contracts.md#resolve-the-current-decisions)
    until behavior is clear enough to test and implement.
    - Choose which details require user answers.
