@@ -27,15 +27,11 @@
   - Restrict access to fallback `.env` files and exclude them from version
     control and exports.
   - Public strategy IDs may be shown and recorded in `plan.md`.
-- Resolve bundled CLI helpers from the installed skill directory.
-  - [alphainsider_setup_request.py](../scripts/alphainsider_setup_request.py):
-    privately injected `ALPHAINSIDER_API_KEY` with project `.env` fallback,
-    redacted setup requests, and an allowlist excluding orders.
 
 ## Check existing access
 
-- After implementation is chosen, verify access through the setup helper without
-  opening `.env`.
+- After implementation is chosen, [verify access](#verify-access-and-continue)
+  without opening `.env`.
   - If access works, continue without requesting the key again.
   - For other services, verify access privately through their configured runtime.
 
@@ -62,13 +58,27 @@
 
 ## Verify access and continue
 
-- Verify saved access with the setup helper before implementation questions.
-  - Report only safe results.
-  - Agent-only command shape:
+- Call the API directly with curl or any HTTP client at `https://alphainsider.com/api`.
+  Send the raw `ALPHAINSIDER_API_KEY` in the `Authorization` header, with no
+  `Bearer` prefix. Follow the hosted [API skill](https://api.alphainsider.com/skill.md)
+  and [authentication guide](https://api.alphainsider.com/resources/introduction.md#authentication-and-requests).
+- Verify saved access with `GET /verifyToken`, which shows the key's scopes,
+  before implementation questions. Report only safe results.
+  - Load the key from the runtime's injected environment without printing it or
+    putting it in arguments, for example:
 
     ```bash
-    python <skill>/scripts/alphainsider_setup_request.py --project-root <project> GET /verifyToken
+    printf 'Authorization: %s\n' "$ALPHAINSIDER_API_KEY" |
+      curl -sS -H @- https://alphainsider.com/api/verifyToken
     ```
+
+  - With `.env` fallback, load it in a subshell:
+    `(set -a; . <project>/.env; set +a; <command>)`.
+- Gotchas:
+  - Plural reads such as `/getStrategyValues` and `/getStrategyTimelines` take
+    `strategy_id[]`; a plain `strategy_id` returns 400.
+  - Absence from `/getOrders` does not prove a fill.
+  - Read endpoint pages for required fields before `/newStrategy` or `/updateStrategy`.
 
 - Runtime code must use only required credentials through the recorded injection
   or private loading method, without additional persistent copies, and redact

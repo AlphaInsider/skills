@@ -90,14 +90,13 @@ for web-client instructions.
 
 If a release has no skill ZIPs, or you need an unreleased branch, download the
 repository's source ZIP, extract it, and open `skills/`. Compress the individual
-skill folder with its `SKILL.md`, references, and scripts:
+skill folder with its `SKILL.md` and references:
 
 ```text
 alphainsider-strategy-creator.zip
 └── alphainsider-strategy-creator/
     ├── SKILL.md
-    ├── references/
-    └── scripts/
+    └── references/
 ```
 
 Keep `.env`, API keys, and generated projects out of the archive. Upload one skill
