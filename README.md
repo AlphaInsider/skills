@@ -164,8 +164,7 @@ task. Strategy Creator takes you through a longer workflow:
 4. **Implement and schedule.** The assistant builds the program and operating
    instructions. It verifies API access and helps you select a new or compatible
    existing AlphaInsider strategy.
-   You choose the schedule, notifications, optional timeline posts after trades,
-   and whether to enable automatic recovery.
+   You choose the schedule, notifications, and whether to enable automatic recovery.
    Agreed setup activates the schedule for its next run unless you have paused it
    or setup is blocked.
 5. **Run and maintain.** Each scheduled run follows the saved plan, executes the

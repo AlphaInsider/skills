@@ -28,9 +28,7 @@
      implementation failure.
    - On error, follow recovery below.
 5. Record the outcome and apply selected notification settings.
-6. If [timeline posts](timeline-posts.md) are enabled and the run placed orders,
-   post the update; record any posting failure without affecting trading or recovery.
-7. Release exclusivity after evaluation and any recovery finish.
+6. Release exclusivity after evaluation and any recovery finish.
 
 ## Recover from an error
 
