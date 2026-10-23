@@ -5,7 +5,7 @@ description: All-in-one access to AlphaInsider skills for API work, strategy cre
 
 # AlphaInsider
 
-Version: 1.0.10
+Version: 1.1.0
 
 ## Updates
 
