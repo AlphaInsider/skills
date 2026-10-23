@@ -42,3 +42,6 @@
   - Enabled/disabled, selected events, channels, and safe destination references.
   - Delivery status/limitations; keep private destinations and credentials in
     the selected authoritative storage following [credentials](credentials.md).
+- Timeline post decisions and state.
+  - Enabled/disabled, style changes, and the latest post result or failure; see
+    [timeline posts](timeline-posts.md).

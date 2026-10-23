@@ -31,6 +31,9 @@
   - [alphainsider_setup_request.py](../scripts/alphainsider_setup_request.py):
     privately injected `ALPHAINSIDER_API_KEY` with project `.env` fallback,
     redacted setup requests, and an allowlist excluding orders.
+  - [alphainsider_strategy_post.py](../scripts/alphainsider_strategy_post.py):
+    opt-in [timeline posts](timeline-posts.md) with the same private key loading,
+    read-only run facts, offline draft checks, and at most one post per run.
 
 ## Check existing access
 

@@ -98,6 +98,8 @@ Version: 1.0.10
        - Ask about strategy access: public, private, or paid (cryptocurrency only),
          subject to account eligibility; confirm the monthly price if paid.
    - Resolve self-healing and notification preferences.
+   - Ask whether to post [timeline updates](references/timeline-posts.md) after
+     runs that place orders; default off, recommending based on the user's goals.
 3. Build the program command and runbook using
    [run and recover](references/run-and-recover.md).
    - Do not prefer `/getStockPriceHistory` as a data source; it may have gaps.
@@ -119,3 +121,5 @@ Version: 1.0.10
 - Follow current `plan.md` and the generated runbook for scheduled or manual runs.
   - The [runtime workflow](references/run-and-recover.md) covers execution,
     evaluation, recovery, and notifications.
+  - When enabled, [timeline posts](references/timeline-posts.md) follow runs
+    that placed orders.
