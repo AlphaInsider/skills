@@ -98,6 +98,7 @@ Version: 1.0.10
        - Ask about strategy access: public, private, or paid (cryptocurrency only),
          subject to account eligibility; confirm the monthly price if paid.
    - Resolve self-healing and notification preferences.
+   - Ask whether to post [timeline updates](references/timeline-posts.md); default off.
 3. Build the program command and runbook using
    [run and recover](references/run-and-recover.md).
    - Do not prefer `/getStockPriceHistory` as a data source; it may have gaps.
