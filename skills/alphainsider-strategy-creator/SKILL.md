@@ -95,7 +95,7 @@ Version: 1.1.0
      - Before creating a new strategy, check available API parameters. Ask about
        options unresolved by prior answers or strategy context, recommending values
        with reasons; wait for answers.
-       - Ask about strategy access: public, private, or paid (cryptocurrency only),
+       - Ask about strategy access: public, private, or paid,
          subject to account eligibility; confirm the monthly price if paid.
    - Resolve self-healing and notification preferences.
    - Ask whether to post [timeline updates](references/timeline-posts.md); default off.
