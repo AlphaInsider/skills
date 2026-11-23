@@ -10,7 +10,8 @@ Version: 1.1.0
 ## Updates
 
 1. On first interactive use per conversation, inspect installed versions of this
-   repository's `alphainsider` and `alphainsider-strategy-creator` skills, and read
+   repository's `alphainsider`, `alphainsider-strategy-creator`, and
+   `alphainsider-broker-connector` skills, and read
    all pages of [public GitHub releases](https://api.github.com/repos/AlphaInsider/skills/releases?per_page=100)
    without authentication. Compare numerically with the highest published stable
    `vX.Y.Z`; ignore drafts, prereleases, bare tags, and Latest. For older/unknown

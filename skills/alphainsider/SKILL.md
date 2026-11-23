@@ -1,6 +1,6 @@
 ---
 name: alphainsider
-description: All-in-one access to AlphaInsider skills for API work, strategy creation, backtesting, and automation. Loads the matching specialist on request. Use only when the user runs /alphainsider, says "use the alphainsider skill", "route this with alphainsider", or "which AlphaInsider skill".
+description: All-in-one access to AlphaInsider skills for API work, strategy creation, backtesting, automation, and broker connections. Loads the matching specialist on request. Use only when the user runs /alphainsider, says "use the alphainsider skill", "route this with alphainsider", or "which AlphaInsider skill".
 ---
 
 # AlphaInsider
@@ -10,7 +10,8 @@ Version: 1.1.0
 ## Updates
 
 1. On first interactive use per conversation, inspect installed versions of this
-   repository's `alphainsider` and `alphainsider-strategy-creator` skills, and read
+   repository's `alphainsider`, `alphainsider-strategy-creator`, and
+   `alphainsider-broker-connector` skills, and read
    all pages of [public GitHub releases](https://api.github.com/repos/AlphaInsider/skills/releases?per_page=100)
    without authentication. Compare numerically with the highest published stable
    `vX.Y.Z`; ignore drafts, prereleases, bare tags, and Latest. For older/unknown
@@ -27,9 +28,9 @@ Version: 1.1.0
    suitable manual instructions; continue with available versions.
 
 The all-in-one AlphaInsider skill provides one entry point for API work, strategy
-creation, backtesting, and automation. Load the matching specialist as needed;
-users do not need to install each one separately. Specialists also remain
-available on their own.
+creation, backtesting, automation, and broker connections. Load the matching
+specialist as needed; users do not need to install each one separately.
+Specialists also remain available on their own.
 
 ## Start
 
@@ -51,7 +52,7 @@ and follow its navigation and prerequisite guides. Use this source even if an
 older GitHub API skill is installed. If required guidance cannot be fetched,
 report the missing source and pause dependent API work.
 
-For Strategy Creator:
+For Strategy Creator or Broker Connector:
 
 1. Use the environment's discovery tools to find an installed specialist.
    Follow its `SKILL.md`, references, and scripts.
@@ -62,6 +63,7 @@ For Strategy Creator:
    and scripts. This loads it for the conversation without installing it.
 3. If package access is unavailable, read
    [Strategy Creator](https://raw.githubusercontent.com/AlphaInsider/skills/master/skills/alphainsider-strategy-creator/SKILL.md)
+   or [Broker Connector](https://raw.githubusercontent.com/AlphaInsider/skills/master/skills/alphainsider-broker-connector/SKILL.md)
    directly, then its required references. For a selected release, resolve its
    tag and use that tag in all raw URLs instead of `master`. Do not silently
    substitute another version if retrieval fails. Report any required file
@@ -75,9 +77,9 @@ or skill-file storage. Never install the API skill from the GitHub repository.
 For filesystem installation, if the user does not say global vs this project,
 ask and recommend global. Respect an already selected scope.
 
-For Strategy Creator, download the complete selected release package, including
-references and scripts, preserving its directory layout and Git ref. For the API
-skill, save the hosted file as described in the catalog. After installation, confirm the
+For Strategy Creator or Broker Connector, download the complete selected release
+package, preserving its directory layout and Git ref. For the API skill, save
+the hosted file as described in the catalog. After installation, confirm the
 location, version when available, and whether the agent can discover and load
 the skill. Load it using the source rules above. If installation is unavailable
 or incomplete, report that outcome and provide the catalog's ZIP/upload steps;
