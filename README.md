@@ -139,23 +139,19 @@ With the API skill installed directly:
 Use the alphainsider-api skill to explain how to retrieve my strategy's positions and display their dollar values correctly.
 ```
 
-If you installed Strategy Creator directly:
+With the Strategy Creator skill installed directly:
 
 ```text
 Using the alphainsider-strategy-creator skill, help me define and backtest this paper-trading idea: [describe your idea].
 ```
 
-To connect a broker in chat, use the all-in-one skill or name Broker Connector directly.
+With the Broker Connector skill installed directly:
 
 ```text
-Use the alphainsider skill to connect my [broker] account to the AlphaInsider strategies I subscribe to. Show me a dry run before any live orders.
+Use the alphainsider-broker-connector skill to set up a connection for my [broker] account.
 ```
 
-```text
-Use the alphainsider-broker-connector skill to set up a connection for my [broker] account. Show me which holdings and orders would change.
-```
-
-In Grok Bot, open the [AlphaInsider Broker Connector template](https://x.ai/bot/X9XYUn6dar3vB3B_NKWZb)
+In Grok Bot, open the [AlphaInsider Strategy Creator template](https://x.ai/bot/B0YZtZvucLBawisJIWT9H) or [AlphaInsider Broker Connector template](https://x.ai/bot/X9XYUn6dar3vB3B_NKWZb)
 and select **Add to Grok Bot**. Open your copy and tell it which broker you use.
 The [Grok Bot guide](https://api.alphainsider.com/resources/grok-bot) walks through setup.
 
