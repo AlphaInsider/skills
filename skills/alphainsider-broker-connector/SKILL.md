@@ -5,7 +5,7 @@ description: Connect a user's existing brokerage account to AlphaInsider strateg
 
 # AlphaInsider Broker Connector
 
-Version: 1.1.1
+Version: 1.2.0
 
 ## Updates
 
