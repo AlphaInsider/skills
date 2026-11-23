@@ -31,6 +31,7 @@
 - AlphaInsider strategy/settings, visibility, and public ID/link.
 - Agreed setup and ongoing authority.
 - Program/dry-run commands, expected outcomes, and runbook/artifact locations.
+- Confirmed AlphaInsider `user_id`.
 - Each credential's authoritative storage reference and runtime access method
   for future chats and scheduled runs, verification status, and missing access;
   never secret values.

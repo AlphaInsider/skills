@@ -32,7 +32,8 @@
 
 - After implementation is chosen, [verify access](#verify-access-and-continue)
   without opening `.env`.
-  - If access works, continue without requesting the key again.
+  - If access works and the account is confirmed, continue without requesting
+    the key again.
   - For other services, verify access privately through their configured runtime.
 
 ## Request missing credentials
@@ -64,6 +65,11 @@
   and [authentication guide](https://api.alphainsider.com/resources/introduction.md#authentication-and-requests).
 - Verify saved access with `GET /verifyToken`, which shows the key's scopes,
   before implementation questions. Report only safe results.
+  - Show the returned `user_id` and token `name`, and have the user confirm the
+    account is theirs before continuing. Record the confirmed `user_id` in `plan.md`.
+  - In later chats and scheduled runs, compare the returned `user_id` with the
+    recorded one. If they differ, stop before any AlphaInsider action and ask the
+    user; scheduled runs pause and send the action-required notification.
   - Load the key from the runtime's injected environment without printing it or
     putting it in arguments, for example:
 

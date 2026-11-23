@@ -1,7 +1,7 @@
 # AlphaInsider skill catalog
 
 Routable specialists and their canonical sources. The API skill is hosted by
-Mintlify; Strategy Creator is published from this repository.
+Mintlify; Strategy Creator and Broker Connector are published from this repository.
 
 For requested installation, use the environment's supported skill manager or
 skill-file storage. If unavailable, provide the
@@ -30,5 +30,19 @@ manual packaging when assets are unavailable, and the separately hosted API skil
 - Install only when requested. Keep the complete skill folder, including
   `SKILL.md`, references, and scripts, in the supported skill storage.
 - For conversation-only fallback, read the [raw Strategy Creator skill](https://raw.githubusercontent.com/AlphaInsider/skills/master/skills/alphainsider-strategy-creator/SKILL.md)
+  and its required references. Use the selected release's Git ref for every file;
+  the `master` link applies when no release was selected.
+
+## alphainsider-broker-connector
+
+- When to use: connect the user's existing brokerage account to AlphaInsider
+  strategies and keep it rebalanced across allocations with scheduled agent
+  runs, a persistent connection plan, and optional self-healing.
+- Source: the [latest release](https://github.com/AlphaInsider/skills/releases/latest)
+  and its [Broker Connector ZIP](https://github.com/AlphaInsider/skills/releases/latest/download/alphainsider-broker-connector.zip).
+  Use the selected version's assets instead when the user specifies a release.
+- Install only when requested. Keep the complete skill folder, including
+  `SKILL.md` and references, in the supported skill storage.
+- For conversation-only fallback, read the [raw Broker Connector skill](https://raw.githubusercontent.com/AlphaInsider/skills/master/skills/alphainsider-broker-connector/SKILL.md)
   and its required references. Use the selected release's Git ref for every file;
   the `master` link applies when no release was selected.

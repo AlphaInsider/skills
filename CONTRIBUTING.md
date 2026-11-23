@@ -58,8 +58,9 @@ that exact commit and publishes `Release vX.Y.Z` with generated release
 notes as the latest release. It does not publish to npm or PyPI.
 
 The release job checks out that same version commit and attaches one ZIP for
-every `skills/<name>/SKILL.md`: currently `alphainsider.zip` and
-`alphainsider-strategy-creator.zip`. Each archive contains the complete tracked
+every `skills/<name>/SKILL.md`: currently `alphainsider.zip`,
+`alphainsider-strategy-creator.zip`, and `alphainsider-broker-connector.zip`.
+Each archive contains the complete tracked
 `<name>/` folder with its entrypoint, references, and scripts, ready to upload
 directly to an agent harness. Before the generated changelog, each skill has a ZIP
 download and copyable install and update prompts. ZIP links and the setup guide
