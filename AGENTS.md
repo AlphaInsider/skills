@@ -6,6 +6,7 @@ This repository publishes reusable AlphaInsider agent skills from `skills/`.
 
 - [AlphaInsider all-in-one skill](https://raw.githubusercontent.com/AlphaInsider/skills/master/skills/alphainsider/SKILL.md)
 - [Strategy Creator](https://raw.githubusercontent.com/AlphaInsider/skills/master/skills/alphainsider-strategy-creator/SKILL.md)
+- [Broker Connector](https://raw.githubusercontent.com/AlphaInsider/skills/master/skills/alphainsider-broker-connector/SKILL.md)
 - [AlphaInsider API](https://api.alphainsider.com/skill.md)
 
 For web-loaded files, resolve relative links against each fetched file's URL,
@@ -28,7 +29,8 @@ to a chat is not proof of installation.
 - Keep each public skill self-contained. `alphainsider` is the all-in-one
   entry point that loads published specialists on explicit request; specialists stay self-contained.
   API behavior comes from the hosted `alphainsider-api` skill at
-  `https://api.alphainsider.com/skill.md`, including for Strategy Creator.
+  `https://api.alphainsider.com/skill.md`, including for Strategy Creator and
+  Broker Connector.
   Do not prefer an older installed GitHub copy.
 - Expose public skills only as `skills/<name>/SKILL.md`.
 - Keep public skills and documentation agent-vendor agnostic; do not require

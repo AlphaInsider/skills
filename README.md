@@ -7,7 +7,7 @@
 # AlphaInsider Skills
 
 Give your AI assistant the instructions to work with [AlphaInsider](https://alphainsider.com),
-research trading ideas, and build automated trading strategies.
+research trading ideas, build strategies, and connect a brokerage account to the strategies you follow.
 
 A skill is a reusable set of instructions, references, and optional scripts that
 your assistant follows. These skills work within your assistant's tools and
@@ -20,15 +20,17 @@ revisit in later conversations.
 
 | Skill | What it helps you do |
 | --- | --- |
-| [**AlphaInsider**](skills/alphainsider) (`alphainsider`) | Start with one entry point. It loads the appropriate specialist for API work or strategy creation, backtesting, and automation. |
+| [**AlphaInsider**](skills/alphainsider) (`alphainsider`) | Start with one entry point for API work, strategy creation, backtesting, automation, and broker connections. |
 | [**Strategy Creator**](skills/alphainsider-strategy-creator) (`alphainsider-strategy-creator`) | Turn an idea into a defined strategy, evaluate it with backtests, and implement and schedule it for AlphaInsider forward testing using simulated funds. Resume or update the project later. |
+| [**Broker Connector**](skills/alphainsider-broker-connector) (`alphainsider-broker-connector`) | Connect your existing brokerage account to AlphaInsider strategies. Your assistant researches the broker, sets up access, and keeps the account rebalanced across your allocations on a schedule. |
 | [**AlphaInsider API**](https://api.alphainsider.com/skill.md) (`alphainsider-api`) | Work with the REST and WebSocket APIs, including authentication, market data, strategies, orders, positions, and bots. Follow current documentation for requests and trading calculations. |
 
 **Start with `alphainsider` if you want access to everything.** It loads specialists
 as needed without requiring separate installation. You can also install a
-specialist directly. Strategy Creator reads the hosted API skill when needed.
+specialist directly. Strategy Creator and Broker Connector read the hosted API skill
+when needed.
 
-This repository publishes AlphaInsider and Strategy Creator. The API skill is
+This repository publishes AlphaInsider, Strategy Creator, and Broker Connector. The API skill is
 [hosted separately](https://api.alphainsider.com/skill.md) and maintained with the
 API documentation.
 
@@ -58,6 +60,12 @@ Install the latest alphainsider skill from https://github.com/AlphaInsider/skill
 Install the latest alphainsider-strategy-creator skill from https://github.com/AlphaInsider/skills for use in future conversations. Confirm where it was installed and whether it is ready to use.
 ```
 
+**Broker Connector:**
+
+```text
+Install the latest alphainsider-broker-connector skill from https://github.com/AlphaInsider/skills for use in future conversations. Confirm where it was installed and whether it is ready to use.
+```
+
 **AlphaInsider API:**
 
 ```text
@@ -72,9 +80,10 @@ Install the latest alphainsider-api skill from https://api.alphainsider.com/skil
 
 If your assistant supports skill uploads:
 
-1. Download the [AlphaInsider ZIP](https://github.com/AlphaInsider/skills/releases/latest/download/alphainsider.zip)
-   or [Strategy Creator ZIP](https://github.com/AlphaInsider/skills/releases/latest/download/alphainsider-strategy-creator.zip).
-   Install both if you want to invoke either directly.
+1. Download the [AlphaInsider ZIP](https://github.com/AlphaInsider/skills/releases/latest/download/alphainsider.zip),
+   [Strategy Creator ZIP](https://github.com/AlphaInsider/skills/releases/latest/download/alphainsider-strategy-creator.zip),
+   or [Broker Connector ZIP](https://github.com/AlphaInsider/skills/releases/latest/download/alphainsider-broker-connector.zip).
+   Install each one you want to invoke directly.
 2. Upload each ZIP through your application's skill manager, then finish
    installation and enable it. Use the downloaded file as is.
 3. Start a new conversation and ask the assistant to confirm it can load the
@@ -136,6 +145,20 @@ If you installed Strategy Creator directly:
 Using the alphainsider-strategy-creator skill, help me define and backtest this paper-trading idea: [describe your idea].
 ```
 
+To connect a broker in chat, use the all-in-one skill or name Broker Connector directly.
+
+```text
+Use the alphainsider skill to connect my [broker] account to the AlphaInsider strategies I subscribe to. Show me a dry run before any live orders.
+```
+
+```text
+Use the alphainsider-broker-connector skill to set up a connection for my [broker] account. Show me which holdings and orders would change.
+```
+
+In Grok Bot, open the [AlphaInsider Broker Connector template](https://x.ai/bot/X9XYUn6dar3vB3B_NKWZb)
+and select **Add to Grok Bot**. Open your copy and tell it which broker you use.
+The [Grok Bot guide](https://api.alphainsider.com/resources/grok-bot) walks through setup.
+
 You can ask to revise an idea, run another backtest, pause automation, or change
 an existing strategy. To resume later, give the assistant your project location
 and ask it to continue from `plan.md`.
@@ -143,8 +166,8 @@ and ask it to continue from `plan.md`.
 ## How it works
 
 The all-in-one skill matches your request to a specialist and asks you to choose
-if the request fits more than one. For Strategy Creator, it uses an installed
-copy or loads the published files for the conversation. For API work, it reads
+if the request fits more than one. For Strategy Creator or Broker Connector, it
+uses an installed copy or loads the published files for the conversation. For API work, it reads
 the live hosted skill. Routing does not install additional skills.
 
 The API skill guides the assistant through the current documentation for your
@@ -190,6 +213,31 @@ AlphaInsider forward testing requires an account and API key.
 > or you request an external scheduler. Local execution requires the host and
 > necessary application to remain running.
 
+Broker Connector follows a similar setup interview for one brokerage account:
+
+1. **Check the environment.** The same access check, plus a local SQLite file
+   (`connection.db`) that must persist between scheduled runs.
+2. **Research the broker.** The assistant finds the broker's access options,
+   account rules, instruments, order handling, and costs. You choose how it
+   connects, and credentials go to secure storage. It then lists the accounts it
+   can reach (main, sub-accounts, and paper) and you pick one; a sub-account is
+   recommended.
+3. **Choose allocations.** Pick stock or crypto strategies with active subscriptions,
+   including paid stock strategies, that match the account's asset type. Choose
+   percentages or dollar amounts. The connection manages the whole account: weights follow
+   each strategy's performance, deposits and withdrawals spread across
+   allocations (right away if you choose, otherwise at the next rebalance), and
+   holdings outside the targets are closed.
+4. **Review the dry run.** The assistant shows the orders it would send to the broker,
+   including holdings it would close. You decide whether to go live and whether to
+   allow an optional test trade.
+5. **Run and maintain.** Each scheduled run checks your strategies for new trades
+   and rebalances when they trade. Settings live in `plan.md`; `connection.md`
+   shows status. Automatic recovery and notifications work as in Strategy Creator.
+
+To resume later, give the assistant your project location and ask it to continue
+from `plan.md`.
+
 ## Update installed skills
 
 Ask your assistant to update the installed copy while preserving its scope:
@@ -203,11 +251,15 @@ Update my installed alphainsider-strategy-creator skill to the latest version fr
 ```
 
 ```text
+Update my installed alphainsider-broker-connector skill to the latest version from https://github.com/AlphaInsider/skills. Preserve its current installation scope and report what changed.
+```
+
+```text
 Update my installed alphainsider-api skill from https://api.alphainsider.com/skill.md. Preserve its current installation scope and report what changed.
 ```
 
 For uploaded skills, download a fresh ZIP and replace the installed copy through
 your application's update or import flow. Enable it and start a fresh conversation.
-Uploaded copies do not update automatically from GitHub. AlphaInsider and Strategy
-Creator also check for newer stable releases on first interactive use and offer
+Uploaded copies do not update automatically from GitHub. AlphaInsider, Strategy
+Creator, and Broker Connector also check for newer stable releases on first interactive use and offer
 to update existing installations; unattended runs skip that check.
